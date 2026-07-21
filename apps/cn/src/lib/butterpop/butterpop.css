@@ -6,17 +6,17 @@
   --butterpop-border-radius: 8px;
   --butterpop-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   --butterpop-z-index: 9999;
-  
+
   /* Default theme colors */
   --butterpop-bg-default: #ffffff;
   --butterpop-text-default: #333333;
-  
+
   /* Type colors */
   --butterpop-success-color: #4caf50;
   --butterpop-error-color: #f44336;
   --butterpop-warning-color: #ff9800;
   --butterpop-info-color: #2196f3;
-  
+
   /* Animation durations */
   --butterpop-anim-duration: 0.3s;
 }
@@ -92,7 +92,7 @@
   overflow: hidden;
   pointer-events: auto;
   transform-origin: center;
-  transition: transform var(--butterpop-anim-duration) ease-out, 
+  transition: transform var(--butterpop-anim-duration) ease-out,
               opacity var(--butterpop-anim-duration) ease-out;
   font-family: var(--butterpop-font);
   cursor: default;
@@ -477,16 +477,16 @@ body.dark-mode .butterpop-toast.theme-neumorphism .butterpop-action-btn,
     padding: 0 16px;
     box-sizing: border-box;
   }
-  
+
   .butterpop-toast {
     width: 100%;
     max-width: 100%;
     padding: 12px 14px;
     margin-bottom: 8px;
   }
-  
-  .butterpop-container.top-left, 
-  .butterpop-container.top-right, 
+
+  .butterpop-container.top-left,
+  .butterpop-container.top-right,
   .butterpop-container.top-center {
     top: 10px;
     right: 0;
@@ -494,9 +494,9 @@ body.dark-mode .butterpop-toast.theme-neumorphism .butterpop-action-btn,
     transform: none;
     align-items: center;
   }
-  
-  .butterpop-container.bottom-left, 
-  .butterpop-container.bottom-right, 
+
+  .butterpop-container.bottom-left,
+  .butterpop-container.bottom-right,
   .butterpop-container.bottom-center {
     bottom: 10px;
     right: 0;
@@ -504,22 +504,22 @@ body.dark-mode .butterpop-toast.theme-neumorphism .butterpop-action-btn,
     transform: none;
     align-items: center;
   }
-  
+
   .butterpop-message {
     font-size: 13px;
   }
-  
+
   .butterpop-icon {
     width: 20px;
     height: 20px;
     margin-right: 10px;
   }
-  
+
   .butterpop-action-btn {
     padding: 3px 8px;
     font-size: 11px;
   }
-  
+
   .butterpop-actions {
     flex-wrap: wrap;
     gap: 6px;
@@ -531,20 +531,20 @@ body.dark-mode .butterpop-toast.theme-neumorphism .butterpop-action-btn,
   .butterpop-container {
     padding: 0 20px;
   }
-  
+
   .butterpop-toast {
     max-width: 350px;
     padding: 14px 16px;
   }
-  
+
   .butterpop-action-btn {
     padding: 4px 10px;
   }
 }
 
 /* Accessibility focus styles */
-.butterpop-toast:focus, 
-.butterpop-close:focus, 
+.butterpop-toast:focus,
+.butterpop-close:focus,
 .butterpop-action-btn:focus {
   outline: 2px solid #2684FF;
   outline-offset: 2px;
@@ -2033,7 +2033,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(176, 224, 255, 0.1) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(176, 224, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
@@ -2516,16 +2516,16 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, 
-    rgba(255, 0, 0, 0.1), 
+  background: linear-gradient(45deg,
+    rgba(255, 0, 0, 0.1),
     rgba(255, 154, 0, 0.1),
-    rgba(208, 222, 33, 0.1), 
+    rgba(208, 222, 33, 0.1),
     rgba(79, 220, 74, 0.1),
-    rgba(63, 218, 216, 0.1), 
+    rgba(63, 218, 216, 0.1),
     rgba(47, 201, 226, 0.1),
-    rgba(28, 127, 238, 0.1), 
+    rgba(28, 127, 238, 0.1),
     rgba(95, 21, 242, 0.1),
-    rgba(186, 12, 248, 0.1), 
+    rgba(186, 12, 248, 0.1),
     rgba(251, 7, 217, 0.1),
     rgba(255, 0, 0, 0.1)
   );
@@ -2603,7 +2603,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 
 .butterpop-toast.theme-holographic .butterpop-progress {
   height: 2px;
-  background: linear-gradient(to right, 
+  background: linear-gradient(to right,
     #ff0000, #ff9a00, #d0de21, #4fdc4a,
     #3fdad8, #2fc9e2, #1c7fee, #5f15f2,
     #ba0cf8, #fb07d9, #ff0000
@@ -2733,7 +2733,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
   left: -50%;
   right: -50%;
   bottom: -50%;
-  background: 
+  background:
     radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.4), transparent 30%),
     radial-gradient(circle at 70% 60%, rgba(14, 165, 233, 0.4), transparent 30%),
     radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.2));
@@ -2776,7 +2776,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 }
 
 .butterpop-toast.theme-aurora.success::before {
-  background: 
+  background:
     radial-gradient(circle at 30% 40%, rgba(16, 185, 129, 0.4), transparent 30%),
     radial-gradient(circle at 70% 60%, rgba(6, 95, 70, 0.4), transparent 30%),
     radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.2));
@@ -2788,7 +2788,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 }
 
 .butterpop-toast.theme-aurora.error::before {
-  background: 
+  background:
     radial-gradient(circle at 30% 40%, rgba(248, 113, 113, 0.4), transparent 30%),
     radial-gradient(circle at 70% 60%, rgba(153, 27, 27, 0.4), transparent 30%),
     radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.2));
@@ -2800,7 +2800,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 }
 
 .butterpop-toast.theme-aurora.warning::before {
-  background: 
+  background:
     radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.4), transparent 30%),
     radial-gradient(circle at 70% 60%, rgba(180, 83, 9, 0.4), transparent 30%),
     radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.2));
@@ -2812,7 +2812,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 }
 
 .butterpop-toast.theme-aurora.info::before {
-  background: 
+  background:
     radial-gradient(circle at 30% 40%, rgba(96, 165, 250, 0.4), transparent 30%),
     radial-gradient(circle at 70% 60%, rgba(30, 64, 175, 0.4), transparent 30%),
     radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.2));
@@ -2867,8 +2867,8 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0), 
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0),
     rgba(255, 255, 255, 0.4),
     rgba(255, 255, 255, 0)
   );
@@ -2878,7 +2878,7 @@ body.dark-mode .butterpop-toast.theme-nordic .butterpop-action-btn:hover,
 @keyframes aurora-shine {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
-} 
+}
 
 /* 32. Corporate Theme */
 .butterpop-toast.theme-corporate {
@@ -3105,8 +3105,8 @@ body.dark-mode .butterpop-toast.theme-zen,
   left: 0;
   right: 0;
   height: 100%;
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.3) 0%, 
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.3) 0%,
     rgba(255, 255, 255, 0) 100%);
   pointer-events: none;
 }
@@ -3177,8 +3177,8 @@ body.dark-mode .butterpop-toast.theme-frost,
 
 body.dark-mode .butterpop-toast.theme-frost::before,
 .dark-theme .butterpop-toast.theme-frost::before {
-  background: linear-gradient(180deg, 
-    rgba(44, 62, 80, 0.3) 0%, 
+  background: linear-gradient(180deg,
+    rgba(44, 62, 80, 0.3) 0%,
     rgba(44, 62, 80, 0) 100%);
 }
 
@@ -3408,14 +3408,14 @@ body.dark-mode .butterpop-toast.theme-frost .butterpop-action-btn,
     padding: 0 16px;
     box-sizing: border-box;
   }
-  
+
   .butterpop-toast {
     width: 100%;
     max-width: 100%;
   }
-  
-  .butterpop-container.top-left, 
-  .butterpop-container.top-right, 
+
+  .butterpop-container.top-left,
+  .butterpop-container.top-right,
   .butterpop-container.top-center {
     top: 10px;
     right: 0;
@@ -3423,9 +3423,9 @@ body.dark-mode .butterpop-toast.theme-frost .butterpop-action-btn,
     transform: none;
     align-items: center;
   }
-  
-  .butterpop-container.bottom-left, 
-  .butterpop-container.bottom-right, 
+
+  .butterpop-container.bottom-left,
+  .butterpop-container.bottom-right,
   .butterpop-container.bottom-center {
     bottom: 10px;
     right: 0;
@@ -3454,8 +3454,8 @@ body.dark-mode .butterpop-toast.theme-frost .butterpop-action-btn,
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, 
-    rgba(255, 0, 128, 0.1), 
+  background: linear-gradient(45deg,
+    rgba(255, 0, 128, 0.1),
     rgba(0, 255, 255, 0.1));
   z-index: 0;
   pointer-events: none;

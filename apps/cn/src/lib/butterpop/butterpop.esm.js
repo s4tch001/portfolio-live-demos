@@ -53,12 +53,12 @@ const DEFAULT_CONFIG = {
 // Merge user config with default config
 const mergeConfig = (userConfig = {}) => {
   const config = { ...DEFAULT_CONFIG };
-  
+
   // Deep merge for nested objects (like animation and accessibility)
   for (const key in userConfig) {
     if (userConfig.hasOwnProperty(key)) {
       if (
-        typeof userConfig[key] === 'object' && 
+        typeof userConfig[key] === 'object' &&
         userConfig[key] !== null &&
         typeof config[key] === 'object' &&
         config[key] !== null
@@ -69,7 +69,7 @@ const mergeConfig = (userConfig = {}) => {
       }
     }
   }
-  
+
   return config;
 };
 
@@ -87,14 +87,14 @@ const createContainer = (position) => {
   if (toastStorage.containers.has(position)) {
     return toastStorage.containers.get(position);
   }
-  
+
   const container = document.createElement('div');
   container.className = `butterpop-container ${position}`;
   container.setAttribute('role', 'region');
   container.setAttribute('aria-label', 'Notifications');
   container.setAttribute('data-max-visible', globalConfig.maxVisible);
   document.body.appendChild(container);
-  
+
   toastStorage.containers.set(position, container);
   return container;
 };
@@ -120,34 +120,34 @@ const generateId = () => {
 
 // Create DOM elements for a toast
 const createToastElement = (options) => {
-  const { 
-    id, 
-    message, 
-    type, 
-    closable, 
-    icon, 
-    progress, 
-    duration, 
+  const {
+    id,
+    message,
+    type,
+    closable,
+    icon,
+    progress,
+    duration,
     actions,
     theme,
     accessibility
   } = options;
-  
+
   // Toast root element
   const toast = document.createElement('div');
   toast.className = `butterpop-toast ${type || ''}`;
   if (theme && theme !== 'default') {
     toast.classList.add(`theme-${theme}`);
-    
+
     // Check for dark mode when using neumorphism theme
     if (theme === 'neumorphism') {
-      const isDarkMode = document.body.classList.contains('dark-mode') || 
+      const isDarkMode = document.body.classList.contains('dark-mode') ||
                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
       if (isDarkMode) {
         toast.classList.add('dark-theme');
       }
     }
-    
+
     // Support for specialized themes like holographic and aurora that have animations
     if (['holographic', 'aurora'].includes(theme)) {
       toast.classList.add('animated-theme');
@@ -159,7 +159,7 @@ const createToastElement = (options) => {
   toast.setAttribute('aria-relevant', accessibility.ariaRelevant);
   toast.setAttribute('tabindex', '0');
   toast.style.setProperty('--duration', `${duration}ms`);
-  
+
   // Icon element
   if (icon !== false) {
     const iconEl = document.createElement('div');
@@ -168,48 +168,48 @@ const createToastElement = (options) => {
     iconEl.setAttribute('aria-hidden', 'true');
     toast.appendChild(iconEl);
   }
-  
+
   // Content wrapper
   const content = document.createElement('div');
   content.className = 'butterpop-content';
-  
+
   // Message
   const messageEl = document.createElement('p');
   messageEl.className = 'butterpop-message';
   messageEl.innerHTML = options.escapeHtml ? escapeHtml(message) : message;
   content.appendChild(messageEl);
-  
+
   // Action buttons
   if (actions && actions.length) {
     const actionsEl = document.createElement('div');
     actionsEl.className = 'butterpop-actions';
-    
+
     actions.forEach((action, index) => {
       const btn = document.createElement('button');
       btn.className = 'butterpop-action-btn';
       btn.textContent = action.text;
       btn.setAttribute('type', 'button');
       btn.setAttribute('aria-label', action.ariaLabel || action.text);
-      
+
       if (action.className) {
         btn.className += ` ${action.className}`;
       }
-      
+
       btn.addEventListener('click', (event) => {
         event.stopPropagation();
         if (typeof action.callback === 'function') {
           action.callback(toast);
         }
       });
-      
+
       actionsEl.appendChild(btn);
     });
-    
+
     content.appendChild(actionsEl);
   }
-  
+
   toast.appendChild(content);
-  
+
   // Close button
   if (closable) {
     const closeBtn = document.createElement('button');
@@ -223,7 +223,7 @@ const createToastElement = (options) => {
     });
     toast.appendChild(closeBtn);
   }
-  
+
   // Progress bar
   if (progress && duration && duration > 0) {
     const progressBar = document.createElement('div');
@@ -233,14 +233,14 @@ const createToastElement = (options) => {
       progressBar.style.background = options.progressColor;
     }
     toast.appendChild(progressBar);
-    
+
     // Start progress animation after a short delay to ensure DOM is updated
     setTimeout(() => {
       progressBar.style.transition = `transform ${duration}ms linear`;
       progressBar.style.transform = 'scaleX(1)';
     }, 10);
   }
-  
+
   return toast;
 };
 
@@ -248,33 +248,33 @@ const createToastElement = (options) => {
 const addToastToDOM = (toast, container) => {
   // Add show class for animation
   toast.classList.add(globalConfig.showClass);
-  
+
   // First child for bottom positions (to maintain order)
-  if (container.classList.contains('bottom-left') || 
+  if (container.classList.contains('bottom-left') ||
       container.classList.contains('bottom-right') ||
       container.classList.contains('bottom-center')) {
     container.insertBefore(toast, container.firstChild);
   } else {
     container.appendChild(toast);
   }
-  
+
   // Trigger reflow for animation
   toast.offsetHeight;
-  
+
   // Remove show class to start animation
   setTimeout(() => {
     toast.classList.remove(globalConfig.showClass);
   }, 10);
-  
+
   // Handle max visible toasts limit
   const maxVisible = parseInt(container.getAttribute('data-max-visible'), 10) || globalConfig.maxVisible;
   const visibleToasts = container.querySelectorAll('.butterpop-toast:not(.butterpop-exit)');
-  
+
   if (visibleToasts.length > maxVisible) {
     // Find oldest toast and remove it
     const oldestToasts = Array.from(visibleToasts)
       .slice(0, visibleToasts.length - maxVisible);
-    
+
     oldestToasts.forEach(oldToast => {
       removeToast(oldToast.id);
     });
@@ -285,36 +285,36 @@ const addToastToDOM = (toast, container) => {
 let removeToast = (id) => {
   const toastData = toastStorage.activeToasts.get(id);
   if (!toastData) return false;
-  
+
   const { element, timeoutId } = toastData;
   if (!element) return false;
-  
+
   // Clear any existing timeout
   if (timeoutId) {
     clearTimeout(timeoutId);
   }
-  
+
   // Add exit class for animation
   element.classList.add(globalConfig.hideClass);
-  
+
   // Call onClose callback if provided
   if (toastData.options && typeof toastData.options.onClose === 'function') {
     toastData.options.onClose(element);
   }
-  
+
   // Remove from DOM after animation
   setTimeout(() => {
     if (element.parentNode) {
       element.parentNode.removeChild(element);
     }
-    
+
     // Remove from storage
     toastStorage.activeToasts.delete(id);
-    
+
     // Process queue if any
     processQueue(toastData.options.position);
   }, globalConfig.animation.duration);
-  
+
   return true;
 };
 
@@ -322,27 +322,27 @@ let removeToast = (id) => {
 const processQueue = (position) => {
   // If no position-specific queue, exit
   if (!toastStorage.queuedToasts.has(position)) return;
-  
+
   const queue = toastStorage.queuedToasts.get(position);
   if (!queue.length) return;
-  
+
   // Get container
   const container = toastStorage.containers.get(position);
   if (!container) return;
-  
+
   // Count visible toasts
   const visibleCount = container.querySelectorAll('.butterpop-toast:not(.butterpop-exit)').length;
   const maxVisible = parseInt(container.getAttribute('data-max-visible'), 10) || globalConfig.maxVisible;
-  
+
   // If we have room for more, show from queue
   if (visibleCount < maxVisible) {
     // Get the first toast from queue
     const nextToast = queue.shift();
     if (!nextToast) return;
-    
+
     // Show it
     showToast(nextToast.options);
-    
+
     // If queue is now empty, remove the queue
     if (queue.length === 0) {
       toastStorage.queuedToasts.delete(position);
@@ -355,8 +355,8 @@ const hasDuplicate = (message, type, position) => {
   for (const [id, data] of toastStorage.activeToasts.entries()) {
     const options = data.options;
     if (
-      options.message === message && 
-      options.type === type && 
+      options.message === message &&
+      options.type === type &&
       options.position === position
     ) {
       return true;
@@ -370,7 +370,7 @@ const setupPauseListeners = (toast, options) => {
   if (!options.pauseOnHover && !options.pauseOnFocusLoss) {
     return;
   }
-  
+
   const progressBar = toast.querySelector('.butterpop-progress');
   let timeLeft = options.duration;
   let isPaused = false;
@@ -382,7 +382,7 @@ const setupPauseListeners = (toast, options) => {
     if (isPaused) return;
     isPaused = true;
     pauseStartTime = Date.now();
-    
+
     // Clear the auto-close timeout
     if (toastStorage.activeToasts.has(toast.id)) {
       const timeoutId = toastStorage.activeToasts.get(toast.id).timeoutId;
@@ -391,30 +391,30 @@ const setupPauseListeners = (toast, options) => {
         toastStorage.activeToasts.get(toast.id).timeoutId = null;
       }
     }
-    
+
     // Pause the progress bar
     if (progressBar) {
       // Calculate time left more accurately
       const elapsedTime = pauseStartTime - startTime;
       timeLeft = Math.max(0, options.duration - elapsedTime);
-      
+
       // Calculate the current scale directly from elapsed time
       const progress = elapsedTime / options.duration;
       pausedScale = progress > 1 ? 1 : progress;
-      
+
       // Stop any running transition and freeze at current position
       progressBar.style.transition = 'none';
       progressBar.style.transform = `scaleX(${pausedScale})`;
     }
   };
-  
+
   const resume = () => {
     if (!isPaused) return;
     isPaused = false;
-    
+
     // Reset the start time to now
     startTime = Date.now() - (options.duration - timeLeft);
-    
+
     // Resume the auto-close timeout
     if (toastStorage.activeToasts.has(toast.id) && timeLeft > 0) {
       const newTimeoutId = setTimeout(() => {
@@ -422,7 +422,7 @@ const setupPauseListeners = (toast, options) => {
       }, timeLeft);
       toastStorage.activeToasts.get(toast.id).timeoutId = newTimeoutId;
     }
-    
+
     // Resume the progress bar animation from current position
     if (progressBar && timeLeft > 0) {
       // Apply smooth transition for remaining time
@@ -432,20 +432,20 @@ const setupPauseListeners = (toast, options) => {
       }, 10);
     }
   };
-  
+
   // Track starting time
   startTime = Date.now();
-  
+
   // Pause on hover
   if (options.pauseOnHover) {
     toast.addEventListener('mouseenter', pause);
     toast.addEventListener('mouseleave', resume);
-    
+
     // Also handle touch events for mobile
     toast.addEventListener('touchstart', pause, { passive: true });
     toast.addEventListener('touchend', resume, { passive: true });
   }
-  
+
   // Pause on focus loss
   if (options.pauseOnFocusLoss) {
     const visibilityChangeHandler = () => {
@@ -455,9 +455,9 @@ const setupPauseListeners = (toast, options) => {
         resume();
       }
     };
-    
+
     document.addEventListener('visibilitychange', visibilityChangeHandler);
-    
+
     // Remove event listener when toast is removed
     const originalRemove = removeToast;
     removeToast = function(id) {
@@ -475,37 +475,37 @@ const setupPauseListeners = (toast, options) => {
 const showToast = (userOptions) => {
   // Merge with global config
   const options = mergeConfig({ ...globalConfig, ...userOptions });
-  
+
   // Check for duplicates if prevention is enabled
   if (options.preventDuplicates && hasDuplicate(options.message, options.type, options.position)) {
     return null;
   }
-  
+
   // Get/create container
   const container = createContainer(options.position);
-  
+
   // Count visible toasts
   const visibleCount = container.querySelectorAll('.butterpop-toast:not(.butterpop-exit)').length;
   const maxVisible = parseInt(container.getAttribute('data-max-visible'), 10) || globalConfig.maxVisible;
-  
+
   // Check if we need to queue this toast
   if (visibleCount >= maxVisible) {
     // Add to queue
     if (!toastStorage.queuedToasts.has(options.position)) {
       toastStorage.queuedToasts.set(options.position, []);
     }
-    
+
     toastStorage.queuedToasts.get(options.position).push({ options });
     return null;
   }
-  
+
   // Generate ID
   const id = generateId();
   options.id = id;
-  
+
   // Create toast element
   const toastElement = createToastElement(options);
-  
+
   // Set up auto-close timeout if duration is provided
   let timeoutId = null;
   if (options.duration && options.duration > 0) {
@@ -513,33 +513,33 @@ const showToast = (userOptions) => {
       removeToast(id);
     }, options.duration);
   }
-  
+
   // Store in active toasts
   toastStorage.activeToasts.set(id, {
     element: toastElement,
     timeoutId,
     options
   });
-  
+
   // Add to DOM
   addToastToDOM(toastElement, container);
-  
+
   // Set up pause/resume listeners
   setupPauseListeners(toastElement, options);
-  
+
   // Click event
   if (options.onClick || options.closeOnClick) {
     toastElement.addEventListener('click', () => {
       if (typeof options.onClick === 'function') {
         options.onClick(toastElement);
       }
-      
+
       if (options.closeOnClick) {
         removeToast(id);
       }
     });
   }
-  
+
   // Return the toast ID so it can be referenced later
   return id;
 };
@@ -547,10 +547,10 @@ const showToast = (userOptions) => {
 // Injects CSS if autoInject is true
 const injectCSS = () => {
   if (!globalConfig.autoInject) return;
-  
+
   // Check if CSS already exists
   if (elementExists('style[data-butterpop-css]')) return;
-  
+
   // Try to load the CSS file
   const link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -559,11 +559,11 @@ const injectCSS = () => {
   link.href = '/vendor/butterpop/butterpop.min.css';
   link.setAttribute('data-butterpop-css', 'true');
   document.head.appendChild(link);
-  
+
   // Fallback: if CSS can't be loaded, add basic inline styles
   link.onerror = () => {
     if (elementExists('style[data-butterpop-css]')) return;
-    
+
     const style = document.createElement('style');
     style.setAttribute('data-butterpop-css', 'true');
     style.textContent = `
@@ -594,14 +594,14 @@ const init = () => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return;
   }
-  
+
   // Inject CSS when DOM is ready
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', injectCSS);
   } else {
     injectCSS();
   }
-  
+
   // Handle escape key for closing all toasts
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -615,15 +615,15 @@ const init = () => {
 const clearAll = () => {
   // Get all active toast IDs
   const toastIds = Array.from(toastStorage.activeToasts.keys());
-  
+
   // Remove each toast
   toastIds.forEach(id => {
     removeToast(id);
   });
-  
+
   // Clear queues
   toastStorage.queuedToasts.clear();
-  
+
   return toastIds.length;
 };
 
@@ -631,21 +631,21 @@ const clearAll = () => {
 const clearToastsByPosition = (position) => {
   // Get all active toast IDs for this position
   const toastIds = [];
-  
+
   for (const [id, data] of toastStorage.activeToasts.entries()) {
     if (data.options.position === position) {
       toastIds.push(id);
     }
   }
-  
+
   // Remove each toast
   toastIds.forEach(id => {
     removeToast(id);
   });
-  
+
   // Clear queue for this position
   toastStorage.queuedToasts.delete(position);
-  
+
   return toastIds.length;
 };
 
@@ -657,34 +657,34 @@ const configure = (userConfig) => {
 
 // Helper functions for common toast types
 const success = (message, options = {}) => {
-  return showToast({ 
-    message, 
-    type: 'success', 
-    ...options 
+  return showToast({
+    message,
+    type: 'success',
+    ...options
   });
 };
 
 const error = (message, options = {}) => {
-  return showToast({ 
-    message, 
-    type: 'error', 
-    ...options 
+  return showToast({
+    message,
+    type: 'error',
+    ...options
   });
 };
 
 const warning = (message, options = {}) => {
-  return showToast({ 
-    message, 
-    type: 'warning', 
-    ...options 
+  return showToast({
+    message,
+    type: 'warning',
+    ...options
   });
 };
 
 const info = (message, options = {}) => {
-  return showToast({ 
-    message, 
-    type: 'info', 
-    ...options 
+  return showToast({
+    message,
+    type: 'info',
+    ...options
   });
 };
 
@@ -698,10 +698,10 @@ const update = (id, options = {}) => {
   if (!toastStorage.activeToasts.has(id)) {
     return false;
   }
-  
+
   const toastData = toastStorage.activeToasts.get(id);
   const element = toastData.element;
-  
+
   // Update message if provided
   if (options.message !== undefined) {
     const messageEl = element.querySelector('.butterpop-message');
@@ -709,52 +709,52 @@ const update = (id, options = {}) => {
       messageEl.innerHTML = options.escapeHtml !== false ? escapeHtml(options.message) : options.message;
     }
   }
-  
+
   // Update type if provided
   if (options.type && options.type !== toastData.options.type) {
     // Remove old type class
     element.classList.remove(toastData.options.type);
-    
+
     // Add new type class
     element.classList.add(options.type);
-    
+
     // Update icon if it exists
     const iconEl = element.querySelector('.butterpop-icon');
     if (iconEl && options.icon !== false) {
       iconEl.innerHTML = options.icon || ICONS[options.type] || '';
     }
   }
-  
+
   // Update theme if provided
   if (options.theme && options.theme !== toastData.options.theme) {
     // Remove old theme class
     if (toastData.options.theme && toastData.options.theme !== 'default') {
       element.classList.remove(`theme-${toastData.options.theme}`);
     }
-    
+
     // Add new theme class
     if (options.theme !== 'default') {
       element.classList.add(`theme-${options.theme}`);
     }
   }
-  
+
   // Update duration/timeout if provided
   if (options.duration !== undefined) {
     // Clear existing timeout
     if (toastData.timeoutId) {
       clearTimeout(toastData.timeoutId);
     }
-    
+
     // Set new timeout if duration is valid
     if (options.duration && options.duration > 0) {
       const timeoutId = setTimeout(() => {
         removeToast(id);
       }, options.duration);
-      
+
       toastData.timeoutId = timeoutId;
     }
   }
-  
+
   // Update progress bar if it exists
   if (element.querySelector('.butterpop-progress') && options.duration) {
     const progressBar = element.querySelector('.butterpop-progress');
@@ -772,17 +772,17 @@ const update = (id, options = {}) => {
       progressBar.style.transform = 'scaleX(1)';
     }, 10);
   }
-  
+
   // Update stored options
   toastData.options = { ...toastData.options, ...options };
-  
+
   return true;
 };
 
 // Get info about currently active toasts
 const getToasts = () => {
   const result = [];
-  
+
   for (const [id, data] of toastStorage.activeToasts.entries()) {
     result.push({
       id,
@@ -793,22 +793,22 @@ const getToasts = () => {
       duration: data.options.duration
     });
   }
-  
+
   return result;
 };
 
 // Get info about queued toasts
 const getQueue = (position) => {
   if (position) {
-    return toastStorage.queuedToasts.has(position) ? 
+    return toastStorage.queuedToasts.has(position) ?
       toastStorage.queuedToasts.get(position).length : 0;
   }
-  
+
   let total = 0;
   for (const queue of toastStorage.queuedToasts.values()) {
     total += queue.length;
   }
-  
+
   return total;
 };
 
@@ -830,4 +830,4 @@ export const ButterPop = {
   configure,
   getToasts,
   getQueue
-}; 
+};
