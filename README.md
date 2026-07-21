@@ -2,7 +2,7 @@
 
 This workspace will contain isolated, resettable demo editions of five portfolio projects. It is intentionally separate from every original project repository.
 
-Current state: Phase 2, Sub-phase 2.1 - the shared demo platform contract, reusable preview notice, and reset architecture are defined. No application source, production data, remote database migration, or secret-bearing environment file has been imported.
+Current state: Phase 2, Sub-phase 2.2 - the private Supabase reset-control schema and authenticated Edge coordinator are implemented locally. No application source, production data, remote database migration/function, or secret-bearing environment file has been imported or deployed.
 
 The source-copy rules are defined in config/source-import-policy.json. Run npm run check before and after every future import or migration.
 

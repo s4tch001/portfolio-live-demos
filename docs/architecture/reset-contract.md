@@ -1,6 +1,6 @@
 # Daily reset contract
 
-Status: Architecture contract only in Phase 2.1. No database schema, cron job, Edge Function, or remote migration is created here.
+Status: The private control schema and Edge coordinator are implemented locally in Phase 2.2. They are not deployed remotely, no Cron job exists yet, and all five app handlers remain disabled until their later schema phases.
 
 ## Schedule and logical day
 
@@ -32,7 +32,7 @@ Allowed durable states are `pending`, `running`, `db_cleared`, `storage_pending`
 2. Claim the app/day run only if it is due, retryable, or has an expired lease.
 3. Execute one security-definer reset function owned by a non-login privileged role. Within one database transaction it removes visitor-created rows, restores fictional seed data, and upserts protected defaults without duplicating them.
 4. Commit the database stage and persist `db_cleared`.
-5. List only the app's disposable Storage namespace and delete objects through the Supabase Storage API in batches no larger than 1,000 objects.
+5. List only the app's disposable Storage namespace and delete objects through the Supabase Storage API. The platform limit is 1,000 objects per removal call; this coordinator uses a smaller 500-object operational batch.
 6. Re-list and verify that the disposable namespace is empty. If not, persist `storage_pending` and retry.
 7. Mark `succeeded` only after both the database transaction and Storage verification have completed.
 
