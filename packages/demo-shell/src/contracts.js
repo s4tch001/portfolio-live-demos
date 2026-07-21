@@ -1,3 +1,8 @@
+import {
+  DEMO_DEPLOYMENT_NOTICE,
+  GENERATED_SAMPLE_NOTICE
+} from "./baselines.js";
+
 export const DAILY_RESET_NOTICE =
   "This is a shared portfolio preview. Visitor-created data is cleared every day at 12:00 AM (Asia/Manila). Do not enter real or sensitive information.";
 
@@ -5,7 +10,14 @@ const commonPreview = {
   persistentNotice: true,
   noIndex: true,
   sharedEnvironment: true,
-  warning: DAILY_RESET_NOTICE
+  warning: DAILY_RESET_NOTICE,
+  sampleDataNotice: GENERATED_SAMPLE_NOTICE,
+  deploymentNotice: DEMO_DEPLOYMENT_NOTICE,
+  deployment: {
+    frontend: "Netlify",
+    backend: "Supabase",
+    database: "Supabase"
+  }
 };
 
 const commonReset = {
@@ -35,10 +47,10 @@ const contracts = [
     preview: commonPreview,
     reset: {
       ...commonReset,
-      protectedDefaults: ["devpau", "testteacher", "teststudent"]
+      protectedDefaults: ["admin", "testteacher", "teststudent"]
     },
     credentials: [
-      credential("Administrator", { username: "devpau", password: "password" }),
+      credential("Administrator", { username: "admin", password: "password" }),
       credential("Teacher", { username: "testteacher", password: "password" }),
       credential("Student", { username: "teststudent", password: "password" })
     ],
@@ -140,7 +152,12 @@ function validateContract(contract) {
   if (
     contract.preview?.persistentNotice !== true ||
     contract.preview?.noIndex !== true ||
-    contract.preview?.warning !== DAILY_RESET_NOTICE
+    contract.preview?.warning !== DAILY_RESET_NOTICE ||
+    contract.preview?.sampleDataNotice !== GENERATED_SAMPLE_NOTICE ||
+    contract.preview?.deploymentNotice !== DEMO_DEPLOYMENT_NOTICE ||
+    contract.preview?.deployment?.frontend !== "Netlify" ||
+    contract.preview?.deployment?.backend !== "Supabase" ||
+    contract.preview?.deployment?.database !== "Supabase"
   ) {
     throw new TypeError("Preview warning contract is incomplete for " + contract.id + ".");
   }

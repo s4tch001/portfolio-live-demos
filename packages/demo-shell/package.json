@@ -1,10 +1,11 @@
 {
   "name": "@pauuu-demo/demo-shell",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.js",
+    "./baselines": "./src/baselines.js",
     "./contracts": "./src/contracts.js",
     "./notice": "./src/demo-notice.js"
   },

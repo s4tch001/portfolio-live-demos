@@ -2,6 +2,10 @@ import {
   DAILY_RESET_NOTICE,
   getDemoContract
 } from "./contracts.js";
+import {
+  DEMO_DEPLOYMENT_NOTICE,
+  GENERATED_SAMPLE_NOTICE
+} from "./baselines.js";
 
 export const DEMO_NOTICE_ELEMENT = "portfolio-demo-notice";
 export const ROBOTS_DIRECTIVE = "noindex,nofollow,noarchive,nosnippet,noimageindex";
@@ -66,6 +70,10 @@ const styles = `
     font-size: 0.76rem;
     line-height: 1.45;
     margin: 0.2rem 0 0;
+  }
+
+  .message + .message {
+    margin-top: 0.1rem;
   }
 
   details {
@@ -185,6 +193,12 @@ export function buildDemoNoticeModel(contractOrProjectId) {
     projectId: String(contract.id ?? "unknown"),
     title: String(contract.name ?? "Portfolio project") + " - Portfolio preview",
     message: DAILY_RESET_NOTICE,
+    sampleDataMessage: String(
+      contract.preview?.sampleDataNotice ?? GENERATED_SAMPLE_NOTICE
+    ),
+    deploymentMessage: String(
+      contract.preview?.deploymentNotice ?? DEMO_DEPLOYMENT_NOTICE
+    ),
     credentials: Object.freeze(
       (Array.isArray(contract.credentials) ? contract.credentials : []).map((entry) =>
         Object.freeze({
@@ -291,7 +305,13 @@ export function defineDemoNotice(
       const message = ownerDocument.createElement("p");
       message.className = "message";
       message.textContent = model.message;
-      copy.append(title, message);
+      const sampleDataMessage = ownerDocument.createElement("p");
+      sampleDataMessage.className = "message";
+      sampleDataMessage.textContent = model.sampleDataMessage;
+      const deploymentMessage = ownerDocument.createElement("p");
+      deploymentMessage.className = "message";
+      deploymentMessage.textContent = model.deploymentMessage;
+      copy.append(title, message, sampleDataMessage, deploymentMessage);
       notice.append(copy);
 
       if (model.credentials.length > 0) {

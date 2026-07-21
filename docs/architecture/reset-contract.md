@@ -53,7 +53,7 @@ The approved credentials are public test data, not secrets. They must survive ev
 
 | App | Protected default |
 | --- | --- |
-| CN | `devpau` / `password` administrator |
+| CN | `admin` / `password` non-master administrator |
 | CN | `testteacher` / `password` teacher |
 | CN | `teststudent` / `password` student |
 | RCMI | Administrator page password `password` |
@@ -65,6 +65,8 @@ Protection is layered:
 - API: omit protected credential fields from public mutation endpoints and reject protected-account deletion.
 - Database: use RLS, restricted column/function grants, and a trigger or constrained mutation function that rejects protected identity or credential changes from demo roles.
 - Reset: restore the exact approved hash/identity and role through an idempotent privileged function.
+
+The CN demo does not seed a master/developer account. The legacy master username `devpau` is reserved and must be rejected on account creation or rename so a visitor cannot unlock Permissions, Dev Tools, or Security capabilities.
 
 The final schema phase must test direct API attempts, not only UI behavior.
 
