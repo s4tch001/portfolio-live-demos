@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="description" content="Disposable portfolio preview of the Hours Tracker." />
+    <title>Hours Tracker — Portfolio Preview</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <portfolio-demo-notice project-id="hours"></portfolio-demo-notice>
+
+    <div class="pw-gate" id="pwGate">
+      <div class="pw-box">
+        <h2>Hours <span>Tracker</span></h2>
+        <div>
+          <input
+            type="password"
+            id="pwInput"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            maxlength="72"
+          />
+        </div>
+        <div class="pw-error" id="pwError" role="alert"></div>
+        <p class="preview-credential-hint">
+          Portfolio preview password: <strong>password</strong><br />
+          This default password cannot be changed.
+        </p>
+        <button class="btn-add" id="pwSubmit">Unlock</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <header>
+        <div class="logo" style="display: flex; align-items: center; gap: 12px">
+          <span>Hours Tracker</span>
+          <span class="preview-lock-label">Preview password is locked</span>
+          <button class="theme-toggle" id="themeToggle" title="Switch to light mode">
+            🌙
+          </button>
+        </div>
+        <div class="nav">
+          <button id="prevBtn" aria-label="Previous month">&#8592;</button>
+          <div class="month-title" id="monthTitle"></div>
+          <button id="nextBtn" aria-label="Next month">&#8594;</button>
+        </div>
+        <div class="sync-status" id="syncStatus" aria-live="polite">
+          <span id="syncLabel">locked</span>
+          <span class="sync-dot" id="syncDot"></span>
+        </div>
+      </header>
+
+      <div class="calendar">
+        <div class="weekdays">
+          <div class="weekday">Sun</div>
+          <div class="weekday">Mon</div>
+          <div class="weekday">Tue</div>
+          <div class="weekday">Wed</div>
+          <div class="weekday">Thu</div>
+          <div class="weekday">Fri</div>
+          <div class="weekday">Sat</div>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+      </div>
+
+      <div class="stats-bar" id="statsBar"></div>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal" id="modal">
+        <div class="modal-header">
+          <div class="modal-date" id="modalDate"></div>
+          <button class="close-btn" id="closeBtn" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="add-form">
+            <input
+              type="number"
+              id="hoursInput"
+              placeholder="Enter hours (e.g. 3)"
+              min="0.1"
+              max="24"
+              step="0.1"
+            />
+            <button class="btn-add" id="addBtn">+ Add</button>
+          </div>
+          <div class="hours-section-title">Logged Hours</div>
+          <div class="hours-list" id="hoursList"></div>
+          <div class="day-total" id="dayTotal"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/assets/js/script.js"></script>
+  </body>
+</html>

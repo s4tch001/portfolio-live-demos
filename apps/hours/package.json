@@ -1,6 +1,16 @@
 {
   "name": "@pauuu-demo/hours",
-  "version": "0.0.0",
-  "private": true
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@pauuu-demo/demo-shell": "0.2.0"
+  },
+  "devDependencies": {
+    "vite": "8.1.5"
+  }
 }
-

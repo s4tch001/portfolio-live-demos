@@ -21,7 +21,7 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction] = await Promise.all([
+  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
@@ -32,7 +32,9 @@ async function main() {
     readText("supabase/migrations/20260722000200_cn_demo.sql"),
     readText("supabase/functions/cn-api/index.ts"),
     readText("supabase/migrations/20260722000300_rcmi_demo.sql"),
-    readText("supabase/functions/rcmi-api/index.ts")
+    readText("supabase/functions/rcmi-api/index.ts"),
+    readText("supabase/migrations/20260722000400_hours_demo.sql"),
+    readText("supabase/functions/hours-api/index.ts")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -104,6 +106,13 @@ async function main() {
   requirePattern(rcmiMigration, /revoke all on function rcmi_demo\.reset_demo_data\(date\) from service_role/i, "RCMI reset handler must not be directly executable by API roles.");
   requirePattern(rcmiFunction, /withSupabase\(\{ auth: "publishable:rcmi" \}/, "RCMI API must accept only its named publishable key.");
   requirePattern(rcmiFunction, /demo_password_immutable/, "RCMI API must reject password changes.");
+  requirePattern(config, /"hours_demo"/, "Hours schema must be explicitly listed for the Data API.");
+  requirePattern(config, /^\[functions\.hours-api\]\r?\nverify_jwt = false$/m, "Hours API must delegate modern publishable-key validation to the server wrapper.");
+  requirePattern(hoursMigration, /revoke all on schema hours_demo from public, anon, authenticated/i, "Hours schema must deny browser roles by default.");
+  requirePattern(hoursMigration, /protect_default_password/i, "Hours schema must protect its preview password.");
+  requirePattern(hoursMigration, /revoke all on function hours_demo\.reset_demo_data\(date\) from service_role/i, "Hours reset handler must not be directly executable by API roles.");
+  requirePattern(hoursFunction, /withSupabase\(\{ auth: "publishable:hours" \}/, "Hours API must accept only its named publishable key.");
+  requirePattern(hoursFunction, /demo_password_immutable/, "Hours API must reject password changes.");
 
   const disabledSignupCount = (config.match(/^enable_signup = false$/gm) ?? []).length;
   if (disabledSignupCount < 3) {
