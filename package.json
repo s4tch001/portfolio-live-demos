@@ -1,0 +1,39 @@
+{
+  "name": "portfolio-live-demos",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Isolated, resettable live previews for the pauuu.dev portfolio.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s4tch001/portfolio-live-demos.git"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "packageManager": "npm@11.11.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24 <25",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11 <12",
+      "onFail": "error"
+    }
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "audit:isolation": "node scripts/verify-isolation.mjs",
+    "audit:isolation:ci": "node scripts/verify-isolation.mjs --workspace-only",
+    "audit:toolchain": "node scripts/verify-toolchain.mjs",
+    "check": "npm run audit:isolation && npm run audit:toolchain",
+    "check:ci": "npm run audit:isolation:ci && npm run audit:toolchain"
+  }
+}

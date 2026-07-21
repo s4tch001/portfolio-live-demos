@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "defaultAction": "deny",
+  "workspaceRoot": "D:\\full-stack\\P Projects\\portfolio live app",
+  "copyProtocol": [
+    "Copy only paths explicitly listed in an allow list.",
+    "Review every reviewRequired path before it enters this workspace.",
+    "Never copy runtime data, environment files, credentials, dependencies, build output, or Git metadata.",
+    "Convert hard-coded external credentials and production endpoints to demo-only environment variables.",
+    "Run the isolation audit before and after each import."
+  ],
+  "globalDeny": [
+    "**/.git/**",
+    "**/.env",
+    "**/.env.*",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.netlify/**",
+    "**/.supabase/.temp/**",
+    "**/*.sqlite*",
+    "**/*.db*",
+    "**/*-wal",
+    "**/*-shm",
+    "**/*.pem",
+    "**/*.key",
+    "**/service-account*.json"
+  ],
+  "projects": [
+    {
+      "id": "cn",
+      "sourceRoot": "D:\\full-stack\\P Projects\\cn-class-management",
+      "targetRoot": "apps/cn",
+      "mode": "allowlist-only",
+      "allow": [
+        "README.md",
+        "frontend/index.html",
+        "frontend/package.json",
+        "frontend/package-lock.json",
+        "frontend/public/**",
+        "frontend/src/**",
+        "frontend/vite.config.*",
+        "server/package.json",
+        "server/package-lock.json"
+      ],
+      "reviewRequired": [
+        "server/worker.js",
+        "server/**/*.js",
+        "server/**/*.sql"
+      ],
+      "deny": [
+        ".agents/**",
+        ".claude/**",
+        "data/**",
+        "deploy/**",
+        "r2-import/**",
+        "tool.ps1",
+        "server/**/*.sqlite*",
+        "server/**/*.db*",
+        "server/**/uploads/**",
+        "**/.env*"
+      ]
+    },
+    {
+      "id": "rcmi",
+      "sourceRoot": "D:\\full-stack\\P Projects\\RCMI-Attendance-Checker",
+      "targetRoot": "apps/rcmi",
+      "mode": "allowlist-only",
+      "allow": [
+        "favicon.ico",
+        "index.html",
+        "netlify.toml",
+        "package.json",
+        "package-lock.json",
+        "public/**",
+        "src/**",
+        "vite.config.js"
+      ],
+      "reviewRequired": [
+        "netlify/functions/**",
+        "supabase/**/*.sql",
+        "deno.lock"
+      ],
+      "deny": [
+        ".claude/**",
+        ".netlify/**",
+        "dist/**",
+        "node_modules/**",
+        "SECRETS.md",
+        "supabase/.temp/**",
+        "**/.env*"
+      ]
+    },
+    {
+      "id": "hours",
+      "sourceRoot": "D:\\full-stack\\P Projects\\hours-tracker",
+      "targetRoot": "apps/hours",
+      "mode": "sanitize-required",
+      "allow": [
+        "index.html",
+        "assets/css/**"
+      ],
+      "reviewRequired": [
+        "assets/js/script.js",
+        "assets/**"
+      ],
+      "requiredSanitization": [
+        "Remove the original Supabase URL and anonymous key.",
+        "Replace mutable password storage with the shared demo-only backend policy."
+      ],
+      "deny": [
+        ".claude/**",
+        ".git/**",
+        "**/.env*"
+      ]
+    },
+    {
+      "id": "payroll",
+      "sourceRoot": "D:\\full-stack\\P Projects\\payroll spillter",
+      "targetRoot": "apps/payroll",
+      "mode": "allowlist-only",
+      "allow": [
+        "index.html",
+        "assets/**"
+      ],
+      "reviewRequired": [],
+      "deny": [
+        ".git/**",
+        "**/.env*"
+      ]
+    },
+    {
+      "id": "travels",
+      "sourceRoot": "D:\\full-stack\\P Projects\\p-travels-app",
+      "targetRoot": "apps/travels",
+      "mode": "allowlist-only",
+      "allow": [
+        "package.json",
+        "package-lock.json",
+        "public/**",
+        "src/**"
+      ],
+      "reviewRequired": [
+        "src/**"
+      ],
+      "deny": [
+        ".git/**",
+        "build/**",
+        "node_modules/**",
+        "pnpm-lock.yaml",
+        "**/.env*"
+      ]
+    }
+  ],
+  "portfolio": {
+    "path": "D:\\full-stack\\P Projects\\Portfolio",
+    "mode": "deferred-direct-edit",
+    "earliestPhase": "6.1",
+    "importIntoWorkspace": false
+  }
+}
+

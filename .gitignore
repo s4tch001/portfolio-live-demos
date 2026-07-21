@@ -1,0 +1,57 @@
+# Dependencies and package-manager state
+node_modules/
+.pnpm-store/
+.yarn/
+
+# Build and framework output
+dist/
+build/
+out/
+.next/
+.netlify/
+.supabase/
+.turbo/
+coverage/
+
+# Local environment files (examples are intentionally allowed)
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Logs, caches, and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+.vite/
+.eslintcache
+
+# Runtime data must never be imported from the original projects
+/data/
+/r2-import/
+/uploads/
+/backups/
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.db
+*.db-*
+*-wal
+*-shm
+
+# Private credentials and signing material
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+service-account*.json
+
+# Operating-system and editor metadata
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

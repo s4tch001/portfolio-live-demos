@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-21T22:54:47.4784140+08:00",
+  "sources": [
+    {
+      "id": "cn",
+      "path": "D:\\full-stack\\P Projects\\cn-class-management",
+      "role": "immutable-source",
+      "git": {
+        "branch": "master",
+        "head": "0abdf9105b284db571352a966e5a3e93f252dbe0",
+        "tree": "5647a3ad2e1b689f398ab042ebb687f2bfbcd593",
+        "status": []
+      },
+      "safeChecksums": {
+        "README.md": "bf0c41ae0bb289f1925b4d9bebd69a5e4b587bfce481c577cd0e2f40e810f471",
+        "frontend/package.json": "0c29af51c6b657b4046dbba58962d7e3779fb48411710c61e93331aa5ed78f67",
+        "server/package.json": "07be271e88b8af27b76f687e640ac00f107757132c2d1062dd0ca5274bbbe911",
+        "server/worker.js": "b8b1880bf5771fa8f16c9a314c17439f49530b4d60c667ec7cd564edd5b90ed8"
+      }
+    },
+    {
+      "id": "rcmi",
+      "path": "D:\\full-stack\\P Projects\\RCMI-Attendance-Checker",
+      "role": "immutable-source",
+      "git": {
+        "branch": "main",
+        "head": "27a01dbdeea14312a92ed77aab01f7204a36d079",
+        "tree": "2d0af7e55d5dcdcd5e72285ec051dc549b45de7b",
+        "status": []
+      },
+      "safeChecksums": {
+        "package.json": "db1e6addb9dbba04f0cd34ec5a8479afcdc005cb4fbdbd9fbb1149cec253e793",
+        "netlify.toml": "e576eaa71f0697b7f36c1c287e14c76c3b34ed8cc3be578347ea87bdf975b37a",
+        "src/lib/api.js": "231d3cd571114c6d0d31d1c3545dd82bb9b0c6ef96dd4e8961dc77653b2bd638",
+        "supabase/schema.sql": "bb2e344f7391cd7e2fbd971bfb8eb37f715c90a7875ce7198c1464f2d10104a5"
+      }
+    },
+    {
+      "id": "hours",
+      "path": "D:\\full-stack\\P Projects\\hours-tracker",
+      "role": "immutable-source",
+      "git": {
+        "branch": "main",
+        "head": "d532b2a8dab959f6f9258fa6a6b34976a6af1d19",
+        "tree": "b3d44792656ec177c8b5ea7047882413842b33e5",
+        "status": []
+      },
+      "safeChecksums": {
+        "index.html": "237229c74f90f79b992e2647ea4a37bb37ba46eb0b1f360864df6fb1bf9772c4",
+        "assets/css/styles.css": "c3603e61655d72563d45632ad131c0fcd4f2b224491b77e7acb865ac1325681a",
+        "assets/js/script.js": "46c57d87c22ae4f4edd6581627378ed5dd4574bbcbe0bb6f5b017829aeb89cb2"
+      }
+    },
+    {
+      "id": "payroll",
+      "path": "D:\\full-stack\\P Projects\\payroll spillter",
+      "role": "immutable-source",
+      "git": {
+        "branch": "main",
+        "head": "b4853878b0cb24a56f47b1c87c2234c1dbe055f1",
+        "tree": "9d08b334034f6bfb36b9f4671d0d40e1d9bc71eb",
+        "status": []
+      },
+      "safeChecksums": {
+        "index.html": "78dc569991ce6fa0d3d202fe209a9eaa3e770723463a930bbf1b1511f60236f9",
+        "assets/js/script.js": "038631e1fa31ab8a714f29bc24c2fc87393707fdb203a9244147e90d9d1b5474"
+      }
+    },
+    {
+      "id": "travels",
+      "path": "D:\\full-stack\\P Projects\\p-travels-app",
+      "role": "immutable-source",
+      "git": {
+        "branch": "main",
+        "head": "6d515e3ea8e8138e1374dcc52b33650bde8c6c79",
+        "tree": "9f80ccda6df70eb5252f99267eb94e88feef7258",
+        "status": []
+      },
+      "safeChecksums": {
+        "package.json": "7febdccbb16d499e101d3d6fa8b54032cdc705225ce8c2419c674a42c7726194",
+        "src/App.js": "145e4f6c92d0b056c1060b73b6cdd0c1401395239a27718bc72d4c25351ee8a1",
+        "src/data.js": "763858731c66abd1d2fa9a3d779e0c43fea7eef2009742ba186f69e2bd540ceb"
+      }
+    },
+    {
+      "id": "portfolio",
+      "path": "D:\\full-stack\\P Projects\\Portfolio",
+      "role": "deferred-destination",
+      "git": {
+        "branch": "main",
+        "head": "32ed53ff9379ab77c8bfdec0a7329c19748ab9c2",
+        "tree": "20fb1f11b136084f43cae5039bf72ebfe7619b4a",
+        "status": []
+      },
+      "safeChecksums": {
+        "package.json": "10062c87756731580d6fc844f4285c681cd934415865cdf2f1baaa1bc37720ff",
+        "app/data/projects.js": "09604281e1645452cc46b5fcd7bb0143e075dc234fbd7ee1739df84b455ce0a5",
+        "app/components/Projects.jsx": "61c894faa138e6c3ecef9b4b82623b739ebf6359816b9419fb41bc46a05b40e6"
+      }
+    }
+  ]
+}
+
