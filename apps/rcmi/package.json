@@ -1,6 +1,23 @@
 {
   "name": "@pauuu-demo/rcmi",
-  "version": "0.0.0",
-  "private": true
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "preview": "vite preview --port 4174",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@pauuu-demo/demo-shell": "0.2.0",
+    "exceljs": "4.4.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router-dom": "7.17.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.0.3",
+    "vite": "8.1.5"
+  }
 }
-

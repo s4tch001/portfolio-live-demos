@@ -21,7 +21,7 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction] = await Promise.all([
+  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
@@ -30,7 +30,9 @@ async function main() {
     readText("supabase/migrations/20260722000100_demo_reset_control.sql"),
     readText("supabase/functions/reset-coordinator/index.ts"),
     readText("supabase/migrations/20260722000200_cn_demo.sql"),
-    readText("supabase/functions/cn-api/index.ts")
+    readText("supabase/functions/cn-api/index.ts"),
+    readText("supabase/migrations/20260722000300_rcmi_demo.sql"),
+    readText("supabase/functions/rcmi-api/index.ts")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -95,6 +97,13 @@ async function main() {
   requirePattern(cnMigration, /revoke all on function cn_demo\.reset_demo_data\(date\) from public, anon, authenticated, service_role/i, "CN reset handler must not be directly executable by API roles.");
   requirePattern(cnFunction, /withSupabase\(\{ auth: "publishable:cn" \}/, "CN API must accept only its named publishable key.");
   requirePattern(cnFunction, /demo_credentials_immutable/, "CN API must enforce immutable preview credentials.");
+  requirePattern(config, /"rcmi_demo"/, "RCMI schema must be explicitly listed for the Data API.");
+  requirePattern(config, /^\[functions\.rcmi-api\]\r?\nverify_jwt = false$/m, "RCMI API must delegate modern publishable-key validation to the server wrapper.");
+  requirePattern(rcmiMigration, /revoke all on schema rcmi_demo from public, anon, authenticated/i, "RCMI schema must deny browser roles by default.");
+  requirePattern(rcmiMigration, /protect_default_password/i, "RCMI schema must protect its preview password.");
+  requirePattern(rcmiMigration, /revoke all on function rcmi_demo\.reset_demo_data\(date\) from service_role/i, "RCMI reset handler must not be directly executable by API roles.");
+  requirePattern(rcmiFunction, /withSupabase\(\{ auth: "publishable:rcmi" \}/, "RCMI API must accept only its named publishable key.");
+  requirePattern(rcmiFunction, /demo_password_immutable/, "RCMI API must reject password changes.");
 
   const disabledSignupCount = (config.match(/^enable_signup = false$/gm) ?? []).length;
   if (disabledSignupCount < 3) {
