@@ -8,4 +8,4 @@ Each invocation claims at most five due applications, executes their transaction
 
 The function logs only event names, counts, public application ids, and allowlisted error categories. It never reads or logs raw secret values.
 
-Phase 2.2 is local implementation only. Do not deploy this function until the named secret key, database migration, app reset handlers, and Cron invocation have been reviewed in their scheduled sub-phases.
+The function was deployed in Phase 2.4 after the named `automations` key and control migration were configured. It remains inert because every application is disabled and no Cron invocation exists. Later application phases must install and review their own reset handlers before enabling their registrations.

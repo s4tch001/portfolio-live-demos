@@ -1,6 +1,6 @@
 # Daily reset contract
 
-Status: The private control schema and Edge coordinator are implemented locally in Phase 2.2. They are not deployed remotely, no Cron job exists yet, and all five app handlers remain disabled until their later schema phases.
+Status: The private control schema and Edge coordinator were implemented in Phase 2.2 and deployed to the dedicated preview Supabase project in Phase 2.4. No Cron job exists yet, and all five app handlers remain disabled until their later schema phases.
 
 ## Schedule and logical day
 
