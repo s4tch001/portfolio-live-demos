@@ -21,7 +21,7 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction] = await Promise.all([
+  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
@@ -34,7 +34,8 @@ async function main() {
     readText("supabase/migrations/20260722000300_rcmi_demo.sql"),
     readText("supabase/functions/rcmi-api/index.ts"),
     readText("supabase/migrations/20260722000400_hours_demo.sql"),
-    readText("supabase/functions/hours-api/index.ts")
+    readText("supabase/functions/hours-api/index.ts"),
+    readText("supabase/migrations/20260722000500_payroll_demo.sql")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -113,6 +114,9 @@ async function main() {
   requirePattern(hoursMigration, /revoke all on function hours_demo\.reset_demo_data\(date\) from service_role/i, "Hours reset handler must not be directly executable by API roles.");
   requirePattern(hoursFunction, /withSupabase\(\{ auth: "publishable:hours" \}/, "Hours API must accept only its named publishable key.");
   requirePattern(hoursFunction, /demo_password_immutable/, "Hours API must reject password changes.");
+  requirePattern(config, /"payroll_demo"/, "Payroll schema must be explicitly listed for the reset contract.");
+  requirePattern(payrollMigration, /persists no visitor data/i, "Payroll reset handler must document its no-persistence design.");
+  requirePattern(payrollMigration, /revoke all on all functions in schema payroll_demo from public, anon, authenticated, service_role/i, "Payroll reset handler must not be executable by API roles.");
 
   const disabledSignupCount = (config.match(/^enable_signup = false$/gm) ?? []).length;
   if (disabledSignupCount < 3) {

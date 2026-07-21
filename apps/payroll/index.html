@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="description" content="Disposable portfolio preview of the Payroll Splitter." />
+    <title>Payroll Splitter — Portfolio Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <portfolio-demo-notice project-id="payroll"></portfolio-demo-notice>
+    <div class="wrapper">
+      <!-- HEADER -->
+      <header>
+        <div class="header-badge">Payroll Splitter</div>
+        <div class="header-sub">Salary Split · USD ↔ PHP</div>
+      </header>
+
+      <!-- ─── SECTION 1: USD INPUTS ─── -->
+      <div class="section-label">USD Setup</div>
+      <div class="card">
+        <div class="input-grid">
+          <div class="field">
+            <label>Total Pay (USD)</label>
+            <div class="currency-wrap">
+              <span class="currency-prefix">$</span>
+              <input
+                type="number"
+                id="totalUSD"
+                placeholder="0.00"
+                min="0"
+                max="10000000"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label>Rate per Hour (USD)</label>
+            <div class="currency-wrap">
+              <span class="currency-prefix">$</span>
+              <input
+                type="number"
+                id="rateUSD"
+                placeholder="0.00"
+                min="0"
+                max="100000"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label>USD → PHP Conversion Rate</label>
+            <div class="currency-wrap">
+              <span class="currency-prefix">₱</span>
+              <input
+                type="number"
+                id="conversionRate"
+                placeholder="0.00"
+                min="0"
+                max="1000"
+                step="0.01"
+              />
+            </div>
+            <div class="rate-note">
+              Enter the current exchange rate manually.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 2: HOURS ─── -->
+      <div class="section-label">Hours Rendered</div>
+      <div class="card">
+        <!-- Employee Manager Controls -->
+        <div class="employee-manager">
+          <div
+            style="font-size: 0.8rem; font-weight: 600; color: var(--text-dim)"
+          >
+            Persons
+          </div>
+          <div class="employee-controls">
+            <button
+              class="btn-emp minus"
+              id="btnRemoveEmp"
+              title="Remove person"
+            >
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <span class="emp-count-label" id="empCountLabel">2 employees</span>
+            <button
+              class="btn-emp plus"
+              id="btnAddEmp"
+              title="Add person"
+            >
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Column headers -->
+        <div class="hours-header">
+          <div class="hours-col-label">Person</div>
+          <div class="hours-col-label">Hours</div>
+        </div>
+
+        <!-- Total Hours row -->
+        <div class="total-hours-row">
+          <div class="total-hours-inner">
+            <div class="total-hours-label">
+              <i class="fa-regular fa-clock" style="font-size: 0.75rem"></i>
+              Total Hours
+            </div>
+            <div class="emp-hours-wrap">
+              <span class="emp-hours-prefix" style="color: var(--text-muted)">
+                <i class="fa-regular fa-clock"></i>
+              </span>
+              <input
+                type="number"
+                id="totalHours"
+                class="emp-hours-input"
+                placeholder="0"
+                min="0"
+                max="10000"
+                step="0.5"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee rows -->
+        <div id="employeeList"></div>
+
+        <div class="warn-text" id="hoursWarn">
+          ⚠ Combined person hours do not match the Total Hours.
+        </div>
+      </div>
+
+      <!-- ─── SECTION 3: RESULTS ─── -->
+      <div class="section-label">Computation</div>
+      <div id="resultsArea">
+        <div class="results-card">
+          <div class="empty-state">
+            <div class="empty-icon">🧮</div>
+            Enter values above to start the computation.
+          </div>
+        </div>
+      </div>
+
+      <footer>Payroll Splitter · USD ↔ PHP</footer>
+    </div>
+
+    <!-- STICKY CLEAR BUTTON -->
+    <div class="sticky-bar">
+      <button class="btn-clear" id="btnClear">
+        <svg viewBox="0 0 24 24">
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
+        </svg>
+        Clear All
+      </button>
+    </div>
+
+    <script type="module" src="/assets/js/script.js"></script>
+  </body>
+</html>
