@@ -219,34 +219,32 @@ And the preview destination is labeled as a disposable Netlify/Supabase portfoli
 - [x] Add generated-data and Netlify/Supabase deployment disclosures.
 - [x] Define immutable CN and RCMI baseline records with relative dates and stable keys.
 - [x] Define the payroll blur-synchronization behavior contract.
-- [ ] Map each baseline contract to its future PostgreSQL app schema and reset handler.
+- [x] Map each baseline contract to its PostgreSQL app schema and reset handler.
 
 ### CN demo adaptation
 
-- [ ] Seed the approved accounts, teachers, students, schedules, reports, transactions, and usage.
-- [ ] Prevent `devpau` creation/rename and all master privilege escalation at the database/API layers.
-- [ ] Hide restricted navigation and deny direct route/API access for `admin`.
-- [ ] Add direct authorization, reset-idempotency, and credential-immutability tests.
+- [x] Seed the approved accounts, teachers, students, schedules, reports, transactions, and usage.
+- [x] Prevent `devpau` creation/rename and all master privilege escalation at the database/API layers.
+- [x] Hide restricted navigation and deny direct route/API access for `admin`.
+- [x] Add direct authorization, reset-idempotency, and credential-immutability contract tests.
 
 ### RCMI demo adaptation
 
-- [ ] Seed members, hierarchy, role history, and attendance from the approved baseline.
-- [ ] Add reset-idempotency and visitor-data disposal tests.
+- [x] Seed members, hierarchy, role history, and attendance from the approved baseline.
+- [x] Add reset-idempotency and visitor-data disposal contract tests.
 
 ### Payroll demo adaptation
 
-- [ ] Move dependent-hours synchronization from `input` to `blur` in the isolated demo copy.
-- [ ] Add keyboard, pointer, invalid-value, and bidirectional calculation tests.
+- [x] Move dependent-hours synchronization from `input` to `blur` in the isolated demo copy.
+- [x] Add blur-order, invalid-value, and bidirectional calculation contract tests.
 
 ### Portfolio integration
 
 - [ ] Add distinct production and preview actions during the final portfolio phase.
 - [ ] Label the preview hosting and disposable-data behavior.
 
-## Out of scope for this sub-phase
+## Remaining out of scope after Phase 3
 
-- Importing or modifying any original project source.
-- Creating the app-specific PostgreSQL schemas or seed migrations.
 - Deploying to Supabase or Netlify.
 - Editing the portfolio before the final integration phase.
 

@@ -1,17 +1,42 @@
 # Portfolio Live Demos
 
-This workspace will contain isolated, resettable demo editions of five portfolio projects. It is intentionally separate from every original project repository.
+This workspace contains isolated, resettable demo editions of five portfolio
+projects. It remains separate from every original project repository.
 
-Current state: Phase 2 is complete. The shared architecture, amended preview hints, CN access rules, persistent fictional CN/RCMI baseline contracts, and Payroll hours interaction behavior are defined. The private reset-control migration and authenticated coordinator are deployed to the dedicated Supabase preview project, but all five application handlers remain disabled and no reset schedule exists yet. No application source, production data, or secret-bearing environment file has been imported.
+Current state: Phase 3 is complete locally. CN Class Management, RCMI
+Attendance Checker, Hours Tracker, Payroll Splitter, and P Travels each have a
+buildable demo workspace, persistent preview notice, `noindex` protection, and
+an app-specific reset contract. CN and RCMI restore fictional sample records;
+CN, RCMI, and Hours enforce immutable default credentials at UI, API, and
+database layers. Payroll and Travels persist no visitor data.
 
-The source-copy rules are defined in config/source-import-policy.json. Run npm run check before and after every future import or migration.
+The Phase 3 migrations and app Edge Functions have **not** been deployed. All
+five applications remain disabled in the existing remote reset registry, and
+no Cron schedule, Netlify site, custom domain, or portfolio link has been
+created. Those are Phase 4 tasks and require the user's next go signal.
 
-Node.js 24 LTS and npm 11 are the supported toolchain. See docs/toolchain.md for the local and CI workflow.
+## Local verification
 
-Supabase project identity and dashboard security choices are recorded in config/supabase-project.json. App-specific schemas, grants, policies, reset handlers, and fictional seed migrations will be added only in their approved later phases.
+Use Node.js 24 LTS and npm 11:
 
-The sanitized Phase 2 deployment record is in docs/supabase-deployment.md. It contains no API keys, request identifiers, cookies, or credentials.
+```powershell
+npm.cmd install --ignore-scripts
+npm.cmd run check
+npm.cmd run build:apps
+npm.cmd audit --audit-level=high
+```
 
-The approved platform architecture and reset behavior are documented in docs/architecture/system-design.md and docs/architecture/reset-contract.md. Significant decisions are recorded under docs/adr.
+Public browser configuration is listed in `.env.example`. Never place a
+Supabase secret key, database password, or personal access token in a Vite
+variable or browser bundle.
 
-The approved persistent sample-data, CN restricted-access, portfolio-labeling, and Payroll blur-calculation requirements are documented in specs/demo-preview-baselines.spec.md.
+## Project documentation
+
+- Phase 3 completion and verification: `docs/phase-3-completion.md`
+- Phase 3 security review: `docs/security/phase-3-review.md`
+- System design: `docs/architecture/system-design.md`
+- Daily reset contract: `docs/architecture/reset-contract.md`
+- Source isolation rules: `config/source-import-policy.json`
+- Supabase setup/deployment history: `docs/supabase-setup.md` and
+  `docs/supabase-deployment.md`
+- Preview baseline requirements: `specs/demo-preview-baselines.spec.md`
