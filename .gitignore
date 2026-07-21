@@ -10,6 +10,8 @@ out/
 .next/
 .netlify/
 .supabase/
+/supabase/.branches/
+/supabase/.temp/
 .turbo/
 coverage/
 
@@ -54,4 +56,3 @@ service-account*.json
 Thumbs.db
 .idea/
 .vscode/
-

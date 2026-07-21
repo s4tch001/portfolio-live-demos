@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "name": "portfolio-live-demos",
+  "projectRef": "ivqfxdibluhgyttgxbmz",
+  "projectUrl": "https://ivqfxdibluhgyttgxbmz.supabase.co",
+  "organization": {
+    "id": "lmoeiwzzdokwvtkzytaq",
+    "name": "isong"
+  },
+  "plan": "free",
+  "region": "ap-southeast-1",
+  "createdAt": "2026-07-21T14:01:18.989328Z",
+  "database": {
+    "majorVersion": 17,
+    "releaseChannel": "ga"
+  },
+  "dashboardConfiguration": {
+    "dataApiEnabled": true,
+    "automaticallyExposeNewTables": false,
+    "automaticRls": true
+  },
+  "dataPolicy": "fictional-demo-data-only",
+  "purpose": "Dedicated shared backend for five disposable portfolio previews"
+}

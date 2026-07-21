@@ -1,0 +1,2 @@
+-- Intentionally empty in Phase 1.3.
+-- Later migrations will add deterministic fictional demo data only.

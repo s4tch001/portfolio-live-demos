@@ -32,8 +32,17 @@
   "scripts": {
     "audit:isolation": "node scripts/verify-isolation.mjs",
     "audit:isolation:ci": "node scripts/verify-isolation.mjs --workspace-only",
+    "audit:supabase": "node scripts/verify-supabase-config.mjs",
     "audit:toolchain": "node scripts/verify-toolchain.mjs",
-    "check": "npm run audit:isolation && npm run audit:toolchain",
-    "check:ci": "npm run audit:isolation:ci && npm run audit:toolchain"
+    "check": "npm run audit:isolation && npm run audit:toolchain && npm run audit:supabase",
+    "check:ci": "npm run audit:isolation:ci && npm run audit:toolchain && npm run audit:supabase",
+    "supabase": "supabase",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:db-reset": "supabase db reset"
+  },
+  "devDependencies": {
+    "supabase": "2.109.1"
   }
 }
