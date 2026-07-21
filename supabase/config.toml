@@ -5,7 +5,7 @@ project_id = "portfolio-live-demos"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "graphql_public"]
+schemas = ["public", "graphql_public", "cn_demo"]
 extra_search_path = ["public", "extensions"]
 max_rows = 500
 
@@ -102,6 +102,9 @@ inspector_port = 8083
 deno_version = 2
 
 [functions.reset-coordinator]
+verify_jwt = false
+
+[functions.cn-api]
 verify_jwt = false
 
 [analytics]

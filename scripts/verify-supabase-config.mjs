@@ -21,14 +21,16 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction] = await Promise.all([
+  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
     readText("supabase/config.toml"),
     readText("supabase/seed.sql"),
     readText("supabase/migrations/20260722000100_demo_reset_control.sql"),
-    readText("supabase/functions/reset-coordinator/index.ts")
+    readText("supabase/functions/reset-coordinator/index.ts"),
+    readText("supabase/migrations/20260722000200_cn_demo.sql"),
+    readText("supabase/functions/cn-api/index.ts")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -82,6 +84,17 @@ async function main() {
     /withSupabase\(\{ auth: "secret:automations" \}/,
     "Reset coordinator must accept only the named automation secret key."
   );
+  requirePattern(config, /"cn_demo"/, "CN schema must be explicitly listed for the Data API.");
+  requirePattern(
+    config,
+    /^\[functions\.cn-api\]\r?\nverify_jwt = false$/m,
+    "CN API must delegate modern publishable-key validation to the server wrapper."
+  );
+  requirePattern(cnMigration, /revoke all on schema cn_demo from public, anon, authenticated/i, "CN schema must deny browser roles by default.");
+  requirePattern(cnMigration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/i, "CN schema must reserve the master username.");
+  requirePattern(cnMigration, /revoke all on function cn_demo\.reset_demo_data\(date\) from public, anon, authenticated, service_role/i, "CN reset handler must not be directly executable by API roles.");
+  requirePattern(cnFunction, /withSupabase\(\{ auth: "publishable:cn" \}/, "CN API must accept only its named publishable key.");
+  requirePattern(cnFunction, /demo_credentials_immutable/, "CN API must enforce immutable preview credentials.");
 
   const disabledSignupCount = (config.match(/^enable_signup = false$/gm) ?? []).length;
   if (disabledSignupCount < 3) {

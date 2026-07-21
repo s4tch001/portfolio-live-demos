@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta
+      name="robots"
+      content="noindex, nofollow, noarchive, nosnippet, noimageindex"
+    />
+    <meta name="description" content="Disposable portfolio preview of the Sunset-Speaks class management project." />
+    <title>Sunset-Speaks Class Management — Portfolio Preview</title>
+    <link rel="icon" href="/assets/img/logo/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/assets/img/logo/apple-touch-icon.png" />
+    <!-- Pre-paint theme: set data-theme before first paint to avoid FOUC.
+         Ported verbatim from the legacy theme.js — must run before React mounts. -->
+    <script>
+      (function () {
+        var t = 'light';
+        try {
+          t = localStorage.getItem('theme') || 'light';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+    <!-- All libraries self-hosted (China deployment: no Google/CDN hosts) -->
+    <link href="/vendor/fonts/fonts.css" rel="stylesheet" />
+    <link href="/vendor/fontawesome/css/all.min.css" rel="stylesheet" />
+    <script src="/vendor/dompurify/purify.min.js"></script>
+    <script src="/vendor/exceljs/exceljs.min.js"></script>
+    <script src="/vendor/html2canvas/html2canvas.min.js"></script>
+    <script src="/vendor/jszip/jszip.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="modal-root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
