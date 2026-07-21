@@ -1,6 +1,20 @@
 {
   "name": "@pauuu-demo/demo-shell",
-  "version": "0.0.0",
-  "private": true
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./contracts": "./src/contracts.js",
+    "./notice": "./src/demo-notice.js"
+  },
+  "files": [
+    "src"
+  ],
+  "sideEffects": [
+    "./src/index.js"
+  ],
+  "scripts": {
+    "test": "node --test"
+  }
 }
-
