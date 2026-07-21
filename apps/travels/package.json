@@ -1,6 +1,20 @@
 {
   "name": "@pauuu-demo/travels",
-  "version": "0.0.0",
-  "private": true
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "7.2.0",
+    "@pauuu-demo/demo-shell": "0.2.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.0.3",
+    "vite": "8.1.5"
+  }
 }
-

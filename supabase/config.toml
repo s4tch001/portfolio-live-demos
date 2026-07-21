@@ -5,7 +5,7 @@ project_id = "portfolio-live-demos"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "graphql_public", "cn_demo", "rcmi_demo", "hours_demo", "payroll_demo"]
+schemas = ["public", "graphql_public", "cn_demo", "rcmi_demo", "hours_demo", "payroll_demo", "travels_demo"]
 extra_search_path = ["public", "extensions"]
 max_rows = 500
 

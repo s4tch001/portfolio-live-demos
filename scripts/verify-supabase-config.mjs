@@ -21,7 +21,7 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration] = await Promise.all([
+  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration, travelsMigration] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
@@ -35,7 +35,8 @@ async function main() {
     readText("supabase/functions/rcmi-api/index.ts"),
     readText("supabase/migrations/20260722000400_hours_demo.sql"),
     readText("supabase/functions/hours-api/index.ts"),
-    readText("supabase/migrations/20260722000500_payroll_demo.sql")
+    readText("supabase/migrations/20260722000500_payroll_demo.sql"),
+    readText("supabase/migrations/20260722000600_travels_demo.sql")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -117,6 +118,9 @@ async function main() {
   requirePattern(config, /"payroll_demo"/, "Payroll schema must be explicitly listed for the reset contract.");
   requirePattern(payrollMigration, /persists no visitor data/i, "Payroll reset handler must document its no-persistence design.");
   requirePattern(payrollMigration, /revoke all on all functions in schema payroll_demo from public, anon, authenticated, service_role/i, "Payroll reset handler must not be executable by API roles.");
+  requirePattern(config, /"travels_demo"/, "Travels schema must be explicitly listed for the reset contract.");
+  requirePattern(travelsMigration, /persists no visitor data/i, "Travels reset handler must document its no-persistence design.");
+  requirePattern(travelsMigration, /revoke all on all functions in schema travels_demo from public, anon, authenticated, service_role/i, "Travels reset handler must not be executable by API roles.");
 
   const disabledSignupCount = (config.match(/^enable_signup = false$/gm) ?? []).length;
   if (disabledSignupCount < 3) {
