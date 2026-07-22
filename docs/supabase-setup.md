@@ -33,15 +33,21 @@ The Supabase CLI is pinned as a project dev dependency. Use npm run supabase -- 
 
 The local stack requires Docker. The workspace is linked to the demo project; generated link state remains under the ignored supabase/.temp directory and is never committed.
 
-## Remote foundation status
+## Remote deployment status
 
-Phase 2.4 deployed only the reviewed reset foundation:
+Phase 2.4 deployed the reviewed reset foundation, and Phase 4.1 added the five
+application schemas and reset handlers:
 
 - Migration `20260722000100_demo_reset_control.sql` is applied to the dedicated preview project.
 - Edge Function `reset-coordinator` is active and requires the named secret key `automations` through the `apikey` header.
 - The function's platform JWT check is disabled intentionally; `@supabase/server` performs the named-key check before entering the handler.
 - Legacy JWT-based `anon` and `service_role` keys are disabled; browser clients must use a modern publishable key and server callers must use a scoped modern secret key.
-- All five application registrations remain disabled and report `database_reset_ready = false`.
+- All six migrations through `20260722000600` are applied and remote database
+  lint reports zero errors.
+- All five application registrations remain disabled. Their app migrations set
+  `database_reset_ready = true` without enabling cleanup.
 - No Cron schedule exists. Daily deletion cannot begin until each application has a reviewed schema, reset handler, protected baseline, and explicit enablement.
 
-See `docs/supabase-deployment.md` for the secret-free verification record.
+See `docs/supabase-deployment.md` and
+`docs/phase-4-1-supabase-schema-deployment.md` for secret-free verification
+records.

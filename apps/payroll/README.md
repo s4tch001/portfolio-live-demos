@@ -8,3 +8,6 @@ no-op.
 Dependent hours are calculated only when the edited Total Hours or person
 hours field loses focus, so a visitor can finish typing before the final field
 is derived.
+
+Phase 4.1 deployed the private no-op `payroll_demo` reset handler while keeping
+its reset registration disabled. No visitor calculation data is stored.

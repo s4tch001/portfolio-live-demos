@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "phase": "4.1",
+  "updatedAt": "2026-07-22",
+  "supabase": {
+    "projectRef": "ivqfxdibluhgyttgxbmz",
+    "migrationVersions": [
+      "20260722000100",
+      "20260722000200",
+      "20260722000300",
+      "20260722000400",
+      "20260722000500",
+      "20260722000600"
+    ],
+    "remoteMigrationHistoryVerified": true,
+    "remoteLintErrorCount": 0,
+    "applications": {
+      "cn": { "databaseResetReady": true, "enabled": false },
+      "rcmi": { "databaseResetReady": true, "enabled": false },
+      "hours": { "databaseResetReady": true, "enabled": false },
+      "payroll": { "databaseResetReady": true, "enabled": false },
+      "travels": { "databaseResetReady": true, "enabled": false }
+    },
+    "edgeFunctions": {
+      "reset-coordinator": "active",
+      "cn-api": "not-deployed",
+      "rcmi-api": "not-deployed",
+      "hours-api": "not-deployed"
+    },
+    "namedKeys": {
+      "automations": "configured",
+      "cn": "not-created",
+      "rcmi": "not-created",
+      "hours": "not-created"
+    },
+    "cronInstalled": false
+  },
+  "netlifySitesCreated": false,
+  "cloudflareSubdomainsConfigured": false,
+  "portfolioUpdated": false
+}

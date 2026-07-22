@@ -15,6 +15,8 @@ and has a private daily reset handler contract. Payroll and Travels handlers
 are explicit no-ops because those pages do not persist visitor values.
 
 From the workspace root, run `npm run build:apps` and `npm run check`.
-Frontend environment values are documented in `.env.example`. Named
-publishable keys, deployments, custom domains, reset activation, and portfolio
-links are intentionally deferred to Phase 4.
+Frontend environment values are documented in `.env.example`. The five app
+schemas and reset handlers were deployed in Phase 4.1, but every reset
+registration remains disabled. Named publishable keys, app Edge Function
+deployments, Netlify sites, custom domains, reset activation, and portfolio
+links remain gated behind later Phase 4 subphases.

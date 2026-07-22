@@ -8,3 +8,7 @@ Local development requires `VITE_SUPABASE_URL` and the named
 `VITE_SUPABASE_PUBLISHABLE_KEY` for the Hours preview. Visitor hours are
 deleted by the daily Manila-time reset. The server-verified preview password
 is immutable and is restored independently of visitor data.
+
+Phase 4.1 deployed the `hours_demo` schema and reset handler while keeping its
+reset registration disabled. The Hours Edge API and named publishable key are
+not deployed yet.

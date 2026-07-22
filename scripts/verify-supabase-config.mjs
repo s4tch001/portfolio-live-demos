@@ -21,10 +21,11 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration, travelsMigration] = await Promise.all([
+  const [rootPackage, lockfile, project, deployment, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration, travelsMigration] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
+    readJson("config/deployment-state.json"),
     readText("supabase/config.toml"),
     readText("supabase/seed.sql"),
     readText("supabase/migrations/20260722000100_demo_reset_control.sql"),
@@ -154,6 +155,37 @@ async function main() {
   }
   if (project.dataPolicy !== "fictional-demo-data-only") {
     failures.push("Supabase remote data policy must remain fictional-demo-data-only.");
+  }
+  const expectedMigrationVersions = [
+    "20260722000100",
+    "20260722000200",
+    "20260722000300",
+    "20260722000400",
+    "20260722000500",
+    "20260722000600"
+  ];
+  if (
+    deployment.phase !== "4.1" ||
+    deployment.supabase?.projectRef !== project.projectRef ||
+    JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
+    deployment.supabase?.remoteMigrationHistoryVerified !== true ||
+    deployment.supabase?.remoteLintErrorCount !== 0
+  ) {
+    failures.push("Phase 4.1 Supabase deployment evidence is incomplete or targets an unexpected project.");
+  }
+  for (const appId of ["cn", "rcmi", "hours", "payroll", "travels"]) {
+    const application = deployment.supabase?.applications?.[appId];
+    if (application?.databaseResetReady !== true || application?.enabled !== false) {
+      failures.push(`Phase 4.1 application state is unsafe or incomplete for ${appId}.`);
+    }
+  }
+  if (
+    deployment.supabase?.cronInstalled !== false ||
+    deployment.netlifySitesCreated !== false ||
+    deployment.cloudflareSubdomainsConfigured !== false ||
+    deployment.portfolioUpdated !== false
+  ) {
+    failures.push("Phase 4.1 must not claim or activate later deployment work.");
   }
 
   try {

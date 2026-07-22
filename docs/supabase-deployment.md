@@ -31,8 +31,17 @@ Gateway JWT verification is disabled because modern Supabase secret keys are not
 - The legacy JWT-based `anon` and `service_role` API keys were disabled after local CLI output exposed their values.
 - A second authenticated Dashboard `POST` after legacy-key deactivation still returned HTTP 200, confirming that the coordinator uses the named modern secret key.
 
-The zero-claim response is expected and is a safety invariant at this stage. Registrations for `cn`, `rcmi`, `hours`, `payroll`, and `travels` remain `enabled = false` and `database_reset_ready = false`, so this deployment cannot clear application data.
+The zero-claim response was expected during Phase 2.4. Phase 4.1 later set the
+five registrations to `database_reset_ready = true`, while preserving
+`enabled = false`, so the coordinator still cannot claim application cleanup.
 
 ## Activation gate
 
-Each later application phase must add and test its isolated schema, protected credentials or fictional baseline, and idempotent `reset_demo_data(date)` handler. Only that application's registration may then be enabled. The daily Manila schedule must not be installed until all enabled applications satisfy the reset and isolation acceptance tests.
+Phase 4.1 deployed each isolated schema, protected credential or fictional
+baseline, and idempotent `reset_demo_data(date)` handler. Registrations must
+remain disabled until the app APIs and live negative-path tests are complete.
+The daily Manila schedule must not be installed until every enabled application
+satisfies reset and isolation acceptance tests.
+
+See `docs/phase-4-1-supabase-schema-deployment.md` for the app-schema deployment
+record.
