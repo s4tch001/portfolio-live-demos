@@ -70,14 +70,20 @@ test('CN frontend uses only environment-provided public Supabase configuration',
   assert.match(api, /apikey: SUPABASE_PUBLISHABLE_KEY/);
 });
 
-test('keeps sticky navigation and full-screen layers below the preview notice', async () => {
-  const [app, css] = await Promise.all([
+test('keeps the authenticated app shell below the preview notice without a double offset', async () => {
+  const [app, appShell, css] = await Promise.all([
     read('apps/cn/src/App.jsx'),
+    read('apps/cn/src/components/Layout/AppShell.jsx'),
     read('apps/cn/src/styles/styles.css'),
   ]);
   assert.match(app, /inset: 'var\(--portfolio-demo-notice-height, 0px\) 0 0'/);
+  assert.doesNotMatch(appShell, /height:\s*'100vh'/);
+  assert.match(css, /#app\s*\{[\s\S]*?height: calc\(100dvh - var\(--portfolio-demo-notice-height, 0px\)\)/);
+  assert.match(css, /\.body-wrap\s*\{[\s\S]*?min-height: 0/);
+  assert.match(css, /\.main\s*\{[\s\S]*?min-height: 0/);
+  assert.match(css, /\.mobile-nav\s*\{[\s\S]*?position: relative;[\s\S]*?top: auto;[\s\S]*?flex: 0 0 auto/);
+  assert.doesNotMatch(css, /\.mobile-nav\s*\{[^}]*top: var\(--portfolio-demo-notice-height, 0px\)/);
   assert.match(css, /\.public-header\s*\{[\s\S]*?top: var\(--portfolio-demo-notice-height, 0px\)/);
-  assert.match(css, /\.mobile-nav\s*\{[\s\S]*?top: var\(--portfolio-demo-notice-height, 0px\)/);
   for (const selector of ['modal-overlay', 'link-modal', 'lightbox', 'maintenance-screen', 'hamburger-menu']) {
     assert.match(css, new RegExp(`\\.${selector}\\s*\\{[\\s\\S]*?inset: var\\(--portfolio-demo-notice-height, 0px\\) 0 0`));
   }

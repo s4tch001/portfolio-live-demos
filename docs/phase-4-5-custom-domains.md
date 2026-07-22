@@ -12,7 +12,7 @@ apex domain, replace any unrelated DNS record, or push the phase commits.
 
 | Demo | Public preview | DNS-only CNAME target | Netlify deploy |
 | --- | --- | --- | --- |
-| CN Class Management | <https://cn-demo.pauuu.dev> | `pauuu-cn-demo.netlify.app` | `6a603d7e228f86fb2c05e134` |
+| CN Class Management | <https://cn-demo.pauuu.dev> | `pauuu-cn-demo.netlify.app` | `6a6054c6d330aa5768689105` |
 | RCMI Attendance Checker | <https://rcmi-demo.pauuu.dev> | `pauuu-rcmi-demo.netlify.app` | `6a60518f84e5b89872299d37` |
 | Hours Tracker | <https://hours-demo.pauuu.dev> | `pauuu-hours-demo.netlify.app` | `6a603d7c20b6dd6e5c0447d1` |
 | Payroll Splitter | <https://payroll-demo.pauuu.dev> | `pauuu-payroll-demo.netlify.app` | `6a603d7e84e5b83c59299ee8` |
@@ -37,8 +37,8 @@ The value is consumed by:
 - the P Travels fixed navbar and mobile dropdown;
 - the Hours password gate and full-screen overlays;
 - the RCMI modal and busy overlays; and
-- the CN loading, maintenance, authentication, toolbar, public-header, mobile
-  navigation, and notification layers.
+- the CN authenticated app-shell height plus its loading, maintenance,
+  authentication, toolbar, public-header, and notification layers.
 
 RCMI's notice also tells visitors that the unlinked administrator panel must be
 opened manually at `/administrator`. The hint is visible without exposing any
@@ -48,6 +48,14 @@ The corrected builds were checked at 1280 x 800 and 390 x 844. Each demo had
 zero notice overlap. On mobile, the P Travels notice ended at 174 px, the
 navbar started at 174 px, and its dropdown started below the 64 px navbar at
 238 px.
+
+A follow-up CN shell hotfix removed the duplicate notice offset from the
+authenticated navigation and sized the app to the viewport space remaining
+below the notice. At 1280 x 800, the notice ended at 103 px, navigation occupied
+103–155 px, and the scrollable content began at 155 px. At 390 x 844, the
+notice ended at 213 px, navigation occupied 213–265 px, its tabs stayed within
+222–255 px, and the content began at 265 px. Accounts, Schedule, Reports,
+Tracker, and Classes all passed these checks with no browser console errors.
 
 ## Security and live acceptance
 

@@ -142,7 +142,7 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a603d7e228f86fb2c05e134",
+        "productionDeployId": "6a6054c6d330aa5768689105",
         "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {
@@ -184,6 +184,23 @@
       "appApis": true,
       "customDomains": true,
       "noticeLayoutNoOverlap": true,
+      "cnAuthenticatedShell": {
+        "primaryRoutesVerified": 5,
+        "desktop1280x800": {
+          "noticeBottom": 103,
+          "navTop": 103,
+          "navBottom": 155,
+          "mainTop": 155
+        },
+        "mobile390x844": {
+          "noticeBottom": 213,
+          "navTop": 213,
+          "navBottom": 265,
+          "mainTop": 265,
+          "tabsInsideNav": true
+        },
+        "browserConsoleErrors": 0
+      },
       "rcmiAdministratorNavigationHint": true
     }
   },

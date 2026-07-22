@@ -13,7 +13,7 @@ export default function AppShell() {
     <div
       id="app"
       className="app"
-      style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      style={{ display: 'flex', flexDirection: 'column' }}
     >
       <MobileNav onHamburger={() => setHamOpen((o) => !o)} />
       <HamburgerMenu open={hamOpen} onClose={() => setHamOpen(false)} />
