@@ -8,6 +8,7 @@ import {
 } from "./baselines.js";
 
 export const DEMO_NOTICE_ELEMENT = "portfolio-demo-notice";
+export const DEMO_NOTICE_HEIGHT_PROPERTY = "--portfolio-demo-notice-height";
 export const ROBOTS_DIRECTIVE = "noindex,nofollow,noarchive,nosnippet,noimageindex";
 
 const styles = `
@@ -199,6 +200,9 @@ export function buildDemoNoticeModel(contractOrProjectId) {
     deploymentMessage: String(
       contract.preview?.deploymentNotice ?? DEMO_DEPLOYMENT_NOTICE
     ),
+    navigationHint: contract.preview?.navigationHint
+      ? String(contract.preview.navigationHint)
+      : null,
     credentials: Object.freeze(
       (Array.isArray(contract.credentials) ? contract.credentials : []).map((entry) =>
         Object.freeze({
@@ -257,6 +261,8 @@ export function defineDemoNotice(
     }
 
     #contract;
+    #heightFrame;
+    #resizeObserver;
 
     set contract(value) {
       this.#contract = value;
@@ -269,11 +275,56 @@ export function defineDemoNotice(
 
     connectedCallback() {
       this.render();
+      this.#observeHeight();
+    }
+
+    disconnectedCallback() {
+      this.#resizeObserver?.disconnect();
+      this.#resizeObserver = undefined;
+
+      const ownerDocument = this.ownerDocument ?? documentRef;
+      const view = ownerDocument.defaultView;
+      if (this.#heightFrame !== undefined && typeof view?.cancelAnimationFrame === "function") {
+        view.cancelAnimationFrame(this.#heightFrame);
+      }
+      this.#heightFrame = undefined;
+
+      if (!ownerDocument.querySelector?.(DEMO_NOTICE_ELEMENT)) {
+        ownerDocument.documentElement?.style?.removeProperty?.(DEMO_NOTICE_HEIGHT_PROPERTY);
+      }
     }
 
     attributeChangedCallback() {
       if (this.isConnected) {
         this.render();
+      }
+    }
+
+    #publishHeight() {
+      const height = Math.ceil(Number(this.getBoundingClientRect?.().height ?? 0));
+      if (height > 0) {
+        const ownerDocument = this.ownerDocument ?? documentRef;
+        ownerDocument.documentElement?.style?.setProperty?.(DEMO_NOTICE_HEIGHT_PROPERTY, `${height}px`);
+      }
+    }
+
+    #observeHeight() {
+      this.#resizeObserver?.disconnect();
+      const ownerDocument = this.ownerDocument ?? documentRef;
+      const view = ownerDocument.defaultView;
+      const ResizeObserverBase = view?.ResizeObserver ?? globalThis.ResizeObserver;
+      if (typeof ResizeObserverBase === "function") {
+        this.#resizeObserver = new ResizeObserverBase(() => this.#publishHeight());
+        this.#resizeObserver.observe(this);
+      }
+
+      if (typeof view?.requestAnimationFrame === "function") {
+        this.#heightFrame = view.requestAnimationFrame(() => {
+          this.#heightFrame = undefined;
+          this.#publishHeight();
+        });
+      } else {
+        this.#publishHeight();
       }
     }
 
@@ -312,6 +363,12 @@ export function defineDemoNotice(
       deploymentMessage.className = "message";
       deploymentMessage.textContent = model.deploymentMessage;
       copy.append(title, message, sampleDataMessage, deploymentMessage);
+      if (model.navigationHint) {
+        const navigationHint = ownerDocument.createElement("p");
+        navigationHint.className = "message";
+        navigationHint.textContent = model.navigationHint;
+        copy.append(navigationHint);
+      }
       notice.append(copy);
 
       if (model.credentials.length > 0) {
@@ -342,6 +399,7 @@ export function defineDemoNotice(
 
       shadow.replaceChildren(style, notice);
       this.dataset.projectId = model.projectId;
+      this.#publishHeight();
     }
   }
 

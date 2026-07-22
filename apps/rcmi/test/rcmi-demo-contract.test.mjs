@@ -34,6 +34,13 @@ test('shows the default password hint and removes password mutation controls', a
   assert.doesNotMatch(admin, /newPassword/);
 });
 
+test('tells visitors to open the unlinked administrator route manually', async () => {
+  const contracts = await read('packages/demo-shell/src/contracts.js');
+  const notice = await read('packages/demo-shell/src/demo-notice.js');
+  assert.match(contracts, /manually open \/administrator in the address bar/);
+  assert.match(notice, /model\.navigationHint/);
+});
+
 test('RCMI Edge API uses a named key, bounded mutations, and immutable password', async () => {
   const edge = await read('supabase/functions/rcmi-api/index.ts');
   assert.match(edge, /auth: "publishable:rcmi_demo"/);
@@ -52,4 +59,10 @@ test('frontend consumes only environment-provided public Supabase settings', asy
   assert.match(api, /apikey: SUPABASE_PUBLISHABLE_KEY/);
   assert.doesNotMatch(api, /\.netlify\/functions/);
   assert.doesNotMatch(api, /ivqfxdibluhgyttgxbmz/);
+});
+
+test('keeps full-screen overlays below the preview notice', async () => {
+  const css = await read('apps/rcmi/src/styles.css');
+  assert.match(css, /\.modalOverlay\s*\{[\s\S]*?inset: var\(--portfolio-demo-notice-height, 0px\) 0 0/);
+  assert.match(css, /\.overlay\s*\{[\s\S]*?inset: var\(--portfolio-demo-notice-height, 0px\) 0 0/);
 });

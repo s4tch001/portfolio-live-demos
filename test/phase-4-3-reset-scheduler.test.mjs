@@ -111,7 +111,7 @@ test('private status reports bounded Cron execution evidence', async () => {
 test('deployment record captures successful reset, Cron, and post-reset baselines', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
 
-  assert.ok(['4.3', '4.4'].includes(state.phase));
+  assert.ok(['4.3', '4.4', '4.5'].includes(state.phase));
   assert.equal(state.supabase.cronInstalled, true);
   assert.deepEqual(state.supabase.resetScheduler, {
     installed: true,
@@ -135,7 +135,7 @@ test('deployment record captures successful reset, Cron, and post-reset baseline
   );
   assert.equal(state.supabase.resetVerification.postResetBaselines.rcmiMemberCount, 8);
   assert.equal(state.supabase.resetVerification.postResetBaselines.hoursPasswordMutationRejected, true);
-  assert.equal(state.netlifySitesCreated, state.phase === '4.4');
-  assert.equal(state.cloudflareSubdomainsConfigured, false);
+  assert.equal(state.netlifySitesCreated, ['4.4', '4.5'].includes(state.phase));
+  assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
   assert.equal(state.portfolioUpdated, false);
 });

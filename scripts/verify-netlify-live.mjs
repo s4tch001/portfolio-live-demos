@@ -1,13 +1,15 @@
 const SUPABASE_URL = 'https://ivqfxdibluhgyttgxbmz.supabase.co';
 const timeout = () => AbortSignal.timeout(20_000);
 
-const sites = {
-  cn: 'https://pauuu-cn-demo.netlify.app',
-  rcmi: 'https://pauuu-rcmi-demo.netlify.app',
-  hours: 'https://pauuu-hours-demo.netlify.app',
-  payroll: 'https://pauuu-payroll-demo.netlify.app',
-  travels: 'https://pauuu-travels-demo.netlify.app',
-};
+const hostMode = process.env.DEMO_HOST_MODE === 'netlify' ? 'netlify' : 'custom';
+const sites = Object.fromEntries(
+  ['cn', 'rcmi', 'hours', 'payroll', 'travels'].map((app) => [
+    app,
+    hostMode === 'custom'
+      ? `https://${app}-demo.pauuu.dev`
+      : `https://pauuu-${app}-demo.netlify.app`,
+  ]),
+);
 
 const publicKeys = {
   cn: process.env.CN_DEMO_PUBLISHABLE_KEY,
@@ -101,7 +103,7 @@ try {
   await verifySpa('cn', '/login');
   await verifySpa('rcmi', '/administrator');
   const apiResults = await verifyApis();
-  console.log(JSON.stringify({ ok: true, sites: siteResults, spaRoutes: true, apis: apiResults }, null, 2));
+  console.log(JSON.stringify({ ok: true, hostMode, sites: siteResults, spaRoutes: true, apis: apiResults }, null, 2));
 } catch (error) {
   console.error(JSON.stringify({ ok: false, error: error.message }, null, 2));
   process.exitCode = 1;

@@ -12,7 +12,7 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
   const project = JSON.parse(await read('config/supabase-project.json'));
   const expected = ['public', 'graphql_public', 'cn_demo', 'rcmi_demo', 'hours_demo'];
 
-  assert.ok(['4.2', '4.3', '4.4'].includes(state.phase));
+  assert.ok(['4.2', '4.3', '4.4', '4.5'].includes(state.phase));
   assert.deepEqual(state.supabase.dataApi.exposedSchemas, expected);
   assert.deepEqual(project.dashboardConfiguration.exposedSchemas, expected);
   assert.equal(state.supabase.dataApi.maxRows, 500);
@@ -66,7 +66,7 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
 
 test('later hosting work remains gated after reset activation', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
-  const resetsActive = ['4.3', '4.4'].includes(state.phase);
+  const resetsActive = ['4.3', '4.4', '4.5'].includes(state.phase);
 
   for (const app of Object.values(state.supabase.applications)) {
     assert.equal(app.databaseResetReady, true);
@@ -74,7 +74,7 @@ test('later hosting work remains gated after reset activation', async () => {
   }
   assert.equal(state.supabase.liveVerification.resetCoordinatorClaimed, 0);
   assert.equal(state.supabase.cronInstalled, resetsActive);
-  assert.equal(state.netlifySitesCreated, state.phase === '4.4');
-  assert.equal(state.cloudflareSubdomainsConfigured, false);
+  assert.equal(state.netlifySitesCreated, ['4.4', '4.5'].includes(state.phase));
+  assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
   assert.equal(state.portfolioUpdated, false);
 });

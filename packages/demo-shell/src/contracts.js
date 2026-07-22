@@ -67,7 +67,11 @@ const contracts = [
     id: "rcmi",
     name: "RCMI Attendance Checker",
     hostname: "rcmi-demo.pauuu.dev",
-    preview: commonPreview,
+    preview: {
+      ...commonPreview,
+      navigationHint:
+        "Administrator page: manually open /administrator in the address bar; it is not linked from the main page."
+    },
     reset: {
       ...commonReset,
       protectedDefaults: ["administrator-password"]

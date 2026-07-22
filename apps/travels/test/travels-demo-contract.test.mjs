@@ -37,6 +37,12 @@ test('uses the shared preview notice and noindex metadata', async () => {
   assert.match(robots, /Disallow: \//);
 });
 
+test('keeps the fixed navbar and mobile menu below the dynamic preview notice', async () => {
+  const css = await read('apps/travels/src/index.css');
+  assert.match(css, /\.navbar\s*\{[\s\S]*top: var\(--portfolio-demo-notice-height, 0px\)/);
+  assert.match(css, /\.nav-dropdown\s*\{[\s\S]*top: calc\(var\(--portfolio-demo-notice-height, 0px\) \+ 4rem\)/);
+});
+
 test('does not link the demo logo to the original production deployment', async () => {
   const navbar = await read('apps/travels/src/components/Navbar.jsx');
   assert.match(navbar, /href='#home'/);

@@ -70,7 +70,7 @@ function AppBody() {
     // target page never flashes before a possible redirect to maintenance.
     if (!ready) {
       return (
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
+        <div style={{ position: 'fixed', inset: 'var(--portfolio-demo-notice-height, 0px) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
           <span className="spinner" aria-label="Loading"></span>
         </div>
       );

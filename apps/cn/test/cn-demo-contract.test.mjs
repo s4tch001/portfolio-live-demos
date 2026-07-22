@@ -69,3 +69,16 @@ test('CN frontend uses only environment-provided public Supabase configuration',
   assert.doesNotMatch(endpoint, /ivqfxdibluhgyttgxbmz/);
   assert.match(api, /apikey: SUPABASE_PUBLISHABLE_KEY/);
 });
+
+test('keeps sticky navigation and full-screen layers below the preview notice', async () => {
+  const [app, css] = await Promise.all([
+    read('apps/cn/src/App.jsx'),
+    read('apps/cn/src/styles/styles.css'),
+  ]);
+  assert.match(app, /inset: 'var\(--portfolio-demo-notice-height, 0px\) 0 0'/);
+  assert.match(css, /\.public-header\s*\{[\s\S]*?top: var\(--portfolio-demo-notice-height, 0px\)/);
+  assert.match(css, /\.mobile-nav\s*\{[\s\S]*?top: var\(--portfolio-demo-notice-height, 0px\)/);
+  for (const selector of ['modal-overlay', 'link-modal', 'lightbox', 'maintenance-screen', 'hamburger-menu']) {
+    assert.match(css, new RegExp(`\\.${selector}\\s*\\{[\\s\\S]*?inset: var\\(--portfolio-demo-notice-height, 0px\\) 0 0`));
+  }
+});

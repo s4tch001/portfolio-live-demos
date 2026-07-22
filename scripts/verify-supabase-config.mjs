@@ -184,13 +184,13 @@ async function main() {
     "20260722001100"
   ];
   if (
-    deployment.phase !== "4.4" ||
+    !["4.4", "4.5"].includes(deployment.phase) ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {
-    failures.push("Phase 4.4 Supabase deployment evidence is incomplete or targets an unexpected project.");
+    failures.push("Phase 4.4+ Supabase deployment evidence is incomplete or targets an unexpected project.");
   }
   for (const appId of ["cn", "rcmi", "hours", "payroll", "travels"]) {
     const application = deployment.supabase?.applications?.[appId];
@@ -201,10 +201,10 @@ async function main() {
   if (
     deployment.supabase?.cronInstalled !== true ||
     deployment.netlifySitesCreated !== true ||
-    deployment.cloudflareSubdomainsConfigured !== false ||
+    deployment.cloudflareSubdomainsConfigured !== (deployment.phase === "4.5") ||
     deployment.portfolioUpdated !== false
   ) {
-    failures.push("Phase 4.4 scheduler or later-hosting boundary is inconsistent.");
+    failures.push("Phase 4.4+ scheduler or later-hosting boundary is inconsistent.");
   }
   if (
     deployment.supabase?.vault?.projectUrlSecret !== "configured" ||

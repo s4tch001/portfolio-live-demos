@@ -331,7 +331,7 @@ header {
 /* MODAL OVERLAY */
 .overlay {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   z-index: 100;
@@ -641,7 +641,7 @@ header {
 /* PASSWORD GATE */
 .pw-gate {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: var(--bg);
   z-index: 999;
   display: flex;
@@ -736,7 +736,7 @@ header {
 /* CHANGE PASSWORD MODAL */
 .chpw-overlay {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   z-index: 200;

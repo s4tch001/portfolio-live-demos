@@ -54,3 +54,10 @@ test('daily reset clears visitor sessions and leaves activation disabled', async
   assert.match(migration, /revoke all on function hours_demo\.reset_demo_data\(date\) from service_role/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
+
+test('keeps gates and modal overlays inside the page area below the preview notice', async () => {
+  const css = await read('apps/hours/assets/css/styles.css');
+  for (const selector of ['overlay', 'pw-gate', 'chpw-overlay']) {
+    assert.match(css, new RegExp(`\\.${selector}\\s*\\{[\\s\\S]*?inset: var\\(--portfolio-demo-notice-height, 0px\\) 0 0`));
+  }
+});

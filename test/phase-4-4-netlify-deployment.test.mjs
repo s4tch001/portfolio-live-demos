@@ -43,9 +43,9 @@ test('deployment record captures five isolated Free production previews', async 
   const metadata = JSON.parse(await read('config/netlify-sites.json'));
   const state = JSON.parse(await read('config/deployment-state.json'));
 
-  assert.equal(state.phase, '4.4');
+  assert.ok(['4.4', '4.5'].includes(state.phase));
   assert.equal(state.netlifySitesCreated, true);
-  assert.equal(state.cloudflareSubdomainsConfigured, false);
+  assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
   assert.equal(state.portfolioUpdated, false);
   assert.equal(state.netlify.plan, 'Free');
   assert.equal(state.netlify.deploymentMode, 'manual-atomic');
@@ -57,17 +57,12 @@ test('deployment record captures five isolated Free production previews', async 
     assert.equal(site.siteName, metadata.sites[appId].preferredSiteName);
     assert.equal(site.url, metadata.sites[appId].netlifyUrl);
     assert.equal(site.productionDeployId, metadata.sites[appId].productionDeployId);
+    if (state.phase === '4.5') assert.equal(site.customUrl, metadata.sites[appId].customUrl);
   }
 
-  assert.deepEqual(state.netlify.liveVerification, {
-    completed: true,
-    https200: true,
-    securityHeaders: true,
-    noindex: true,
-    immutableAssets: true,
-    spaRoutes: true,
-    appApis: true,
-  });
+  for (const marker of ['completed', 'https200', 'securityHeaders', 'noindex', 'immutableAssets', 'spaRoutes', 'appApis']) {
+    assert.equal(state.netlify.liveVerification[marker], true);
+  }
 });
 
 test('every site applies the public-preview security header baseline', async () => {

@@ -183,7 +183,7 @@ Navbar
 
 .navbar {
   position: fixed;
-  top: 0;
+  top: var(--portfolio-demo-notice-height, 0px);
   left: 0;
   width: 100%;
   background: var(--clr-primary-3);
@@ -223,7 +223,7 @@ Navbar
 /* Mobile dropdown — nasa labas ng navbar, nagpu-push ng content */
 .nav-dropdown {
   position: fixed;
-  top: 4rem; /* height ng navbar */
+  top: calc(var(--portfolio-demo-notice-height, 0px) + 4rem); /* notice + navbar */
   left: 0;
   width: 100%;
   background: var(--clr-primary-3);

@@ -17,11 +17,21 @@ import {
   validatePersistentDemoBaselines
 } from "../src/baselines.js";
 import {
+  DEMO_NOTICE_HEIGHT_PROPERTY,
   ROBOTS_DIRECTIVE,
   applyDemoDocumentGuards,
   buildDemoNoticeModel,
   defineDemoNotice
 } from "../src/demo-notice.js";
+
+test("publishes a dynamic document-level notice height contract", async () => {
+  const source = await readFile(new URL("../src/demo-notice.js", import.meta.url), "utf8");
+  assert.equal(DEMO_NOTICE_HEIGHT_PROPERTY, "--portfolio-demo-notice-height");
+  assert.match(source, /new ResizeObserverBase/);
+  assert.match(source, /getBoundingClientRect/);
+  assert.match(source, /style\?\.setProperty\?\.\(DEMO_NOTICE_HEIGHT_PROPERTY/);
+  assert.match(source, /style\?\.removeProperty\?\.\(DEMO_NOTICE_HEIGHT_PROPERTY/);
+});
 
 test("defines exactly five unique, immutable preview contracts", () => {
   assert.deepEqual(validateDemoContracts(), { valid: true, count: 5 });
@@ -60,6 +70,15 @@ test("locks the approved public demo credentials", () => {
     ]
   );
   assert.equal(getDemoContract("rcmi").credentials[0].password, "password");
+  assert.equal(
+    getDemoContract("rcmi").preview.navigationHint,
+    "Administrator page: manually open /administrator in the address bar; it is not linked from the main page."
+  );
+  assert.equal(
+    buildDemoNoticeModel("rcmi").navigationHint,
+    "Administrator page: manually open /administrator in the address bar; it is not linked from the main page."
+  );
+  assert.equal(buildDemoNoticeModel("cn").navigationHint, null);
   assert.equal(getDemoContract("hours").credentials[0].password, "password");
   assert.equal(JSON.stringify(DEMO_CONTRACTS).includes("devpau"), false);
 });
@@ -134,6 +153,7 @@ test("rejects unknown contract ids without reflecting them into markup", () => {
   assert.equal(model.message, DAILY_RESET_NOTICE);
   assert.equal(model.sampleDataMessage, GENERATED_SAMPLE_NOTICE);
   assert.equal(model.deploymentMessage, DEMO_DEPLOYMENT_NOTICE);
+  assert.equal(model.navigationHint, null);
 });
 
 test("installs a noindex robots guard without requiring a browser framework", () => {

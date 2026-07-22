@@ -497,7 +497,7 @@ h2 {
 
 .modalOverlay {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   z-index: 20;
   display: grid;
   place-items: center;
@@ -879,7 +879,7 @@ h2 {
 
 .overlay {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   z-index: 25;
   display: grid;
   place-items: center;

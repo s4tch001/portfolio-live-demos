@@ -753,7 +753,7 @@ tr:hover td {
 }
 .calendar-popover-overlay {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   z-index: 900;
   background: transparent;
 }
@@ -1018,7 +1018,7 @@ tr:hover td {
 .modal-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: rgba(15, 23, 42, 0.5);
   z-index: 1000;
   align-items: center;
@@ -1362,7 +1362,7 @@ textarea.form-control {
 .link-modal {
   display: none;
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: rgba(15, 23, 42, 0.6);
   z-index: 2000;
   align-items: center;
@@ -1527,7 +1527,7 @@ textarea.form-control {
 .lightbox {
   display: none;
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   background: rgba(0, 0, 0, 0.92);
   z-index: 3000;
   align-items: center;
@@ -2238,7 +2238,7 @@ textarea.form-control {
 }
 .toolbar-trigger {
   position: fixed;
-  top: 68px;
+  top: calc(var(--portfolio-demo-notice-height, 0px) + 68px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 90;
@@ -2269,7 +2269,7 @@ textarea.form-control {
 }
 .toolbar-expanded {
   position: fixed;
-  top: 60px;
+  top: calc(var(--portfolio-demo-notice-height, 0px) + 60px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 90;
@@ -2646,7 +2646,7 @@ textarea.form-control {
 /* Full-screen maintenance page (shown to all non-devpau users when ON). */
 .maintenance-screen {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   z-index: 20000;
   display: flex;
   align-items: center;
@@ -3249,7 +3249,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   position: sticky;
-  top: 0;
+  top: var(--portfolio-demo-notice-height, 0px);
   overflow: visible;
   z-index: 200;
   background: var(--surface);
@@ -3327,7 +3327,7 @@ textarea.form-control {
 /* ── Account drawer (hamburger) ─────────────────────────────────────────── */
 .hamburger-menu {
   position: fixed;
-  inset: 0;
+  inset: var(--portfolio-demo-notice-height, 0px) 0 0;
   z-index: 900;
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(3px);
@@ -4188,7 +4188,7 @@ textarea.form-control {
     align-items: center;
     justify-content: center;
     position: sticky;
-    top: 0;
+    top: var(--portfolio-demo-notice-height, 0px);
     z-index: 200;
     overflow: visible;
     background: var(--surface);
@@ -5701,7 +5701,7 @@ textarea.form-control {
 @media (max-width: 600px) {
   .notif-dropdown.open {
     position: fixed;
-    top: calc(52px + var(--safe-top, 0px));
+    top: calc(var(--portfolio-demo-notice-height, 0px) + 52px + var(--safe-top, 0px));
     left: 0;
     right: 0;
     bottom: var(--safe-bottom, 0px);
@@ -5717,7 +5717,7 @@ textarea.form-control {
   .notif-dropdown-list {
     max-height: none;
     height: calc(
-      100vh - 52px - var(--safe-top, 0px) - var(--safe-bottom, 0px) - 53px
+      100vh - var(--portfolio-demo-notice-height, 0px) - 52px - var(--safe-top, 0px) - var(--safe-bottom, 0px) - 53px
     );
   }
 }
@@ -5739,7 +5739,7 @@ textarea.form-control {
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   position: sticky;
-  top: 0;
+  top: var(--portfolio-demo-notice-height, 0px);
   z-index: 20;
 }
 .public-header-brand,

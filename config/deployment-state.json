@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "phase": "4.4",
+  "phase": "4.5",
   "updatedAt": "2026-07-22",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
@@ -142,31 +142,36 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a60374df69da29784c0bd86"
+        "productionDeployId": "6a603d7e228f86fb2c05e134",
+        "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {
         "siteId": "d20cfc17-c761-4d5b-93e1-05354c8e8651",
         "siteName": "pauuu-rcmi-demo",
         "url": "https://pauuu-rcmi-demo.netlify.app",
-        "productionDeployId": "6a603790cd99b589dfaa5953"
+        "productionDeployId": "6a60518f84e5b89872299d37",
+        "customUrl": "https://rcmi-demo.pauuu.dev"
       },
       "hours": {
         "siteId": "8a1961e7-e895-4df7-b20a-da967b5541d4",
         "siteName": "pauuu-hours-demo",
         "url": "https://pauuu-hours-demo.netlify.app",
-        "productionDeployId": "6a60379392d2f445449f55e1"
+        "productionDeployId": "6a603d7c20b6dd6e5c0447d1",
+        "customUrl": "https://hours-demo.pauuu.dev"
       },
       "payroll": {
         "siteId": "c8fa391e-ca75-4c8f-a8c3-2660ff8ff48a",
         "siteName": "pauuu-payroll-demo",
         "url": "https://pauuu-payroll-demo.netlify.app",
-        "productionDeployId": "6a60378fb33a1846d5d2278d"
+        "productionDeployId": "6a603d7e84e5b83c59299ee8",
+        "customUrl": "https://payroll-demo.pauuu.dev"
       },
       "travels": {
         "siteId": "e0648fcd-8d3a-4d9f-8043-c957146de9dc",
         "siteName": "pauuu-travels-demo",
         "url": "https://pauuu-travels-demo.netlify.app",
-        "productionDeployId": "6a60379d2d011f531d22cc0f"
+        "productionDeployId": "6a603d7e3df0e40c295441dd",
+        "customUrl": "https://travels-demo.pauuu.dev"
       }
     },
     "liveVerification": {
@@ -176,10 +181,27 @@
       "noindex": true,
       "immutableAssets": true,
       "spaRoutes": true,
-      "appApis": true
+      "appApis": true,
+      "customDomains": true,
+      "noticeLayoutNoOverlap": true,
+      "rcmiAdministratorNavigationHint": true
     }
   },
+  "cloudflare": {
+    "plan": "Free",
+    "zone": "pauuu.dev",
+    "proxyMode": "dns-only",
+    "ttl": "auto",
+    "records": {
+      "cn": { "hostname": "cn-demo.pauuu.dev", "type": "CNAME", "target": "pauuu-cn-demo.netlify.app" },
+      "rcmi": { "hostname": "rcmi-demo.pauuu.dev", "type": "CNAME", "target": "pauuu-rcmi-demo.netlify.app" },
+      "hours": { "hostname": "hours-demo.pauuu.dev", "type": "CNAME", "target": "pauuu-hours-demo.netlify.app" },
+      "payroll": { "hostname": "payroll-demo.pauuu.dev", "type": "CNAME", "target": "pauuu-payroll-demo.netlify.app" },
+      "travels": { "hostname": "travels-demo.pauuu.dev", "type": "CNAME", "target": "pauuu-travels-demo.netlify.app" }
+    },
+    "httpsVerified": true
+  },
   "netlifySitesCreated": true,
-  "cloudflareSubdomainsConfigured": false,
+  "cloudflareSubdomainsConfigured": true,
   "portfolioUpdated": false
 }
