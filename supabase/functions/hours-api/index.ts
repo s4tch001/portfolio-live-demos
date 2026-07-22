@@ -253,7 +253,7 @@ async function handle(request: Request, context: any) {
   throw new ApiError(404, "not_found");
 }
 
-const authorized = withSupabase({ auth: "publishable:hours" }, async (request, context) => {
+const authorized = withSupabase({ auth: "publishable:hours_demo" }, async (request, context) => {
   try {
     return await handle(request, context);
   } catch (error) {

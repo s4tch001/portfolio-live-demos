@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "phase": "4.1",
+  "phase": "4.2",
   "updatedAt": "2026-07-22",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
@@ -14,6 +14,17 @@
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
+    "dataApi": {
+      "exposedSchemas": [
+        "public",
+        "graphql_public",
+        "cn_demo",
+        "rcmi_demo",
+        "hours_demo"
+      ],
+      "maxRows": 500,
+      "browserRolesDirectAccessDenied": true
+    },
     "applications": {
       "cn": { "databaseResetReady": true, "enabled": false },
       "rcmi": { "databaseResetReady": true, "enabled": false },
@@ -22,16 +33,43 @@
       "travels": { "databaseResetReady": true, "enabled": false }
     },
     "edgeFunctions": {
-      "reset-coordinator": "active",
-      "cn-api": "not-deployed",
-      "rcmi-api": "not-deployed",
-      "hours-api": "not-deployed"
+      "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 6, "verifyJwt": false },
+      "rcmi-api": { "status": "active", "version": 5, "verifyJwt": false },
+      "hours-api": { "status": "active", "version": 5, "verifyJwt": false }
     },
     "namedKeys": {
       "automations": "configured",
-      "cn": "not-created",
-      "rcmi": "not-created",
-      "hours": "not-created"
+      "cn_demo": "configured",
+      "rcmi_demo": "configured",
+      "hours_demo": "configured"
+    },
+    "liveVerification": {
+      "completed": true,
+      "corsPreflight": true,
+      "blockedOriginRejected": true,
+      "missingKeyRejected": true,
+      "crossKeyRejected": true,
+      "cn": {
+        "defaultLoginsVerified": ["admin", "testteacher", "teststudent"],
+        "teacherCount": 3,
+        "studentCount": 6,
+        "scheduleCount": 7,
+        "reportCount": 2,
+        "credentialMutationRejected": true,
+        "restrictedRoutesRejected": true
+      },
+      "rcmi": {
+        "administratorLoginVerified": true,
+        "memberCount": 8,
+        "passwordMutationRejected": true
+      },
+      "hours": {
+        "passwordLoginVerified": true,
+        "entriesReadVerified": true,
+        "passwordMutationRejected": true
+      },
+      "resetCoordinatorClaimed": 0
     },
     "cronInstalled": false
   },

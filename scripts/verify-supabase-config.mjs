@@ -100,21 +100,21 @@ async function main() {
   requirePattern(cnMigration, /revoke all on schema cn_demo from public, anon, authenticated/i, "CN schema must deny browser roles by default.");
   requirePattern(cnMigration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/i, "CN schema must reserve the master username.");
   requirePattern(cnMigration, /revoke all on function cn_demo\.reset_demo_data\(date\) from public, anon, authenticated, service_role/i, "CN reset handler must not be directly executable by API roles.");
-  requirePattern(cnFunction, /withSupabase\(\{ auth: "publishable:cn" \}/, "CN API must accept only its named publishable key.");
+  requirePattern(cnFunction, /withSupabase\(\{ auth: "publishable:cn_demo" \}/, "CN API must accept only its named publishable key.");
   requirePattern(cnFunction, /demo_credentials_immutable/, "CN API must enforce immutable preview credentials.");
   requirePattern(config, /"rcmi_demo"/, "RCMI schema must be explicitly listed for the Data API.");
   requirePattern(config, /^\[functions\.rcmi-api\]\r?\nverify_jwt = false$/m, "RCMI API must delegate modern publishable-key validation to the server wrapper.");
   requirePattern(rcmiMigration, /revoke all on schema rcmi_demo from public, anon, authenticated/i, "RCMI schema must deny browser roles by default.");
   requirePattern(rcmiMigration, /protect_default_password/i, "RCMI schema must protect its preview password.");
   requirePattern(rcmiMigration, /revoke all on function rcmi_demo\.reset_demo_data\(date\) from service_role/i, "RCMI reset handler must not be directly executable by API roles.");
-  requirePattern(rcmiFunction, /withSupabase\(\{ auth: "publishable:rcmi" \}/, "RCMI API must accept only its named publishable key.");
+  requirePattern(rcmiFunction, /withSupabase\(\{ auth: "publishable:rcmi_demo" \}/, "RCMI API must accept only its named publishable key.");
   requirePattern(rcmiFunction, /demo_password_immutable/, "RCMI API must reject password changes.");
   requirePattern(config, /"hours_demo"/, "Hours schema must be explicitly listed for the Data API.");
   requirePattern(config, /^\[functions\.hours-api\]\r?\nverify_jwt = false$/m, "Hours API must delegate modern publishable-key validation to the server wrapper.");
   requirePattern(hoursMigration, /revoke all on schema hours_demo from public, anon, authenticated/i, "Hours schema must deny browser roles by default.");
   requirePattern(hoursMigration, /protect_default_password/i, "Hours schema must protect its preview password.");
   requirePattern(hoursMigration, /revoke all on function hours_demo\.reset_demo_data\(date\) from service_role/i, "Hours reset handler must not be directly executable by API roles.");
-  requirePattern(hoursFunction, /withSupabase\(\{ auth: "publishable:hours" \}/, "Hours API must accept only its named publishable key.");
+  requirePattern(hoursFunction, /withSupabase\(\{ auth: "publishable:hours_demo" \}/, "Hours API must accept only its named publishable key.");
   requirePattern(hoursFunction, /demo_password_immutable/, "Hours API must reject password changes.");
   requirePattern(config, /"payroll_demo"/, "Payroll schema must be explicitly listed for the reset contract.");
   requirePattern(payrollMigration, /persists no visitor data/i, "Payroll reset handler must document its no-persistence design.");
@@ -165,18 +165,18 @@ async function main() {
     "20260722000600"
   ];
   if (
-    deployment.phase !== "4.1" ||
+    deployment.phase !== "4.2" ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {
-    failures.push("Phase 4.1 Supabase deployment evidence is incomplete or targets an unexpected project.");
+    failures.push("Phase 4.2 Supabase deployment evidence is incomplete or targets an unexpected project.");
   }
   for (const appId of ["cn", "rcmi", "hours", "payroll", "travels"]) {
     const application = deployment.supabase?.applications?.[appId];
     if (application?.databaseResetReady !== true || application?.enabled !== false) {
-      failures.push(`Phase 4.1 application state is unsafe or incomplete for ${appId}.`);
+      failures.push(`Phase 4.2 application state is unsafe or incomplete for ${appId}.`);
     }
   }
   if (
@@ -185,7 +185,36 @@ async function main() {
     deployment.cloudflareSubdomainsConfigured !== false ||
     deployment.portfolioUpdated !== false
   ) {
-    failures.push("Phase 4.1 must not claim or activate later deployment work.");
+    failures.push("Phase 4.2 must not claim or activate later deployment work.");
+  }
+
+  const expectedSchemas = ["public", "graphql_public", "cn_demo", "rcmi_demo", "hours_demo"];
+  if (
+    JSON.stringify(project.dashboardConfiguration?.exposedSchemas) !== JSON.stringify(expectedSchemas) ||
+    project.dashboardConfiguration?.maxRows !== 500 ||
+    JSON.stringify(deployment.supabase?.dataApi?.exposedSchemas) !== JSON.stringify(expectedSchemas) ||
+    deployment.supabase?.dataApi?.maxRows !== 500 ||
+    deployment.supabase?.dataApi?.browserRolesDirectAccessDenied !== true
+  ) {
+    failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
+  }
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 6], ["rcmi-api", 5], ["hours-api", 5]]) {
+    const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
+    if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
+      failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);
+    }
+  }
+  for (const keyName of ["automations", "cn_demo", "rcmi_demo", "hours_demo"]) {
+    if (deployment.supabase?.namedKeys?.[keyName] !== "configured") {
+      failures.push(`Phase 4.2 named-key evidence is incomplete for ${keyName}.`);
+    }
+  }
+  if (
+    deployment.supabase?.liveVerification?.completed !== true ||
+    deployment.supabase?.liveVerification?.crossKeyRejected !== true ||
+    deployment.supabase?.liveVerification?.resetCoordinatorClaimed !== 0
+  ) {
+    failures.push("Phase 4.2 live security verification evidence is incomplete.");
   }
 
   try {

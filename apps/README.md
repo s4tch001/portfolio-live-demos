@@ -16,7 +16,8 @@ are explicit no-ops because those pages do not persist visitor values.
 
 From the workspace root, run `npm run build:apps` and `npm run check`.
 Frontend environment values are documented in `.env.example`. The five app
-schemas and reset handlers were deployed in Phase 4.1, but every reset
-registration remains disabled. Named publishable keys, app Edge Function
-deployments, Netlify sites, custom domains, reset activation, and portfolio
-links remain gated behind later Phase 4 subphases.
+schemas and reset handlers were deployed in Phase 4.1. Phase 4.2 deployed the
+CN, RCMI, and Hours Edge APIs behind exact app-specific publishable keys and
+completed live security checks. Every reset registration remains disabled;
+Netlify sites, custom domains, reset activation, and portfolio links remain
+gated behind later Phase 4 subphases.

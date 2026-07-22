@@ -46,7 +46,7 @@ test('database protects demo credentials and rejects the reserved master usernam
 
 test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', async () => {
   const edge = await read('supabase/functions/cn-api/index.ts');
-  assert.match(edge, /auth: "publishable:cn"/);
+  assert.match(edge, /auth: "publishable:cn_demo"/);
   assert.match(edge, /ALLOWED_ORIGINS/);
   assert.match(edge, /login_temporarily_locked/);
   assert.match(edge, /path\.startsWith\("\/dev\/"\)/);
@@ -55,6 +55,9 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /MAX_UPLOAD_BYTES = 2 \* 1024 \* 1024/);
   assert.match(edge, /existing\.length >= 20/);
   assert.match(edge, /100 \* 1024 \* 1024/);
+  assert.doesNotMatch(edge, /select\("id,username,password_hash,fullname,name,status,language"\)/);
+  assert.match(edge, /candidate === "student"[\s\S]*password_hash,name,status,language[\s\S]*password_hash,fullname,status,language/);
+  assert.match(edge, /role === "student"[\s\S]*id,username,name,status,language[\s\S]*id,username,fullname,status,language/);
 });
 
 test('CN frontend uses only environment-provided public Supabase configuration', async () => {

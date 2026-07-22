@@ -31,12 +31,9 @@ test('Phase 4.1 records every schema as ready without activating resets', async 
   assert.equal(state.supabase.cronInstalled, false);
 });
 
-test('Phase 4.1 does not claim later deployment work', async () => {
+test('Phase 4.1 safety boundaries remain after later API deployment', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
-  assert.equal(state.supabase.edgeFunctions['cn-api'], 'not-deployed');
-  assert.equal(state.supabase.edgeFunctions['rcmi-api'], 'not-deployed');
-  assert.equal(state.supabase.edgeFunctions['hours-api'], 'not-deployed');
-  assert.equal(state.supabase.namedKeys.cn, 'not-created');
+  assert.equal(state.supabase.cronInstalled, false);
   assert.equal(state.netlifySitesCreated, false);
   assert.equal(state.cloudflareSubdomainsConfigured, false);
   assert.equal(state.portfolioUpdated, false);

@@ -36,7 +36,7 @@ test('shows the default password hint and removes password mutation controls', a
 
 test('RCMI Edge API uses a named key, bounded mutations, and immutable password', async () => {
   const edge = await read('supabase/functions/rcmi-api/index.ts');
-  assert.match(edge, /auth: "publishable:rcmi"/);
+  assert.match(edge, /auth: "publishable:rcmi_demo"/);
   assert.match(edge, /count > 200/);
   assert.match(edge, /login_temporarily_locked/);
   assert.match(edge, /demo_password_immutable/);

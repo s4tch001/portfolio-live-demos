@@ -17,7 +17,15 @@
   "dashboardConfiguration": {
     "dataApiEnabled": true,
     "automaticallyExposeNewTables": false,
-    "automaticRls": true
+    "automaticRls": true,
+    "exposedSchemas": [
+      "public",
+      "graphql_public",
+      "cn_demo",
+      "rcmi_demo",
+      "hours_demo"
+    ],
+    "maxRows": 500
   },
   "dataPolicy": "fictional-demo-data-only",
   "purpose": "Dedicated shared backend for five disposable portfolio previews"

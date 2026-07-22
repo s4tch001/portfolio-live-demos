@@ -27,7 +27,7 @@ test('shows the immutable default password and has no password-change controls',
 
 test('isolates visitor entries by server-issued session and bounds stored hours', async () => {
   const edge = await read('supabase/functions/hours-api/index.ts');
-  assert.match(edge, /auth: "publishable:hours"/);
+  assert.match(edge, /auth: "publishable:hours_demo"/);
   assert.match(edge, /eq\("session_hash", sessionHash\)/);
   assert.match(edge, /value\.length > 48/);
   assert.match(edge, /daily_hours_exceeded/);

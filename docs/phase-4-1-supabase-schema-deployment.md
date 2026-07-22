@@ -59,6 +59,6 @@ migration. Dropping a demo schema would require a separate explicit approval.
 
 ## Next gated work
 
-Phase 4.2 may create the named `cn`, `rcmi`, and `hours` publishable keys,
+Phase 4.2 may create the named `cn_demo`, `rcmi_demo`, and `hours_demo` publishable keys,
 deploy the matching Edge Functions, and run unauthenticated/authenticated
 negative-path verification. It must not begin without the next go signal.

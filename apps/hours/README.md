@@ -9,6 +9,7 @@ Local development requires `VITE_SUPABASE_URL` and the named
 deleted by the daily Manila-time reset. The server-verified preview password
 is immutable and is restored independently of visitor data.
 
-Phase 4.1 deployed the `hours_demo` schema and reset handler while keeping its
-reset registration disabled. The Hours Edge API and named publishable key are
-not deployed yet.
+Phase 4.2 deployed `hours-api` behind the exact `hours_demo` publishable key and
+verified authenticated entry reads plus immutable password enforcement. The
+reset registration remains disabled; reset activation, Netlify configuration,
+and DNS remain pending.

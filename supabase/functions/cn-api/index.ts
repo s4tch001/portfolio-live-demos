@@ -157,8 +157,11 @@ async function requireSession(request: Request, database: any): Promise<Session>
 
   const role = String(session.role) as DemoUser["role"];
   const table = role === "admin" ? "admins" : role === "teacher" ? "teachers" : "students";
+  const accountColumns = role === "student"
+    ? "id,username,name,status,language"
+    : "id,username,fullname,status,language";
   const account = await queryOne(
-    database.from(table).select("id,username,fullname,name,status,language").eq("id", session.user_id).maybeSingle()
+    database.from(table).select(accountColumns).eq("id", session.user_id).maybeSingle()
   );
   if (!account || account.status !== "Active") throw new ApiError(401, "unauthorized");
   return {
@@ -200,7 +203,10 @@ async function login(request: Request, database: any) {
   let role: DemoUser["role"] | null = null;
   for (const candidate of ["admin", "teacher", "student"] as const) {
     const table = candidate === "admin" ? "admins" : candidate === "teacher" ? "teachers" : "students";
-    account = await queryOne(database.from(table).select("id,username,password_hash,fullname,name,status,language").eq("username", username).maybeSingle());
+    const accountColumns = candidate === "student"
+      ? "id,username,password_hash,name,status,language"
+      : "id,username,password_hash,fullname,status,language";
+    account = await queryOne(database.from(table).select(accountColumns).eq("username", username).maybeSingle());
     if (account) {
       role = candidate;
       break;
@@ -648,7 +654,7 @@ async function handle(request: Request, context: any) {
   throw new ApiError(404, "not_found");
 }
 
-const authorized = withSupabase({ auth: "publishable:cn" }, async (request, context) => {
+const authorized = withSupabase({ auth: "publishable:cn_demo" }, async (request, context) => {
   try {
     return await handle(request, context);
   } catch (error) {
