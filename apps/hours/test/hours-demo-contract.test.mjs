@@ -33,6 +33,7 @@ test('isolates visitor entries by server-issued session and bounds stored hours'
   assert.match(edge, /daily_hours_exceeded/);
   assert.match(edge, /count > 200/);
   assert.match(edge, /ALLOWED_ORIGINS/);
+  assert.match(edge, /https:\/\/pauuu-hours-demo\.netlify\.app/);
 });
 
 test('locks the password at the database and API layers', async () => {

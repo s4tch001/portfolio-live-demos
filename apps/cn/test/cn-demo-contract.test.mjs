@@ -48,6 +48,7 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   const edge = await read('supabase/functions/cn-api/index.ts');
   assert.match(edge, /auth: "publishable:cn_demo"/);
   assert.match(edge, /ALLOWED_ORIGINS/);
+  assert.match(edge, /https:\/\/pauuu-cn-demo\.netlify\.app/);
   assert.match(edge, /login_temporarily_locked/);
   assert.match(edge, /path\.startsWith\("\/dev\/"\)/);
   assert.match(edge, /path\.startsWith\("\/admin-permissions"\)/);

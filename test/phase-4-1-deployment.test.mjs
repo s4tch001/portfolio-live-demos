@@ -22,18 +22,19 @@ test('deployment record matches all committed migration versions', async () => {
 
 test('every schema remains ready and reset activation follows the recorded phase', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
+  const resetsActive = ['4.3', '4.4'].includes(state.phase);
   for (const appId of appIds) {
     assert.deepEqual(state.supabase.applications[appId], {
       databaseResetReady: true,
-      enabled: state.phase === '4.3',
+      enabled: resetsActive,
     });
   }
-  assert.equal(state.supabase.cronInstalled, state.phase === '4.3');
+  assert.equal(state.supabase.cronInstalled, resetsActive);
 });
 
 test('Phase 4.1 hosting safety boundaries remain after later Supabase deployment', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
-  assert.equal(state.netlifySitesCreated, false);
+  assert.equal(state.netlifySitesCreated, state.phase === '4.4');
   assert.equal(state.cloudflareSubdomainsConfigured, false);
   assert.equal(state.portfolioUpdated, false);
 });

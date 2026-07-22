@@ -2,6 +2,7 @@ import { withSupabase } from "npm:@supabase/server@1.4.0";
 
 const ALLOWED_ORIGINS = new Set([
   "https://rcmi-demo.pauuu.dev",
+  "https://pauuu-rcmi-demo.netlify.app",
   "http://localhost:5174",
   "http://127.0.0.1:5174"
 ]);

@@ -3,6 +3,7 @@ import { withSupabase } from "npm:@supabase/server@1.4.0";
 const APP_ID = "cn";
 const ALLOWED_ORIGINS = new Set([
   "https://cn-demo.pauuu.dev",
+  "https://pauuu-cn-demo.netlify.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ]);

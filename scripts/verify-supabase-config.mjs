@@ -184,13 +184,13 @@ async function main() {
     "20260722001100"
   ];
   if (
-    deployment.phase !== "4.3" ||
+    deployment.phase !== "4.4" ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {
-    failures.push("Phase 4.3 Supabase deployment evidence is incomplete or targets an unexpected project.");
+    failures.push("Phase 4.4 Supabase deployment evidence is incomplete or targets an unexpected project.");
   }
   for (const appId of ["cn", "rcmi", "hours", "payroll", "travels"]) {
     const application = deployment.supabase?.applications?.[appId];
@@ -200,11 +200,11 @@ async function main() {
   }
   if (
     deployment.supabase?.cronInstalled !== true ||
-    deployment.netlifySitesCreated !== false ||
+    deployment.netlifySitesCreated !== true ||
     deployment.cloudflareSubdomainsConfigured !== false ||
     deployment.portfolioUpdated !== false
   ) {
-    failures.push("Phase 4.3 scheduler or later-hosting boundary is inconsistent.");
+    failures.push("Phase 4.4 scheduler or later-hosting boundary is inconsistent.");
   }
   if (
     deployment.supabase?.vault?.projectUrlSecret !== "configured" ||
@@ -241,7 +241,7 @@ async function main() {
   ) {
     failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
   }
-  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 6], ["rcmi-api", 5], ["hours-api", 5]]) {
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 7], ["rcmi-api", 6], ["hours-api", 6]]) {
     const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
     if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
       failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);

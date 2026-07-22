@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "plan": "Free",
+  "repository": "s4tch001/portfolio-live-demos",
+  "baseDirectory": null,
+  "sites": {
+    "cn": {
+      "preferredSiteName": "pauuu-cn-demo",
+      "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
+      "netlifyUrl": "https://pauuu-cn-demo.netlify.app",
+      "productionDeployId": "6a60374df69da29784c0bd86",
+      "packageDirectory": "apps/cn",
+      "publishDirectory": "apps/cn/dist",
+      "customHostname": "cn-demo.pauuu.dev",
+      "publicEnvironment": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"]
+    },
+    "rcmi": {
+      "preferredSiteName": "pauuu-rcmi-demo",
+      "siteId": "d20cfc17-c761-4d5b-93e1-05354c8e8651",
+      "netlifyUrl": "https://pauuu-rcmi-demo.netlify.app",
+      "productionDeployId": "6a603790cd99b589dfaa5953",
+      "packageDirectory": "apps/rcmi",
+      "publishDirectory": "apps/rcmi/dist",
+      "customHostname": "rcmi-demo.pauuu.dev",
+      "publicEnvironment": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"]
+    },
+    "hours": {
+      "preferredSiteName": "pauuu-hours-demo",
+      "siteId": "8a1961e7-e895-4df7-b20a-da967b5541d4",
+      "netlifyUrl": "https://pauuu-hours-demo.netlify.app",
+      "productionDeployId": "6a60379392d2f445449f55e1",
+      "packageDirectory": "apps/hours",
+      "publishDirectory": "apps/hours/dist",
+      "customHostname": "hours-demo.pauuu.dev",
+      "publicEnvironment": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"]
+    },
+    "payroll": {
+      "preferredSiteName": "pauuu-payroll-demo",
+      "siteId": "c8fa391e-ca75-4c8f-a8c3-2660ff8ff48a",
+      "netlifyUrl": "https://pauuu-payroll-demo.netlify.app",
+      "productionDeployId": "6a60378fb33a1846d5d2278d",
+      "packageDirectory": "apps/payroll",
+      "publishDirectory": "apps/payroll/dist",
+      "customHostname": "payroll-demo.pauuu.dev",
+      "publicEnvironment": []
+    },
+    "travels": {
+      "preferredSiteName": "pauuu-travels-demo",
+      "siteId": "e0648fcd-8d3a-4d9f-8043-c957146de9dc",
+      "netlifyUrl": "https://pauuu-travels-demo.netlify.app",
+      "productionDeployId": "6a60379d2d011f531d22cc0f",
+      "packageDirectory": "apps/travels",
+      "publishDirectory": "apps/travels/dist",
+      "customHostname": "travels-demo.pauuu.dev",
+      "publicEnvironment": []
+    }
+  }
+}

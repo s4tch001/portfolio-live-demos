@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "phase": "4.3",
+  "phase": "4.4",
   "updatedAt": "2026-07-22",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
@@ -39,9 +39,9 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 6, "verifyJwt": false },
-      "rcmi-api": { "status": "active", "version": 5, "verifyJwt": false },
-      "hours-api": { "status": "active", "version": 5, "verifyJwt": false }
+      "cn-api": { "status": "active", "version": 7, "verifyJwt": false },
+      "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
+      "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
     "namedKeys": {
       "automations": "configured",
@@ -74,7 +74,8 @@
         "entriesReadVerified": true,
         "passwordMutationRejected": true
       },
-      "resetCoordinatorClaimed": 0
+      "resetCoordinatorClaimed": 0,
+      "netlifyOriginsVerified": true
     },
     "vault": {
       "projectUrlSecret": "configured",
@@ -124,7 +125,61 @@
     },
     "cronInstalled": true
   },
-  "netlifySitesCreated": false,
+  "netlify": {
+    "plan": "Free",
+    "accountSlug": "s4tch001",
+    "cliVersion": "26.2.0",
+    "deploymentMode": "manual-atomic",
+    "publicBuildVariables": {
+      "cn": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"],
+      "rcmi": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"],
+      "hours": ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"],
+      "payroll": [],
+      "travels": []
+    },
+    "sites": {
+      "cn": {
+        "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
+        "siteName": "pauuu-cn-demo",
+        "url": "https://pauuu-cn-demo.netlify.app",
+        "productionDeployId": "6a60374df69da29784c0bd86"
+      },
+      "rcmi": {
+        "siteId": "d20cfc17-c761-4d5b-93e1-05354c8e8651",
+        "siteName": "pauuu-rcmi-demo",
+        "url": "https://pauuu-rcmi-demo.netlify.app",
+        "productionDeployId": "6a603790cd99b589dfaa5953"
+      },
+      "hours": {
+        "siteId": "8a1961e7-e895-4df7-b20a-da967b5541d4",
+        "siteName": "pauuu-hours-demo",
+        "url": "https://pauuu-hours-demo.netlify.app",
+        "productionDeployId": "6a60379392d2f445449f55e1"
+      },
+      "payroll": {
+        "siteId": "c8fa391e-ca75-4c8f-a8c3-2660ff8ff48a",
+        "siteName": "pauuu-payroll-demo",
+        "url": "https://pauuu-payroll-demo.netlify.app",
+        "productionDeployId": "6a60378fb33a1846d5d2278d"
+      },
+      "travels": {
+        "siteId": "e0648fcd-8d3a-4d9f-8043-c957146de9dc",
+        "siteName": "pauuu-travels-demo",
+        "url": "https://pauuu-travels-demo.netlify.app",
+        "productionDeployId": "6a60379d2d011f531d22cc0f"
+      }
+    },
+    "liveVerification": {
+      "completed": true,
+      "https200": true,
+      "securityHeaders": true,
+      "noindex": true,
+      "immutableAssets": true,
+      "spaRoutes": true,
+      "appApis": true
+    }
+  },
+  "netlifySitesCreated": true,
   "cloudflareSubdomainsConfigured": false,
   "portfolioUpdated": false
 }

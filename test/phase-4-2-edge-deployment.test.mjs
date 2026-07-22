@@ -12,7 +12,7 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
   const project = JSON.parse(await read('config/supabase-project.json'));
   const expected = ['public', 'graphql_public', 'cn_demo', 'rcmi_demo', 'hours_demo'];
 
-  assert.ok(['4.2', '4.3'].includes(state.phase));
+  assert.ok(['4.2', '4.3', '4.4'].includes(state.phase));
   assert.deepEqual(state.supabase.dataApi.exposedSchemas, expected);
   assert.deepEqual(project.dashboardConfiguration.exposedSchemas, expected);
   assert.equal(state.supabase.dataApi.maxRows, 500);
@@ -23,9 +23,9 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
 test('each persistent app API accepts only its exact named publishable key', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
   const functions = {
-    'cn-api': ['cn_demo', 6],
-    'rcmi-api': ['rcmi_demo', 5],
-    'hours-api': ['hours_demo', 5],
+    'cn-api': ['cn_demo', 7],
+    'rcmi-api': ['rcmi_demo', 6],
+    'hours-api': ['hours_demo', 6],
   };
 
   for (const [functionName, [keyName, version]] of Object.entries(functions)) {
@@ -66,14 +66,15 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
 
 test('later hosting work remains gated after reset activation', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
+  const resetsActive = ['4.3', '4.4'].includes(state.phase);
 
   for (const app of Object.values(state.supabase.applications)) {
     assert.equal(app.databaseResetReady, true);
-    assert.equal(app.enabled, state.phase === '4.3');
+    assert.equal(app.enabled, resetsActive);
   }
   assert.equal(state.supabase.liveVerification.resetCoordinatorClaimed, 0);
-  assert.equal(state.supabase.cronInstalled, state.phase === '4.3');
-  assert.equal(state.netlifySitesCreated, false);
+  assert.equal(state.supabase.cronInstalled, resetsActive);
+  assert.equal(state.netlifySitesCreated, state.phase === '4.4');
   assert.equal(state.cloudflareSubdomainsConfigured, false);
   assert.equal(state.portfolioUpdated, false);
 });

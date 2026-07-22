@@ -2,6 +2,7 @@ import { withSupabase } from "npm:@supabase/server@1.4.0";
 
 const ALLOWED_ORIGINS = new Set([
   "https://hours-demo.pauuu.dev",
+  "https://pauuu-hours-demo.netlify.app",
   "http://localhost:5175",
   "http://127.0.0.1:5175"
 ]);

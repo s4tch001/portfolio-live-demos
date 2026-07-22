@@ -16,15 +16,7 @@
     <link rel="apple-touch-icon" href="/assets/img/logo/apple-touch-icon.png" />
     <!-- Pre-paint theme: set data-theme before first paint to avoid FOUC.
          Ported verbatim from the legacy theme.js — must run before React mounts. -->
-    <script>
-      (function () {
-        var t = 'light';
-        try {
-          t = localStorage.getItem('theme') || 'light';
-        } catch (e) {}
-        document.documentElement.setAttribute('data-theme', t);
-      })();
-    </script>
+    <script src="/prepaint-theme.js"></script>
     <!-- All libraries self-hosted (China deployment: no Google/CDN hosts) -->
     <link href="/vendor/fonts/fonts.css" rel="stylesheet" />
     <link href="/vendor/fontawesome/css/all.min.css" rel="stylesheet" />

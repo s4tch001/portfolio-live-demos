@@ -42,6 +42,7 @@ test('RCMI Edge API uses a named key, bounded mutations, and immutable password'
   assert.match(edge, /demo_password_immutable/);
   assert.match(edge, /ids\.slice\(0, 100\)/);
   assert.match(edge, /ALLOWED_ORIGINS/);
+  assert.match(edge, /https:\/\/pauuu-rcmi-demo\.netlify\.app/);
 });
 
 test('frontend consumes only environment-provided public Supabase settings', async () => {
