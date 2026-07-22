@@ -1,11 +1,11 @@
 # Daily reset contract
 
-Status: The private control schema and Edge coordinator were deployed in Phase 2.4. Phase 4.1 deployed all five app schemas and reset handlers. Every app registration remains disabled and no Cron job exists.
+Status: Active and live-verified in Phase 4.3. All five registrations are enabled, the Vault-backed Supabase Cron dispatcher runs every 15 minutes, and the coordinator preserves one successful reset per Manila logical day.
 
 ## Schedule and logical day
 
 - The user-facing target is 00:00 in the IANA timezone `Asia/Manila`.
-- A planned Supabase Cron dispatcher runs every 15 minutes using `*/15 * * * *`.
+- The Supabase Cron dispatcher runs every 15 minutes using `*/15 * * * *`.
 - The coordinator calculates the current Manila date with timezone-aware PostgreSQL operations. It must not rely on a hard-coded UTC offset.
 - Each app has at most one successful reset for each logical Manila date. Missed work remains due and is retried after recovery.
 

@@ -21,7 +21,7 @@ function requirePattern(content, pattern, message) {
 }
 
 async function main() {
-  const [rootPackage, lockfile, project, deployment, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration, travelsMigration] = await Promise.all([
+  const [rootPackage, lockfile, project, deployment, config, seed, resetMigration, resetFunction, cnMigration, cnFunction, rcmiMigration, rcmiFunction, hoursMigration, hoursFunction, payrollMigration, travelsMigration, schedulerMigration, safeDeleteMigration, cronStatusMigration] = await Promise.all([
     readJson("package.json"),
     readJson("package-lock.json"),
     readJson("config/supabase-project.json"),
@@ -37,7 +37,10 @@ async function main() {
     readText("supabase/migrations/20260722000400_hours_demo.sql"),
     readText("supabase/functions/hours-api/index.ts"),
     readText("supabase/migrations/20260722000500_payroll_demo.sql"),
-    readText("supabase/migrations/20260722000600_travels_demo.sql")
+    readText("supabase/migrations/20260722000600_travels_demo.sql"),
+    readText("supabase/migrations/20260722000700_activate_daily_resets.sql"),
+    readText("supabase/migrations/20260722001000_make_reset_deletes_data_api_safe.sql"),
+    readText("supabase/migrations/20260722001100_add_private_cron_run_status.sql")
   ]);
 
   if (rootPackage.devDependencies?.supabase !== "2.109.1") {
@@ -91,6 +94,17 @@ async function main() {
     /withSupabase\(\{ auth: "secret:automations" \}/,
     "Reset coordinator must accept only the named automation secret key."
   );
+  requirePattern(schedulerMigration, /from vault\.decrypted_secrets/i, "Reset scheduler must read its server credentials from Vault.");
+  requirePattern(schedulerMigration, /'\*\/15 \* \* \* \*'/, "Reset scheduler must retain its 15-minute retry cadence.");
+  requirePattern(schedulerMigration, /'select demo_control\.dispatch_reset_coordinator\(\);'/i, "Cron command must remain secret-free and private.");
+  requirePattern(schedulerMigration, /revoke all on function demo_control\.dispatch_reset_coordinator\(\)[\s\S]*service_role/i, "The Vault-backed dispatcher must not be executable by API roles.");
+  requirePattern(safeDeleteMigration, /replace\(delete_statement, ';', ' where true;'\)/i, "Persistent reset deletes must satisfy the hosted Data API safety guard.");
+  requirePattern(safeDeleteMigration, /reset handler still contains an unconditional DELETE without WHERE/i, "Safe-delete migration must fail if an unconditional reset DELETE remains.");
+  requirePattern(cronStatusMigration, /from cron\.job_run_details as run/i, "Private status must retain bounded Cron execution evidence.");
+  requirePattern(cronStatusMigration, /grant execute on function public\.get_demo_reset_status\(\) to service_role/i, "Reset status must remain server-only.");
+  if (/sb_secret_[A-Za-z0-9_-]{20,}/.test(schedulerMigration + safeDeleteMigration + cronStatusMigration)) {
+    failures.push("Reset scheduler migrations must not contain a secret API-key value.");
+  }
   requirePattern(config, /"cn_demo"/, "CN schema must be explicitly listed for the Data API.");
   requirePattern(
     config,
@@ -162,30 +176,59 @@ async function main() {
     "20260722000300",
     "20260722000400",
     "20260722000500",
-    "20260722000600"
+    "20260722000600",
+    "20260722000700",
+    "20260722000800",
+    "20260722000900",
+    "20260722001000",
+    "20260722001100"
   ];
   if (
-    deployment.phase !== "4.2" ||
+    deployment.phase !== "4.3" ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {
-    failures.push("Phase 4.2 Supabase deployment evidence is incomplete or targets an unexpected project.");
+    failures.push("Phase 4.3 Supabase deployment evidence is incomplete or targets an unexpected project.");
   }
   for (const appId of ["cn", "rcmi", "hours", "payroll", "travels"]) {
     const application = deployment.supabase?.applications?.[appId];
-    if (application?.databaseResetReady !== true || application?.enabled !== false) {
-      failures.push(`Phase 4.2 application state is unsafe or incomplete for ${appId}.`);
+    if (application?.databaseResetReady !== true || application?.enabled !== true) {
+      failures.push(`Phase 4.3 reset activation is incomplete for ${appId}.`);
     }
   }
   if (
-    deployment.supabase?.cronInstalled !== false ||
+    deployment.supabase?.cronInstalled !== true ||
     deployment.netlifySitesCreated !== false ||
     deployment.cloudflareSubdomainsConfigured !== false ||
     deployment.portfolioUpdated !== false
   ) {
-    failures.push("Phase 4.2 must not claim or activate later deployment work.");
+    failures.push("Phase 4.3 scheduler or later-hosting boundary is inconsistent.");
+  }
+  if (
+    deployment.supabase?.vault?.projectUrlSecret !== "configured" ||
+    deployment.supabase?.vault?.automationsKeySecret !== "configured" ||
+    deployment.supabase?.resetScheduler?.installed !== true ||
+    deployment.supabase?.resetScheduler?.jobName !== "portfolio-demo-reset-dispatch" ||
+    deployment.supabase?.resetScheduler?.schedule !== "*/15 * * * *" ||
+    deployment.supabase?.resetScheduler?.timezone !== "Asia/Manila" ||
+    deployment.supabase?.resetScheduler?.latestRunStatus !== "succeeded"
+  ) {
+    failures.push("Phase 4.3 Vault or Cron evidence is incomplete.");
+  }
+  const resetVerification = deployment.supabase?.resetVerification;
+  if (
+    resetVerification?.completed !== true ||
+    resetVerification?.allApplicationsSucceeded !== true ||
+    resetVerification?.recoveryInvocation?.failed !== 0 ||
+    resetVerification?.idempotentInvocation?.claimed !== 0 ||
+    resetVerification?.dataApiSafeDeleteCompatibilityApplied !== true ||
+    resetVerification?.postResetBaselines?.cnTeacherCount !== 3 ||
+    resetVerification?.postResetBaselines?.rcmiMemberCount !== 8 ||
+    resetVerification?.postResetBaselines?.hoursPasswordMutationRejected !== true
+  ) {
+    failures.push("Phase 4.3 reset idempotency or post-reset baseline evidence is incomplete.");
   }
 
   const expectedSchemas = ["public", "graphql_public", "cn_demo", "rcmi_demo", "hours_demo"];
@@ -239,6 +282,7 @@ async function main() {
   console.log(" - CLI 2.109.1 is locked with registry integrity metadata.");
   console.log(" - Local auth, API, seed, and upload defaults are deny-by-default and bounded.");
   console.log(" - Reset control RPCs and the Edge coordinator are private, leased, and bounded.");
+  console.log(" - Vault-backed Cron is active, idempotent, and live-verified for all five demos.");
   console.log(" - Remote target metadata records the dedicated Free Singapore demo project.");
 }
 

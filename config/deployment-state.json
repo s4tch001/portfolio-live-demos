@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "phase": "4.2",
+  "phase": "4.3",
   "updatedAt": "2026-07-22",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
@@ -10,7 +10,12 @@
       "20260722000300",
       "20260722000400",
       "20260722000500",
-      "20260722000600"
+      "20260722000600",
+      "20260722000700",
+      "20260722000800",
+      "20260722000900",
+      "20260722001000",
+      "20260722001100"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -26,11 +31,11 @@
       "browserRolesDirectAccessDenied": true
     },
     "applications": {
-      "cn": { "databaseResetReady": true, "enabled": false },
-      "rcmi": { "databaseResetReady": true, "enabled": false },
-      "hours": { "databaseResetReady": true, "enabled": false },
-      "payroll": { "databaseResetReady": true, "enabled": false },
-      "travels": { "databaseResetReady": true, "enabled": false }
+      "cn": { "databaseResetReady": true, "enabled": true },
+      "rcmi": { "databaseResetReady": true, "enabled": true },
+      "hours": { "databaseResetReady": true, "enabled": true },
+      "payroll": { "databaseResetReady": true, "enabled": true },
+      "travels": { "databaseResetReady": true, "enabled": true }
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
@@ -71,7 +76,53 @@
       },
       "resetCoordinatorClaimed": 0
     },
-    "cronInstalled": false
+    "vault": {
+      "projectUrlSecret": "configured",
+      "automationsKeySecret": "configured"
+    },
+    "resetScheduler": {
+      "installed": true,
+      "jobName": "portfolio-demo-reset-dispatch",
+      "schedule": "*/15 * * * *",
+      "timezone": "Asia/Manila",
+      "latestRunStatus": "succeeded",
+      "latestRunStartedAt": "2026-07-22T02:30:00.153704+00:00",
+      "latestRunEndedAt": "2026-07-22T02:30:00.179159+00:00"
+    },
+    "resetVerification": {
+      "completed": true,
+      "logicalDate": "2026-07-22",
+      "allApplicationsSucceeded": true,
+      "recoveryInvocation": {
+        "claimed": 3,
+        "succeeded": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "idempotentInvocation": {
+        "claimed": 0,
+        "succeeded": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "dataApiSafeDeleteCompatibilityApplied": true,
+      "postResetBaselines": {
+        "cnDefaultLoginsVerified": ["admin", "testteacher", "teststudent"],
+        "cnTeacherCount": 3,
+        "cnStudentCount": 6,
+        "cnScheduleCount": 7,
+        "cnReportCount": 2,
+        "cnCredentialMutationRejected": true,
+        "cnRestrictedRouteRejected": true,
+        "rcmiAdministratorLoginVerified": true,
+        "rcmiMemberCount": 8,
+        "rcmiPasswordMutationRejected": true,
+        "hoursPasswordLoginVerified": true,
+        "hoursEntryCount": 0,
+        "hoursPasswordMutationRejected": true
+      }
+    },
+    "cronInstalled": true
   },
   "netlifySitesCreated": false,
   "cloudflareSubdomainsConfigured": false,
