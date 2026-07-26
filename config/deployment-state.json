@@ -144,7 +144,7 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a6054c6d330aa5768689105",
+        "productionDeployId": "6a656e267cac9a2003505968",
         "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {
@@ -205,7 +205,7 @@
       },
       "rcmiAdministratorNavigationHint": true
     },
-    "frontendRedeployRequired": true
+    "frontendRedeployRequired": false
   },
   "cloudflare": {
     "plan": "Free",
