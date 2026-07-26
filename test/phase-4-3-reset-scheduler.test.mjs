@@ -133,9 +133,9 @@ test('deployment record captures successful reset, Cron, and post-reset baseline
     state.supabase.resetVerification.postResetBaselines.cnDefaultLoginsVerified,
     ['admin', 'testteacher', 'teststudent'],
   );
-  assert.equal(state.supabase.resetVerification.postResetBaselines.rcmiMemberCount, 8);
+  assert.equal(state.supabase.resetVerification.postResetBaselines.rcmiMemberCount, 12);
   assert.equal(state.supabase.resetVerification.postResetBaselines.hoursPasswordMutationRejected, true);
   assert.equal(state.netlifySitesCreated, ['4.4', '4.5'].includes(state.phase));
   assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
-  assert.equal(state.portfolioUpdated, false);
+  assert.equal(state.portfolioUpdated, true);
 });

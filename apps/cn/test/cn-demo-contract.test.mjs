@@ -31,10 +31,14 @@ test('keeps restricted CN navigation behind non-preview master checks', async ()
 });
 
 test('database protects demo credentials and rejects the reserved master username', async () => {
-  const migration = await read('supabase/migrations/20260722000200_cn_demo.sql');
+  const migration = [
+    await read('supabase/migrations/20260722000200_cn_demo.sql'),
+    await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql'),
+  ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
   assert.match(migration, /protected demo credential/);
+  assert.match(migration, /protected demo admin must stay active/);
   assert.match(migration, /'admin'.+'password'/s);
   assert.match(migration, /'testteacher'.+'password'/s);
   assert.match(migration, /'teststudent'.+'password'/s);
@@ -42,6 +46,25 @@ test('database protects demo credentials and rejects the reserved master usernam
   assert.match(migration, /where app_id = 'cn'/);
   assert.match(migration, /set database_reset_ready = true/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
+});
+
+test('database seeds richer current-month CN preview data without exposing extra credentials', async () => {
+  const migration = await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql');
+  assert.match(migration, /month_start date := date_trunc\('month', p_logical_date\)::date/);
+  assert.match(migration, /Grace Mendoza/);
+  assert.match(migration, /Amanda Reyes/);
+  assert.match(migration, /Miguel Santos/);
+  assert.match(migration, /Sophia Lim/);
+  assert.match(migration, /Isabella Ramos/);
+  assert.match(migration, /month_start \+ 23/);
+  assert.match(migration, /'Late Notice'/);
+  assert.match(migration, /cancelled = excluded\.cancelled/);
+  assert.match(migration, /class_usage/);
+  assert.match(migration, /low remaining class balance/);
+  assert.match(migration, /Emma Chen has a low remaining class balance/);
+  assert.match(migration, /'DEMO-RC-001', 'purchase', 3, 2/);
+  assert.match(migration, /activity_logs/);
+  assert.doesNotMatch(await read('apps/cn/src/pages/LoginPage/LoginPage.jsx'), /amanda\.reyes|liam\.garcia|isabella\.ramos/);
 });
 
 test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', async () => {
@@ -53,12 +76,44 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /path\.startsWith\("\/dev\/"\)/);
   assert.match(edge, /path\.startsWith\("\/admin-permissions"\)/);
   assert.match(edge, /demo_credentials_immutable/);
+  assert.match(edge, /protected_demo_admin_must_stay_active/);
+  assert.match(edge, /chargeReportUsage/);
+  assert.match(edge, /refundScheduleUsage/);
+  assert.match(edge, /requireReportScheduleAccess/);
+  assert.match(edge, /cannot_move_report_schedule/);
+  assert.match(edge, /path !== "\/logs"/);
+  assert.match(edge, /studentScheduleIds/);
   assert.match(edge, /MAX_UPLOAD_BYTES = 2 \* 1024 \* 1024/);
   assert.match(edge, /existing\.length >= 20/);
   assert.match(edge, /100 \* 1024 \* 1024/);
   assert.doesNotMatch(edge, /select\("id,username,password_hash,fullname,name,status,language"\)/);
   assert.match(edge, /candidate === "student"[\s\S]*password_hash,name,status,language[\s\S]*password_hash,fullname,status,language/);
   assert.match(edge, /role === "student"[\s\S]*id,username,name,status,language[\s\S]*id,username,fullname,status,language/);
+});
+
+test('CN demo root tells crawlers not to index or crawl the disposable preview', async () => {
+  const index = await read('apps/cn/index.html');
+  const robots = await read('apps/cn/public/robots.txt');
+  const netlify = await read('apps/cn/netlify.toml');
+  assert.match(index, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+  assert.match(robots, /User-agent: \*/);
+  assert.match(robots, /Disallow: \//);
+  assert.match(netlify, /X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"/);
+});
+
+test('CN public pages describe student access and use a dummy support email', async () => {
+  const landing = await read('apps/cn/src/pages/public/LandingPage.jsx');
+  const strings = await read('apps/cn/src/i18n/strings.js');
+  const legal = await read('apps/cn/src/i18n/legal.js');
+  const legalDoc = await read('apps/cn/src/pages/public/LegalDoc.jsx');
+  assert.match(landing, /landing\.audience\.students/);
+  assert.match(strings, /Students/);
+  assert.match(strings, /low-balance notifications/);
+  assert.match(strings, /Students can only see their own schedules and class reports/);
+  assert.match(legal, /Student accounts are limited to their own schedules/);
+  assert.match(legal, /Students must not attempt to access another student/);
+  assert.match(legalDoc, /support@example\.com/);
+  assert.doesNotMatch(legalDoc, /educonnect@gmail\.com/);
 });
 
 test('CN frontend uses only environment-provided public Supabase configuration', async () => {

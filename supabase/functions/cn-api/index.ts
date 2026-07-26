@@ -82,6 +82,10 @@ function optionalString(value: unknown, maxLength: number) {
   return normalized;
 }
 
+function searchToken(value: string) {
+  return value.replace(/[^\p{L}\p{N} ._@/-]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+}
+
 function positiveId(value: unknown, field = "id") {
   const number = Number(value);
   if (!Number.isSafeInteger(number) || number < 1) throw new ApiError(400, `invalid_${field}`);
@@ -141,6 +145,31 @@ async function queryMany(query: PromiseLike<{ data: unknown; error: unknown }>) 
   const { data, error } = await query;
   if (error) throw new ApiError(503, "database_unavailable");
   return Array.isArray(data) ? data as Record<string, unknown>[] : [];
+}
+
+async function writeLog(
+  database: any,
+  session: Session | null,
+  request: Request,
+  action: string,
+  status = 200,
+  details: Record<string, unknown> = {}
+) {
+  const path = routePath(request);
+  try {
+    await database.from("activity_logs").insert({
+      actor_role: session?.user.role ?? "public",
+      actor_id: session?.user.id ?? null,
+      actor_name: session?.user.fullname ?? "",
+      method: request.method,
+      path,
+      action,
+      status,
+      details: JSON.stringify({ ok: status < 400, body: details })
+    });
+  } catch (_) {
+    // Logging is useful in the preview, but it must never break the demo flow.
+  }
 }
 
 async function requireSession(request: Request, database: any): Promise<Session> {
@@ -247,11 +276,13 @@ async function login(request: Request, database: any) {
     expires_at: expiresAt
   });
   if (error) throw new ApiError(503, "login_unavailable");
-  return {
+  const result = {
     token,
     expires_at: expiresAt,
     user: publicAccount(account, role)
   };
+  await writeLog(database, { tokenHash, user: result.user as DemoUser }, request, "Signed in", 200);
+  return result;
 }
 
 async function hashPassword(database: any, password: unknown) {
@@ -283,6 +314,7 @@ async function accountRoutes(request: Request, path: string, database: any, sess
     if (id) query = query.eq("id", id);
     const search = new URL(request.url).searchParams.get("search")?.trim();
     if (search && group.path === "students") query = query.ilike("name", `%${search.replaceAll("%", "")}%`);
+    if (group.path === "students" && session.user.role === "student") query = query.eq("id", session.user.id);
     const rows = await queryMany(query.order("id"));
     return id ? rows[0] ?? null : rows;
   }
@@ -317,6 +349,9 @@ async function accountRoutes(request: Request, path: string, database: any, sess
       ? new Set(["Active", "Inactive", "End of Contract"])
       : new Set(["Active", "Inactive"]);
     values.status = statuses.has(String(body.status)) ? body.status : "Active";
+    if (group.path === "admins" && existing?.protected && values.status !== "Active") {
+      throw new ApiError(403, "protected_demo_admin_must_stay_active");
+    }
   }
   if (body.username !== undefined) {
     const username = requiredString(body.username, "username", 40).toLowerCase();
@@ -354,6 +389,11 @@ async function accountRoutes(request: Request, path: string, database: any, sess
       ? "id,username,fullname,color,status,language,protected"
       : "id,name,notes,teacher_id,status,username,language,protected";
   const row = await queryOne(mutation.select(columns).single());
+  await writeLog(database, session, request, `${id ? "Updated" : "Created"} ${group.role} account`, 200, {
+    account_id: row?.id,
+    username: row?.username,
+    status: row?.status
+  });
   return row;
 }
 
@@ -402,7 +442,11 @@ async function scheduleRoutes(request: Request, path: string, database: any, ses
   if (cancel && request.method === "POST") {
     const body = await bodyJson(request);
     const reason = requiredString(body.reason, "reason", 500);
-    return await queryOne(database.from("schedules").update({ cancelled: true, cancel_reason: reason }).eq("id", positiveId(cancel[1])).select("*").single());
+    const scheduleId = positiveId(cancel[1]);
+    const row = await queryOne(database.from("schedules").update({ cancelled: true, cancel_reason: reason }).eq("id", scheduleId).select("*").single());
+    await refundScheduleUsage(database, scheduleId);
+    await writeLog(database, session, request, "Cancelled class", 200, { schedule_id: scheduleId, reason });
+    return row;
   }
   if (path === "/schedules/bulk-copy") throw new ApiError(501, "bulk_copy_unavailable_in_demo");
   return null;
@@ -431,6 +475,94 @@ function reportValues(body: Record<string, unknown>) {
   };
 }
 
+async function studentScheduleIds(database: any, studentId: number, start?: string | null, end?: string | null) {
+  let query = database.from("schedules").select("id").contains("student_ids", [studentId]);
+  if (start) query = query.gte("date", start);
+  if (end) query = query.lte("date", end);
+  return (await queryMany(query)).map((row) => Number(row.id)).filter(Boolean);
+}
+
+async function refundScheduleUsage(database: any, scheduleId: number) {
+  const usage = await queryMany(database.from("class_usage").select("id,transaction_id").eq("schedule_id", scheduleId));
+  for (const row of usage) {
+    const transactionId = Number(row.transaction_id);
+    const transaction = await queryOne(database.from("class_transactions").select("remaining_classes").eq("id", transactionId).maybeSingle());
+    if (transaction) {
+      await database.from("class_transactions").update({
+        remaining_classes: Number(transaction.remaining_classes ?? 0) + 1,
+        updated_at: new Date().toISOString()
+      }).eq("id", transactionId);
+    }
+  }
+  if (usage.length) await database.from("class_usage").delete().eq("schedule_id", scheduleId);
+}
+
+async function chargeReportUsage(database: any, report: Record<string, unknown>) {
+  const schedule = await queryOne(database.from("schedules").select("*").eq("id", report.schedule_id).maybeSingle());
+  if (!schedule || schedule.cancelled || schedule.trial) {
+    if (schedule?.cancelled) await refundScheduleUsage(database, Number(schedule.id));
+    return;
+  }
+
+  const studentIds = Array.isArray(schedule.student_ids) && schedule.student_ids.length
+    ? schedule.student_ids.map(Number).filter(Boolean)
+    : schedule.student_id
+      ? [Number(schedule.student_id)]
+      : [];
+  if (!studentIds.length) return;
+
+  const existingUsage = await queryMany(database.from("class_usage").select("transaction_id").eq("schedule_id", schedule.id));
+  const chargedTransactionIds = new Set(existingUsage.map((row) => Number(row.transaction_id)));
+  for (const studentId of studentIds) {
+    const transactions = await queryMany(
+      database
+        .from("class_transactions")
+        .select("id,remaining_classes,type")
+        .eq("student_id", studentId)
+        .gt("remaining_classes", 0)
+        .order("date")
+        .order("id")
+    );
+    const transaction = transactions.find((row) => row.type !== "monthly-fee" && !chargedTransactionIds.has(Number(row.id)));
+    if (!transaction) continue;
+    const nextRemaining = Math.max(0, Number(transaction.remaining_classes ?? 0) - 1);
+    await database.from("class_transactions").update({
+      remaining_classes: nextRemaining,
+      updated_at: new Date().toISOString()
+    }).eq("id", transaction.id);
+    await database.from("class_usage").insert({
+      transaction_id: transaction.id,
+      schedule_id: schedule.id,
+      date: report.date,
+      time: String(schedule.timeslot ?? ""),
+      duration: String(report.class_duration ?? ""),
+      materials: String(report.book ?? ""),
+      pages: String(report.pages ?? ""),
+      remarks: report.absent ? String(report.absent_reason || "Absent") : "Present",
+      charged: true
+    });
+    chargedTransactionIds.add(Number(transaction.id));
+  }
+}
+
+async function requireReportScheduleAccess(
+  database: any,
+  session: Session,
+  scheduleId: number,
+  reportId?: number
+) {
+  const schedule = await queryOne(database.from("schedules").select("id,teacher_id").eq("id", scheduleId).maybeSingle());
+  if (!schedule) throw new ApiError(404, "schedule_not_found");
+  if (session.user.role === "teacher" && Number(schedule.teacher_id) !== session.user.id) throw new ApiError(403, "forbidden");
+  if (!reportId) return schedule;
+
+  const report = await queryOne(database.from("reports").select("id,schedule_id,teacher_id").eq("id", reportId).maybeSingle());
+  if (!report) throw new ApiError(404, "report_not_found");
+  if (Number(report.schedule_id) !== scheduleId) throw new ApiError(400, "cannot_move_report_schedule");
+  if (session.user.role === "teacher" && Number(report.teacher_id) !== session.user.id) throw new ApiError(403, "forbidden");
+  return schedule;
+}
+
 async function reportRoutes(request: Request, path: string, database: any, session: Session) {
   if (path === "/reports" && request.method === "GET") {
     const params = new URL(request.url).searchParams;
@@ -438,15 +570,39 @@ async function reportRoutes(request: Request, path: string, database: any, sessi
     if (params.get("start")) query = query.gte("date", params.get("start"));
     if (params.get("end")) query = query.lte("date", params.get("end"));
     if (session.user.role === "teacher") query = query.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") {
+      const ids = await studentScheduleIds(database, session.user.id, params.get("start"), params.get("end"));
+      if (!ids.length) return [];
+      query = query.in("schedule_id", ids);
+    }
     return await queryMany(query);
   }
   const id = numericIdFromPath(path, "reports");
   requireStaff(session);
   if (path === "/reports" && request.method === "POST") {
-    return await queryOne(database.from("reports").insert(reportValues(await bodyJson(request))).select("*").single());
+    const values = reportValues(await bodyJson(request));
+    if (session.user.role === "teacher" && values.teacher_id !== session.user.id) throw new ApiError(403, "forbidden");
+    await requireReportScheduleAccess(database, session, values.schedule_id);
+    const row = await queryOne(database.from("reports").insert(values).select("*").single());
+    if (row) await chargeReportUsage(database, row);
+    await writeLog(database, session, request, "Submitted class report", 201, {
+      schedule_id: values.schedule_id,
+      absent: values.absent
+    });
+    return row;
   }
   if (id && request.method === "PUT") {
-    return await queryOne(database.from("reports").update(reportValues(await bodyJson(request))).eq("id", id).select("*").single());
+    const values = reportValues(await bodyJson(request));
+    if (session.user.role === "teacher" && values.teacher_id !== session.user.id) throw new ApiError(403, "forbidden");
+    await requireReportScheduleAccess(database, session, values.schedule_id, id);
+    const row = await queryOne(database.from("reports").update(values).eq("id", id).select("*").single());
+    if (row) await chargeReportUsage(database, row);
+    await writeLog(database, session, request, "Updated class report", 200, {
+      report_id: id,
+      schedule_id: values.schedule_id,
+      absent: values.absent
+    });
+    return row;
   }
   return null;
 }
@@ -559,6 +715,33 @@ async function transactionRoutes(request: Request, path: string, database: any, 
   throw new ApiError(405, "method_not_allowed");
 }
 
+async function logRoutes(request: Request, path: string, database: any, session: Session) {
+  if (path !== "/logs" || request.method !== "GET") return null;
+  requireRole(session, "admin");
+  const params = new URL(request.url).searchParams;
+  const limit = Math.min(100, Math.max(1, Number(params.get("limit") ?? 30)));
+  let query = database
+    .from("activity_logs")
+    .select("id,actor_role,actor_id,actor_name,method,path,action,status,details,created_at")
+    .order("id", { ascending: false })
+    .limit(limit + 1);
+  if (params.get("before")) query = query.lt("id", positiveId(params.get("before"), "before"));
+  if (params.get("date")) {
+    const date = params.get("date")!;
+    if (!DATE.test(date)) throw new ApiError(400, "invalid_date");
+    query = query.gte("created_at", `${date}T00:00:00+08:00`).lt("created_at", `${date}T23:59:59.999+08:00`);
+  }
+  const search = searchToken(params.get("search") ?? "");
+  if (search) query = query.or(`action.ilike.%${search}%,actor_name.ilike.%${search}%,path.ilike.%${search}%`);
+  const rows = await queryMany(query);
+  const page = rows.slice(0, limit);
+  return {
+    logs: page,
+    hasMore: rows.length > limit,
+    nextBefore: page.length ? page[page.length - 1].id : null
+  };
+}
+
 async function upload(request: Request, database: any, storage: any, session: Session) {
   requireStaff(session);
   const form = await request.formData().catch(() => null);
@@ -612,31 +795,61 @@ async function handle(request: Request, context: any) {
     return json(request, { ok: true });
   }
   if (path === "/notifications" && request.method === "GET") {
-    return json(request, await queryMany(database.from("notifications").select("*").order("created_at", { ascending: false }).limit(50)));
+    let query = database.from("notifications").select("*").order("created_at", { ascending: false }).limit(50);
+    if (session.user.role === "teacher") query = query.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") query = query.eq("student_id", session.user.id);
+    return json(request, await queryMany(query));
   }
   if (path === "/notifications" && request.method === "POST") {
     const body = await bodyJson(request);
-    await database.from("notifications").update({ read: true }).eq("id", positiveId(body.id));
+    let mutation = database.from("notifications").update({ read: true }).eq("id", positiveId(body.id));
+    if (session.user.role === "teacher") mutation = mutation.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") mutation = mutation.eq("student_id", session.user.id);
+    await mutation;
     return json(request, { ok: true });
   }
   const notificationId = numericIdFromPath(path, "notifications");
   if (notificationId && request.method === "DELETE") {
-    await database.from("notifications").delete().eq("id", notificationId);
+    let mutation = database.from("notifications").delete().eq("id", notificationId);
+    if (session.user.role === "teacher") mutation = mutation.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") mutation = mutation.eq("student_id", session.user.id);
+    await mutation;
     return json(request, { ok: true });
   }
   if (path === "/notifications/read-all" && request.method === "POST") {
-    await database.from("notifications").update({ read: true }).eq("read", false);
+    let mutation = database.from("notifications").update({ read: true }).eq("read", false);
+    if (session.user.role === "teacher") mutation = mutation.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") mutation = mutation.eq("student_id", session.user.id);
+    await mutation;
     return json(request, { ok: true });
   }
   if (path === "/notifications/clear-all" && request.method === "POST") {
-    await database.from("notifications").delete().neq("id", 0);
+    let mutation = database.from("notifications").delete().neq("id", 0);
+    if (session.user.role === "teacher") mutation = mutation.eq("teacher_id", session.user.id);
+    if (session.user.role === "student") mutation = mutation.eq("student_id", session.user.id);
+    await mutation;
     return json(request, { ok: true });
   }
   if (path === "/my-classes" && request.method === "GET") {
+    const params = new URL(request.url).searchParams;
     let query = database.from("schedules").select("*").order("date");
+    if (params.get("start")) query = query.gte("date", params.get("start"));
+    if (params.get("end")) query = query.lte("date", params.get("end"));
     if (session.user.role === "teacher") query = query.eq("teacher_id", session.user.id);
     if (session.user.role === "student") query = query.contains("student_ids", [session.user.id]);
-    return json(request, await queryMany(query));
+    const schedules = await queryMany(query);
+    const ids = schedules.map((row) => Number(row.id)).filter(Boolean);
+    const reports = ids.length
+      ? await queryMany(database.from("reports").select("*").in("schedule_id", ids).order("date"))
+      : [];
+    const teacherIds = [...new Set(schedules.map((row) => Number(row.teacher_id)).filter(Boolean))];
+    const teachers = teacherIds.length
+      ? await queryMany(database.from("teachers").select("id,fullname").in("id", teacherIds))
+      : [];
+    const teacherNames = new Map(teachers.map((row) => [Number(row.id), row.fullname]));
+    const enrichedSchedules = schedules.map((row) => ({ ...row, teacher_name: teacherNames.get(Number(row.teacher_id)) ?? "" }));
+    const enrichedReports = reports.map((row) => ({ ...row, teacher_name: teacherNames.get(Number(row.teacher_id)) ?? "" }));
+    return json(request, { schedules: enrichedSchedules, reports: enrichedReports });
   }
   if (path === "/schedule-limits" && request.method === "GET") return json(request, { max_per_day: 20 });
   if (path === "/upload" && request.method === "POST") return json(request, await upload(request, database, context.supabaseAdmin.storage, session), 201);
@@ -651,6 +864,8 @@ async function handle(request: Request, context: any) {
   if (draftResult !== null) return json(request, draftResult);
   const transactionResult = await transactionRoutes(request, path, database, session);
   if (transactionResult !== null) return json(request, transactionResult);
+  const logResult = await logRoutes(request, path, database, session);
+  if (logResult !== null) return json(request, logResult);
 
   throw new ApiError(404, "not_found");
 }

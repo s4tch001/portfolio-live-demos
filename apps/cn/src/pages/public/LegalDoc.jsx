@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const SUPPORT_EMAIL = 'esl.educonnect@gmail.com';
+const SUPPORT_EMAIL = 'support@example.com';
 
 // Renders a translated legal document (Privacy Policy / Terms of Service) from
 // the structured data in i18n/legal.js. The brand name and support email are

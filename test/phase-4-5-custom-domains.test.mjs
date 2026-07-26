@@ -14,7 +14,7 @@ test('Phase 4.5 records five exact DNS-only custom preview hostnames', async () 
 
   assert.equal(state.phase, '4.5');
   assert.equal(state.cloudflareSubdomainsConfigured, true);
-  assert.equal(state.portfolioUpdated, false);
+  assert.equal(state.portfolioUpdated, true);
   assert.equal(state.cloudflare.plan, 'Free');
   assert.equal(state.cloudflare.zone, 'pauuu.dev');
   assert.equal(state.cloudflare.proxyMode, 'dns-only');
@@ -72,5 +72,17 @@ test('persistent APIs allow exact custom origins without wildcard CORS', async (
     const source = await read(`supabase/functions/${appId}-api/index.ts`);
     assert.match(source, new RegExp(`https://${appId}-demo\\.pauuu\\.dev`));
     assert.doesNotMatch(source, /allowOrigins\s*:\s*\[[^\]]*["']\*["']/s);
+  }
+});
+
+test('all demo sites are explicitly blocked from indexing and crawling', async () => {
+  for (const appId of appIds) {
+    const index = await read(`apps/${appId}/index.html`);
+    const netlify = await read(`apps/${appId}/netlify.toml`);
+    const robots = await read(`apps/${appId}/public/robots.txt`);
+    assert.match(index, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+    assert.match(netlify, /X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"/);
+    assert.match(robots, /User-agent: \*/);
+    assert.match(robots, /Disallow: \//);
   }
 });

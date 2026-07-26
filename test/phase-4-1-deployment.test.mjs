@@ -36,7 +36,7 @@ test('Phase 4.1 hosting safety boundaries remain after later Supabase deployment
   const state = JSON.parse(await read('config/deployment-state.json'));
   assert.equal(state.netlifySitesCreated, ['4.4', '4.5'].includes(state.phase));
   assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
-  assert.equal(state.portfolioUpdated, false);
+  assert.equal(state.portfolioUpdated, true);
 });
 
 test('no app migration can enable a reset registration', async () => {

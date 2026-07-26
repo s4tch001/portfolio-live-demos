@@ -21,6 +21,7 @@ const PRIVACY_US = {
         'Class attendance records (such as present, absent, or cancelled)',
         'Class schedules and lesson records',
         'Educational notes and performance reports related to lessons and language learning progress',
+        'Student account access records, class report access, remaining class balances, and low-balance notifications',
         'Display names or identifiers used for class management purposes',
         'Payment transaction reference numbers and payment confirmation records used solely for payment verification and account administration',
       ] },
@@ -39,6 +40,7 @@ const PRIVACY_US = {
         'Class monitoring and quality assurance',
         'Teacher performance evaluation',
         'Student progress review',
+        'Student access to their own schedules, reports, and remaining class balance notifications',
         'Internal training and service improvement',
         'Attendance and scheduling management',
         'Dispute resolution and record verification',
@@ -54,6 +56,7 @@ const PRIVACY_US = {
     { h: '5. Data Storage and Security', blocks: [
       { p: 'We implement reasonable administrative, technical, and organizational measures to protect information against unauthorized access, disclosure, loss, misuse, or alteration.' },
       { p: 'Access to screenshots and class records is restricted to authorized personnel who require access for operational purposes.' },
+      { p: 'Student accounts are limited to their own schedules, class reports, and balance-related notifications. Students do not receive access to other students’ class records.' },
       { p: 'Data may be stored and processed using trusted third-party infrastructure providers that assist in delivering our services, including cloud storage, databases, and application hosting services.' },
     ] },
     { h: '6. Data Retention', blocks: [
@@ -112,6 +115,7 @@ const PRIVACY_CN = {
         '课堂考勤记录（如出席、缺席或取消）',
         '课程表和课堂记录',
         '与课程及语言学习进度相关的教学笔记和表现报告',
+        '学生账户访问记录、课堂报告访问、剩余课时余额和低余额通知',
         '用于班级管理的显示名称或标识',
         '仅用于付款核对和账户管理的交易参考号和付款确认记录',
       ] },
@@ -130,6 +134,7 @@ const PRIVACY_CN = {
         '课堂监控与质量保证',
         '老师表现评估',
         '学生进度审阅',
+        '让学生查看自己的课程表、课堂报告和剩余课时余额通知',
         '内部培训与服务改进',
         '考勤与排课管理',
         '纠纷处理与记录核实',
@@ -145,6 +150,7 @@ const PRIVACY_CN = {
     { h: '5. 数据存储与安全', blocks: [
       { p: '我们采取合理的管理、技术和组织措施，保护信息免遭未经授权的访问、披露、丢失、滥用或篡改。' },
       { p: '对屏幕截图和课堂记录的访问仅限于因运营需要而需要访问的授权人员。' },
+      { p: '学生账户仅限访问自己的课程表、课堂报告和余额相关通知。学生不能访问其他学生的课堂记录。' },
       { p: '数据可能通过协助我们提供服务的可信第三方基础设施提供商进行存储和处理，包括云存储、数据库和应用托管服务。' },
     ] },
     { h: '6. 数据保留', blocks: [
@@ -203,6 +209,7 @@ const PRIVACY_TW = {
         '課堂出席記錄（如出席、缺席或取消）',
         '課程表和課堂記錄',
         '與課程及語言學習進度相關的教學筆記和表現報告',
+        '學生帳戶存取記錄、課堂報告存取、剩餘課時餘額和低餘額通知',
         '用於班級管理的顯示名稱或識別碼',
         '僅用於付款核對和帳戶管理的交易參考號和付款確認記錄',
       ] },
@@ -221,6 +228,7 @@ const PRIVACY_TW = {
         '課堂監控與品質保證',
         '老師表現評估',
         '學生進度審閱',
+        '讓學生查看自己的課程表、課堂報告和剩餘課時餘額通知',
         '內部培訓與服務改進',
         '出席與排課管理',
         '爭議處理與記錄核實',
@@ -236,6 +244,7 @@ const PRIVACY_TW = {
     { h: '5. 資料儲存與安全', blocks: [
       { p: '我們採取合理的管理、技術及組織措施，保護資料免遭未經授權的存取、揭露、遺失、濫用或竄改。' },
       { p: '對螢幕截圖和課堂記錄的存取僅限於因營運需要而需要存取的授權人員。' },
+      { p: '學生帳戶僅限存取自己的課程表、課堂報告和餘額相關通知。學生不能存取其他學生的課堂記錄。' },
       { p: '資料可能透過協助我們提供服務的可信第三方基礎設施提供商進行儲存和處理，包括雲端儲存、資料庫和應用程式託管服務。' },
     ] },
     { h: '6. 資料保留', blocks: [
@@ -287,7 +296,7 @@ const TERMS_US = {
       { p: 'If you do not agree to these Terms, you must discontinue use of the service.' },
     ] },
     { h: '2. Description of Service', blocks: [
-      { p: 'Sunset-Speaks provides online English as a Second Language (ESL) tutoring services that allow teachers and students to participate in scheduled educational sessions.' },
+      { p: 'Sunset-Speaks provides online English as a Second Language (ESL) tutoring services and a class-management platform where teachers, students, and administrators manage scheduled educational sessions.' },
     ] },
     { h: '3. User Responsibilities', blocks: [
       { p: 'Users agree to:' },
@@ -295,6 +304,7 @@ const TERMS_US = {
         'Provide accurate information necessary for class participation',
         'Attend scheduled classes when applicable',
         'Treat teachers, students, administrators, and staff respectfully',
+        'Use student accounts only to access their own schedules, class reports, and balance-related notifications',
         'Use the platform only for lawful educational purposes',
         'Avoid disruptive, abusive, fraudulent, or inappropriate conduct',
       ] },
@@ -309,7 +319,8 @@ const TERMS_US = {
       ] },
     ] },
     { h: '5. Educational Records', blocks: [
-      { p: 'Sunset-Speaks may maintain attendance records, lesson notes, schedules, and educational performance records necessary for providing and managing services.' },
+      { p: 'Sunset-Speaks may maintain attendance records, lesson notes, schedules, class reports, remaining class balances, and educational performance records necessary for providing and managing services.' },
+      { p: 'Student accounts are intended for viewing the student’s own class schedule, reports for that student’s classes, and low-balance notifications. Students must not attempt to access another student’s class records.' },
     ] },
     { h: '6. Payment Verification', blocks: [
       { p: 'Where applicable, users may be required to provide payment confirmation information, including transaction reference numbers, for verification of payments related to educational services.' },
@@ -363,7 +374,7 @@ const TERMS_CN = {
       { p: '若您不同意本条款，则必须停止使用本服务。' },
     ] },
     { h: '2. 服务说明', blocks: [
-      { p: 'Sunset-Speaks 提供在线英语（ESL）辅导服务，让老师和学生参加已排定的教学课程。' },
+      { p: 'Sunset-Speaks 提供在线英语（ESL）辅导服务和班级管理平台，让老师、学生和管理员管理已排定的教学课程。' },
     ] },
     { h: '3. 用户责任', blocks: [
       { p: '用户同意：' },
@@ -371,6 +382,7 @@ const TERMS_CN = {
         '提供参加课程所必需的准确信息',
         '在适用情况下出席已排定的课程',
         '尊重老师、学生、管理员和工作人员',
+        '学生账户仅可用于访问自己的课程表、课堂报告和余额相关通知',
         '仅将本平台用于合法的教育目的',
         '避免扰乱、辱骂、欺诈或不当行为',
       ] },
@@ -385,7 +397,8 @@ const TERMS_CN = {
       ] },
     ] },
     { h: '5. 教育记录', blocks: [
-      { p: 'Sunset-Speaks 可保存提供和管理服务所必需的考勤记录、课堂笔记、课程表及教育表现记录。' },
+      { p: 'Sunset-Speaks 可保存提供和管理服务所必需的考勤记录、课堂笔记、课程表、课堂报告、剩余课时余额及教育表现记录。' },
+      { p: '学生账户用于查看该学生自己的课程表、该学生课程的报告和低余额通知。学生不得尝试访问其他学生的课堂记录。' },
     ] },
     { h: '6. 付款核实', blocks: [
       { p: '在适用情况下，用户可能需要提供付款确认信息（包括交易参考号），以核实与教育服务相关的付款。' },
@@ -439,7 +452,7 @@ const TERMS_TW = {
       { p: '若您不同意本條款，則必須停止使用本服務。' },
     ] },
     { h: '2. 服務說明', blocks: [
-      { p: 'Sunset-Speaks 提供線上英語（ESL）輔導服務，讓老師和學生參加已排定的教學課程。' },
+      { p: 'Sunset-Speaks 提供線上英語（ESL）輔導服務和班級管理平台，讓老師、學生和管理員管理已排定的教學課程。' },
     ] },
     { h: '3. 使用者責任', blocks: [
       { p: '使用者同意：' },
@@ -447,6 +460,7 @@ const TERMS_TW = {
         '提供參加課程所必需的正確資料',
         '在適用情況下出席已排定的課程',
         '尊重老師、學生、管理員和工作人員',
+        '學生帳戶僅可用於存取自己的課程表、課堂報告和餘額相關通知',
         '僅將本平台用於合法的教育目的',
         '避免擾亂、辱罵、詐欺或不當行為',
       ] },
@@ -461,7 +475,8 @@ const TERMS_TW = {
       ] },
     ] },
     { h: '5. 教育記錄', blocks: [
-      { p: 'Sunset-Speaks 可保存提供及管理服務所必需的出席記錄、課堂筆記、課程表及教育表現記錄。' },
+      { p: 'Sunset-Speaks 可保存提供及管理服務所必需的出席記錄、課堂筆記、課程表、課堂報告、剩餘課時餘額及教育表現記錄。' },
+      { p: '學生帳戶用於查看該學生自己的課程表、該學生課程的報告和低餘額通知。學生不得嘗試存取其他學生的課堂記錄。' },
     ] },
     { h: '6. 付款核實', blocks: [
       { p: '在適用情況下，使用者可能需要提供付款確認資訊（包括交易參考號），以核實與教育服務相關的付款。' },

@@ -46,7 +46,7 @@ test('deployment record captures five isolated Free production previews', async 
   assert.ok(['4.4', '4.5'].includes(state.phase));
   assert.equal(state.netlifySitesCreated, true);
   assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
-  assert.equal(state.portfolioUpdated, false);
+  assert.equal(state.portfolioUpdated, true);
   assert.equal(state.netlify.plan, 'Free');
   assert.equal(state.netlify.deploymentMode, 'manual-atomic');
   assert.deepEqual(Object.keys(state.netlify.sites), appIds);

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "phase": "4.5",
-  "updatedAt": "2026-07-22",
+  "updatedAt": "2026-07-26",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
     "migrationVersions": [
@@ -15,7 +15,8 @@
       "20260722000800",
       "20260722000900",
       "20260722001000",
-      "20260722001100"
+      "20260722001100",
+      "20260726000100"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -39,7 +40,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 7, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 8, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -57,16 +58,16 @@
       "crossKeyRejected": true,
       "cn": {
         "defaultLoginsVerified": ["admin", "testteacher", "teststudent"],
-        "teacherCount": 3,
-        "studentCount": 6,
-        "scheduleCount": 7,
-        "reportCount": 2,
+        "teacherCount": 4,
+        "studentCount": 11,
+        "scheduleCount": 12,
+        "reportCount": 4,
         "credentialMutationRejected": true,
         "restrictedRoutesRejected": true
       },
       "rcmi": {
         "administratorLoginVerified": true,
-        "memberCount": 8,
+        "memberCount": 12,
         "passwordMutationRejected": true
       },
       "hours": {
@@ -109,14 +110,14 @@
       "dataApiSafeDeleteCompatibilityApplied": true,
       "postResetBaselines": {
         "cnDefaultLoginsVerified": ["admin", "testteacher", "teststudent"],
-        "cnTeacherCount": 3,
-        "cnStudentCount": 6,
-        "cnScheduleCount": 7,
-        "cnReportCount": 2,
+        "cnTeacherCount": 4,
+        "cnStudentCount": 11,
+        "cnScheduleCount": 12,
+        "cnReportCount": 4,
         "cnCredentialMutationRejected": true,
         "cnRestrictedRouteRejected": true,
         "rcmiAdministratorLoginVerified": true,
-        "rcmiMemberCount": 8,
+        "rcmiMemberCount": 12,
         "rcmiPasswordMutationRejected": true,
         "hoursPasswordLoginVerified": true,
         "hoursEntryCount": 0,
@@ -202,7 +203,8 @@
         "browserConsoleErrors": 0
       },
       "rcmiAdministratorNavigationHint": true
-    }
+    },
+    "frontendRedeployRequired": true
   },
   "cloudflare": {
     "plan": "Free",
@@ -220,5 +222,5 @@
   },
   "netlifySitesCreated": true,
   "cloudflareSubdomainsConfigured": true,
-  "portfolioUpdated": false
+  "portfolioUpdated": true
 }

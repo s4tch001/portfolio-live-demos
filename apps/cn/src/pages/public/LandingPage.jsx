@@ -7,6 +7,7 @@ import Footer from '../../components/Layout/Footer.jsx';
 
 const AUDIENCE = [
   { icon: 'fa-chalkboard-user', key: 'landing.audience.teachers' },
+  { icon: 'fa-user-graduate', key: 'landing.audience.students' },
   { icon: 'fa-user-shield', key: 'landing.audience.admins' },
 ];
 

@@ -181,7 +181,8 @@ async function main() {
     "20260722000800",
     "20260722000900",
     "20260722001000",
-    "20260722001100"
+    "20260722001100",
+    "20260726000100"
   ];
   if (
     !["4.4", "4.5"].includes(deployment.phase) ||
@@ -202,7 +203,7 @@ async function main() {
     deployment.supabase?.cronInstalled !== true ||
     deployment.netlifySitesCreated !== true ||
     deployment.cloudflareSubdomainsConfigured !== (deployment.phase === "4.5") ||
-    deployment.portfolioUpdated !== false
+    deployment.portfolioUpdated !== true
   ) {
     failures.push("Phase 4.4+ scheduler or later-hosting boundary is inconsistent.");
   }
@@ -224,8 +225,8 @@ async function main() {
     resetVerification?.recoveryInvocation?.failed !== 0 ||
     resetVerification?.idempotentInvocation?.claimed !== 0 ||
     resetVerification?.dataApiSafeDeleteCompatibilityApplied !== true ||
-    resetVerification?.postResetBaselines?.cnTeacherCount !== 3 ||
-    resetVerification?.postResetBaselines?.rcmiMemberCount !== 8 ||
+    resetVerification?.postResetBaselines?.cnTeacherCount !== 4 ||
+    resetVerification?.postResetBaselines?.rcmiMemberCount !== 12 ||
     resetVerification?.postResetBaselines?.hoursPasswordMutationRejected !== true
   ) {
     failures.push("Phase 4.3 reset idempotency or post-reset baseline evidence is incomplete.");
@@ -241,7 +242,7 @@ async function main() {
   ) {
     failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
   }
-  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 7], ["rcmi-api", 6], ["hours-api", 6]]) {
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 8], ["rcmi-api", 6], ["hours-api", 6]]) {
     const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
     if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
       failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);

@@ -23,7 +23,7 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
 test('each persistent app API accepts only its exact named publishable key', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
   const functions = {
-    'cn-api': ['cn_demo', 7],
+    'cn-api': ['cn_demo', 8],
     'rcmi-api': ['rcmi_demo', 6],
     'hours-api': ['hours_demo', 6],
   };
@@ -52,11 +52,11 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
   assert.deepEqual(verification.cn.defaultLoginsVerified, ['admin', 'testteacher', 'teststudent']);
   assert.deepEqual(
     [verification.cn.teacherCount, verification.cn.studentCount, verification.cn.scheduleCount, verification.cn.reportCount],
-    [3, 6, 7, 2],
+    [4, 11, 12, 4],
   );
   assert.equal(verification.cn.credentialMutationRejected, true);
   assert.equal(verification.cn.restrictedRoutesRejected, true);
-  assert.equal(verification.rcmi.memberCount, 8);
+  assert.equal(verification.rcmi.memberCount, 12);
   assert.equal(verification.rcmi.administratorLoginVerified, true);
   assert.equal(verification.rcmi.passwordMutationRejected, true);
   assert.equal(verification.hours.passwordLoginVerified, true);
@@ -76,5 +76,5 @@ test('later hosting work remains gated after reset activation', async () => {
   assert.equal(state.supabase.cronInstalled, resetsActive);
   assert.equal(state.netlifySitesCreated, ['4.4', '4.5'].includes(state.phase));
   assert.equal(state.cloudflareSubdomainsConfigured, state.phase === '4.5');
-  assert.equal(state.portfolioUpdated, false);
+  assert.equal(state.portfolioUpdated, true);
 });
