@@ -19,20 +19,7 @@ import LeadershipOverview from './components/LeadershipOverview.jsx';
 import PasswordModal from './components/PasswordModal.jsx';
 import { SENIOR_PASTOR_NAME, DISTRICT_LEADERS } from './lib/constants.js';
 
-// 1-indexed spreadsheet column number -> letter (1 -> A, 27 -> AA, ...), used
-// to size the dynamic date-column range in the per-day export sheet.
-function columnLetter(index) {
-  let letter = '';
-  let n = index;
-  while (n > 0) {
-    const rem = (n - 1) % 26;
-    letter = String.fromCharCode(65 + rem) + letter;
-    n = Math.floor((n - 1) / 26);
-  }
-  return letter;
-}
-
-// Builds Excel row descriptors for a leader-grouped sheet: each leader's own
+// Builds export row descriptors for a leader-grouped file: each leader's own
 // row, then their people, then a blank spacer row before the next group. A
 // group with leaderId === null (the "Unassigned" bucket) gets a plain header
 // row instead of a leader row, since there's no leader to report attendance
@@ -54,6 +41,24 @@ function buildGroupedDataRows(groups, leaderRowValues, personRowValues, columnCo
     }
   });
   return rows;
+}
+
+function csvCell(value) {
+  const text = String(value ?? '');
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function App() {
@@ -383,17 +388,12 @@ function App() {
         api(`attendance?mode=month-hierarchical&month=${monthKey}`).then((data) => data.rows || []),
       ]);
 
-      setDownloadStatus('Exporting spreadsheet...');
+      setDownloadStatus('Exporting files...');
 
-      // Loaded on demand so the heavy ExcelJS library stays out of the initial bundle.
-      const { default: ExcelJS } = await import('exceljs');
-      const workbook = new ExcelJS.Workbook();
-
-      // ---- Sheet 1: Per-Day View ----
+      // ---- File 1: Per-Day View ----
       // One column per date that actually has attendance this month (days with
       // zero attendance simply never appear), grouped rows: each leader followed
       // by the members/guests assigned to them, one row per person.
-      const sheet1 = workbook.addWorksheet('rcmi-attendance');
 
       const presenceSet = new Set(hierRows.map((row) => `${row.memberId}|${row.attendanceDate}`));
 
@@ -444,56 +444,33 @@ function App() {
         sheet1Groups.push({ leaderId: null, leaderName: 'Unassigned', people: unassignedPeople });
       }
 
-      // Name + Role, then one column per date with attendance this month.
       const columnCount = 2 + sortedDates.length;
-      const lastColumnLetter = columnLetter(columnCount);
 
-      sheet1.mergeCells(`A1:${lastColumnLetter}1`);
-      sheet1.getCell('A1').value = `RCMI ATTENDANCE PER DAY - ${monthName.toUpperCase()} ${year}`;
-      sheet1.getCell('A1').font = { bold: true, size: 14 };
-      sheet1.getCell('A1').alignment = { horizontal: 'center', vertical: 'center' };
+      const dateLabels = sortedDates.map((dateKey) => `${monthName} ${dateDayMap.get(dateKey)}`);
+      const perDayRows = sortedDates.length === 0
+        ? [[`RCMI ATTENDANCE PER DAY - ${monthName.toUpperCase()} ${year}`], [], ['No attendance recorded this month.']]
+        : [
+            [`RCMI ATTENDANCE PER DAY - ${monthName.toUpperCase()} ${year}`],
+            [],
+            ['Name', 'Role', ...dateLabels],
+            ...buildGroupedDataRows(
+              sheet1Groups,
+              (group) => [
+                group.leaderName,
+                'Leader',
+                ...sortedDates.map((dateKey) => (presenceSet.has(`${group.leaderId}|${dateKey}`) ? 1 : '')),
+              ],
+              (person) => [
+                `  ${person.name}`,
+                roleLabel(person.role),
+                ...sortedDates.map((dateKey) => (presenceSet.has(`${person.id}|${dateKey}`) ? 1 : '')),
+              ],
+              columnCount,
+            ).map((row) => row.values),
+          ];
 
-      if (sortedDates.length === 0) {
-        sheet1.getCell('A3').value = 'No attendance recorded this month.';
-        sheet1.getCell('A3').font = { italic: true };
-      } else {
-        const dateLabels = sortedDates.map((dateKey) => `${monthName} ${dateDayMap.get(dateKey)}`);
-
-        const sheet1Rows = buildGroupedDataRows(
-          sheet1Groups,
-          (group) => [
-            group.leaderName,
-            'Leader',
-            ...sortedDates.map((dateKey) => (presenceSet.has(`${group.leaderId}|${dateKey}`) ? 1 : '')),
-          ],
-          (person) => [
-            `  ${person.name}`,
-            roleLabel(person.role),
-            ...sortedDates.map((dateKey) => (presenceSet.has(`${person.id}|${dateKey}`) ? 1 : '')),
-          ],
-          columnCount,
-        );
-
-        sheet1.getRow(3).values = ['Name', 'Role', ...dateLabels];
-        sheet1.getRow(3).font = { bold: true };
-        sheet1Rows.forEach((row, index) => {
-          const excelRow = sheet1.getRow(4 + index);
-          excelRow.values = row.values;
-          if (row.kind === 'leader' || row.kind === 'header') excelRow.font = { bold: true };
-        });
-
-        sheet1.getColumn(1).width = Math.max(
-          26,
-          ...attendees.map((person) => person.name.length + 4),
-          ...leaderRoster.map((leader) => leader.name.length + 2),
-        );
-        for (let col = 2; col <= columnCount; col++) {
-          sheet1.getColumn(col).width = 12;
-        }
-      }
-
-      // ---- Sheet 2: Monthly Summary (rcmi-monthly-summary), same leader-grouped
-      // layout as sheet 1, with an Attended day-count column instead of dates. ----
+      // ---- File 2: Monthly Summary, same leader-grouped layout as file 1,
+      // with an Attended day-count column instead of dates. ----
       const presentMembersMap = new Map();
       Object.values(days).forEach((people) => {
         people.forEach((person) => {
@@ -523,59 +500,25 @@ function App() {
         sheet2Groups.push({ leaderId: null, leaderName: 'Unassigned', count: 0, people: monthlyUnassigned });
       }
 
-      const worksheet = workbook.addWorksheet('rcmi-monthly-summary');
-
-      worksheet.mergeCells('A1:C1');
-      worksheet.getCell('A1').value =
-        `RCMI ATTENDANCE OF ${monthName.toUpperCase()} ${year}`;
-      worksheet.getCell('A1').font = { bold: true, size: 14 };
-      worksheet.getCell('A1').alignment = {
-        horizontal: 'center',
-        vertical: 'center',
-      };
-
-      if (sortedDates.length === 0) {
-        worksheet.getCell('A3').value = 'No attendance recorded this month.';
-        worksheet.getCell('A3').font = { italic: true };
-      } else {
-        const sheet2Rows = buildGroupedDataRows(
-          sheet2Groups,
-          (group) => [group.leaderName, 'Leader', group.count],
-          (person) => [`  ${person.name}`, roleLabel(person.role), person.count],
-          3,
-        );
-
-        worksheet.getRow(3).values = ['Name', 'Role', 'Attended'];
-        worksheet.getRow(3).font = { bold: true };
-        sheet2Rows.forEach((row, index) => {
-          const excelRow = worksheet.getRow(4 + index);
-          excelRow.values = row.values;
-          if (row.kind === 'leader' || row.kind === 'header') excelRow.font = { bold: true };
-        });
-
-        worksheet.getColumn(1).width = Math.max(
-          26,
-          ...monthlyAttendees.map((person) => person.name.length + 4),
-          ...leaderRoster.map((leader) => leader.name.length + 2),
-        );
-        worksheet.getColumn(2).width = 12;
-        worksheet.getColumn(3).width = 12;
-      }
+      const summaryRows = sortedDates.length === 0
+        ? [[`RCMI ATTENDANCE OF ${monthName.toUpperCase()} ${year}`], [], ['No attendance recorded this month.']]
+        : [
+            [`RCMI ATTENDANCE OF ${monthName.toUpperCase()} ${year}`],
+            [],
+            ['Name', 'Role', 'Attended'],
+            ...buildGroupedDataRows(
+              sheet2Groups,
+              (group) => [group.leaderName, 'Leader', group.count],
+              (person) => [`  ${person.name}`, roleLabel(person.role), person.count],
+              3,
+            ).map((row) => row.values),
+          ];
 
       setDownloadStatus('Downloading...');
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${monthName.toLowerCase()}-${year}-rcmi-attendance.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-      setMessage('Monthly attendance downloaded.');
+      const baseName = `${monthName.toLowerCase()}-${year}-rcmi-attendance`;
+      downloadCsv(`${baseName}-per-day.csv`, perDayRows);
+      downloadCsv(`${baseName}-monthly-summary.csv`, summaryRows);
+      setMessage('Monthly attendance CSV files downloaded.');
       setPasswordModalOpen(false);
     } catch (err) {
       setError(err.message);

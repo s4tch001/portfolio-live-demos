@@ -65,12 +65,10 @@ access token is stored in this repository.
 
 - `npm run check` passed all isolation, toolchain, Supabase, and application
   audits plus 57 automated tests.
-- Production builds passed for all five demos. CN and the separately loaded RCMI
-  Excel export remain above Vite's advisory chunk-size threshold; this is a
-  performance warning, not a build failure.
-- `npm audit --audit-level=high` passed. The existing ExcelJS dependency retains
-  two moderate transitive `uuid` findings; npm offers only a forced breaking
-  downgrade, so no unsafe automated dependency change was applied.
+- Production builds passed for all five demos. CN remains above Vite's advisory
+  chunk-size threshold; this is a performance warning, not a build failure.
+- `npm audit --audit-level=high` passed after the RCMI export was changed to
+  grouped CSV files and the ExcelJS transitive dependency chain was removed.
 - Linked local and remote migration histories still match all six committed
   versions exactly.
 

@@ -11,10 +11,9 @@
   },
   "dependencies": {
     "@pauuu-demo/demo-shell": "0.2.0",
-    "exceljs": "4.4.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-router-dom": "7.17.0"
+    "react-router-dom": "6.30.4"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "6.0.3",

@@ -31,10 +31,12 @@ reset migrations, shared reset coordinator integration, and dependency lock.
 | --- | --- | --- |
 | App migrations and functions are not running remotely | No app reset is enabled, preventing false cleanup claims | Apply migrations in order, deploy functions, and run live negative-path tests before activation |
 | Database SQL has contract tests but no fresh local Docker database execution in Phase 3 | Static privilege and schema audits pass | Run migration dry-run/reset or linked preflight and confirm reset idempotency |
-| RCMI uses ExcelJS 4.4.0, which brings `uuid` 8.3.2 with a moderate bounds advisory in UUID v3/v5/v6 buffer APIs | RCMI calls ExcelJS workbook export; ExcelJS uses UUID v4 without a caller-provided buffer. The high-severity audit gate passes. A forced npm fix would downgrade ExcelJS across a breaking major | Retest and upgrade when ExcelJS ships a compatible patched dependency; do not apply the breaking forced downgrade blindly |
+| RCMI export avoids ZIP/XLSX libraries | The demo now downloads grouped CSV files directly in the browser, avoiding the former ExcelJS/archiver/uuid audit chain | If XLSX export is restored later, use a dependency version that keeps `npm audit --audit-level=high` clean |
 | CN and RCMI JavaScript bundles are large, and Travels includes a roughly 3 MB hero image | Functionality and production builds pass | Measure Netlify previews and optimize/lazy-load only if free-tier bandwidth or user experience requires it |
 | Free Supabase/Netlify services can pause or become temporarily unavailable | APIs fail closed and reset work is retryable | Add the planned bounded health check and verify retry behavior after deployment |
 | No browser end-to-end tests exist against the final public hostnames | Local component/contract tests and production builds pass | Test login, CRUD, restrictions, reset, mobile notice, and subdomain CORS on deployed previews |
 
-No high or critical dependency advisory is present at the end of Phase 3. Two
-moderate findings refer to the same transitive UUID advisory through ExcelJS.
+No high or critical dependency advisory is present after the dependency audit
+fix. The remaining audit findings are moderate React Router advisories; these
+apps use client-side SPA routing only, and the CI gate remains high-severity
+clean.

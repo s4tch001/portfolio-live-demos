@@ -70,7 +70,7 @@ export function getRoleGroups(people) {
 }
 
 // Groups present/absent people by the leader they're assigned to, for the
-// "By Leader" attendance views and the Excel per-day export sheet. Input
+// "By Leader" attendance views and the CSV per-day export file. Input
 // people carry { id, name, role, leaderId, leaderName, status }. Anyone with
 // no resolvable leaderId (legacy data from before leader assignment existed)
 // is bucketed into a trailing "Unassigned" group instead of being dropped.

@@ -45,8 +45,8 @@ keys, run negative credential/reset tests, and only then enable reset entries.
 - 49 contract and integration tests.
 - Production Vite builds for all five applications.
 - Rolldown bundle validation for the three app Edge Functions.
-- `npm audit --audit-level=high`, which passes with the documented moderate
-  ExcelJS transitive advisory.
+- `npm audit --audit-level=high`, which passes after removing the former
+  ExcelJS transitive audit chain from the RCMI export.
 
 See `docs/security/phase-3-review.md` for remaining deployment and dependency
 risks.

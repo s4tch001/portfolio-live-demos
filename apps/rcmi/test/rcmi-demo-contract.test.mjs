@@ -83,6 +83,15 @@ test('frontend consumes only environment-provided public Supabase settings', asy
   assert.doesNotMatch(api, /ivqfxdibluhgyttgxbmz/);
 });
 
+test('exports attendance as dependency-light CSV instead of the vulnerable ExcelJS chain', async () => {
+  const app = await read('apps/rcmi/src/App.jsx');
+  const pkg = JSON.parse(await read('apps/rcmi/package.json'));
+  assert.doesNotMatch(app, /import\('exceljs'\)|ExcelJS|writeBuffer/);
+  assert.match(app, /downloadCsv\(`\$\{baseName\}-per-day\.csv`/);
+  assert.match(app, /downloadCsv\(`\$\{baseName\}-monthly-summary\.csv`/);
+  assert.equal(pkg.dependencies.exceljs, undefined);
+});
+
 test('keeps full-screen overlays below the preview notice', async () => {
   const css = await read('apps/rcmi/src/styles.css');
   assert.match(css, /\.modalOverlay\s*\{[\s\S]*?inset: var\(--portfolio-demo-notice-height, 0px\) 0 0/);
