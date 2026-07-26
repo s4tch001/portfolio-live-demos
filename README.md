@@ -1,7 +1,9 @@
 # Portfolio Live Demos
 
-This workspace contains isolated, resettable demo editions of five portfolio
-projects. It remains separate from every original project repository.
+This public workspace contains isolated, resettable demo editions of five
+portfolio projects. It remains separate from every original project repository
+and is safe to publish because it does not commit Supabase secret keys,
+database passwords, Netlify tokens, GitHub tokens, or local `.env` files.
 
 Current state: Phase 4.5 is complete. CN Class Management, RCMI
 Attendance Checker, Hours Tracker, Payroll Splitter, and P Travels each have a
@@ -47,9 +49,21 @@ by default and requires the three app-specific publishable keys in the
 environment. Set `DEMO_HOST_MODE=netlify` to check the original Netlify
 hostnames instead. The audit never prints or stores key values.
 
-Public browser configuration is listed in `.env.example`. Never place a
-Supabase secret key, database password, or personal access token in a Vite
-variable or browser bundle.
+Public browser configuration is listed in `.env.example`. Supabase publishable
+keys are browser-facing by design; Supabase secret keys, database passwords,
+Netlify tokens, GitHub tokens, and personal access tokens must stay in provider
+dashboards, CLI secret stores, or ignored local `.env` files. Never place a
+server-only secret in a Vite variable or browser bundle.
+
+## Public repository safety
+
+- Demo credentials shown in the preview notices are intentional, non-sensitive
+  test accounts for visitors.
+- Visitor-created records are reset daily; protected seed data is restored after
+  each reset.
+- Search indexing is disabled for the demo subdomains with `noindex` controls.
+- `.env.example` contains placeholders only. Copy it to an ignored local file or
+  configure values directly in Netlify/Supabase when deploying.
 
 ## Project documentation
 
