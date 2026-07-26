@@ -122,6 +122,7 @@ test('CN public pages describe student access and use a dummy support email', as
   const legal = await read('apps/cn/src/i18n/legal.js');
   const legalDoc = await read('apps/cn/src/pages/public/LegalDoc.jsx');
   assert.match(landing, /landing\.audience\.students/);
+  assert.match(landing, /landing\.audience\.admins[\s\S]*landing\.audience\.teachers[\s\S]*landing\.audience\.students/);
   assert.match(strings, /Students/);
   assert.match(strings, /low-balance notifications/);
   assert.match(strings, /Students can only see their own schedules and class reports/);
