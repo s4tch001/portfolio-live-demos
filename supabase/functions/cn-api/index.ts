@@ -727,9 +727,22 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     }
     const reportStudentStats = new Map<number, any>();
     const reportTeacherStats = new Map<number, any>();
+    const reportedScheduleIds = new Set<number>();
+    const teacherSummaryFor = (teacherId: number) => {
+      const teacher = teacherById.get(teacherId);
+      const current = reportTeacherStats.get(teacherId) ?? {
+        teacher_id: teacherId,
+        teacher: teacher?.fullname ?? teacher?.username ?? "Teacher",
+        classes: 0,
+        cancelled: 0
+      };
+      reportTeacherStats.set(teacherId, current);
+      return current;
+    };
     for (const report of reports) {
       const schedule = scheduleById.get(Number(report.schedule_id));
       if (!schedule) continue;
+      reportedScheduleIds.add(Number(schedule.id));
       const studentIds = Array.isArray(schedule.student_ids) && schedule.student_ids.length
         ? schedule.student_ids.map(Number).filter(Boolean)
         : schedule.student_id
@@ -751,17 +764,19 @@ async function transactionRoutes(request: Request, path: string, database: any, 
       }
       const teacherId = Number(report.teacher_id || schedule.teacher_id || 0);
       if (teacherId) {
-        const teacher = teacherById.get(teacherId);
-        const current = reportTeacherStats.get(teacherId) ?? {
-          teacher_id: teacherId,
-          teacher: teacher?.fullname ?? teacher?.username ?? "Teacher",
-          classes: 0,
-          cancelled: 0
-        };
+        const current = teacherSummaryFor(teacherId);
         current.classes += 1;
         if (schedule.cancelled) current.cancelled += 1;
-        reportTeacherStats.set(teacherId, current);
       }
+    }
+    for (const schedule of schedules) {
+      if (!schedule.cancelled) continue;
+      if (reportedScheduleIds.has(Number(schedule.id))) continue;
+      const teacherId = Number(schedule.teacher_id || 0);
+      if (!teacherId) continue;
+      const current = teacherSummaryFor(teacherId);
+      current.cancelled += 1;
+      current.classes += 1;
     }
     const withStudentMeta = (row: any, studentId: number) => {
       const student = studentById.get(studentId);
@@ -803,7 +818,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
       monthly,
       busiestMonth,
       topStudents: [...reportStudentStats.values()].sort((a, b) => (b.present + b.absent) - (a.present + a.absent)).slice(0, 5),
-      topTeachers: [...reportTeacherStats.values()].sort((a, b) => b.classes - a.classes).slice(0, 5),
+      topTeachers: [...reportTeacherStats.values()].sort((a, b) => b.classes - a.classes || b.cancelled - a.cancelled).slice(0, 5),
       movedStudents,
       newStudentsList,
       inactiveTeachers: teachers

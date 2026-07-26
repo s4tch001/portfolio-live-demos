@@ -41,7 +41,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 9, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 10, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },

@@ -78,6 +78,10 @@ test('CN Edge adapter returns frontend-ready receipts and yearly summaries', asy
   assert.match(edge, /hasMore: startIndex \+ limit < receipts\.length/);
   assert.match(edge, /totalReceipts: receiptKeys\.size/);
   assert.match(edge, /topStudents: \[\.\.\.reportStudentStats\.values\(\)\]/);
+  assert.match(edge, /reportedScheduleIds/);
+  assert.match(edge, /for \(const schedule of schedules\) \{/);
+  assert.match(edge, /if \(!schedule\.cancelled\) continue/);
+  assert.match(edge, /reportedScheduleIds\.has\(Number\(schedule\.id\)\)/);
   assert.match(edge, /monthlyFeeList/);
   assert.match(edge, /cancelMonthlyList/);
 });

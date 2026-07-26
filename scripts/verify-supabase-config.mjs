@@ -243,7 +243,7 @@ async function main() {
   ) {
     failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
   }
-  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 9], ["rcmi-api", 6], ["hours-api", 6]]) {
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 10], ["rcmi-api", 6], ["hours-api", 6]]) {
     const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
     if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
       failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);
