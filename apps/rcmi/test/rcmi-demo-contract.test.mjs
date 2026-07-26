@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
 
 test('seeds realistic current-month RCMI preview directory and attendance data', async () => {
-  const migration = await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql');
+  const migration = await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql');
   for (const name of [
     'Sherwin Alonzo',
     'Anj Villanueva',
@@ -16,13 +16,17 @@ test('seeds realistic current-month RCMI preview directory and attendance data',
     'Paolo Mendoza',
     'Andrea Santos',
     'Rafael Torres',
+    'Elaine Dizon',
+    'Kevin Soriano',
   ]) {
     assert.match(migration, new RegExp(name));
   }
   assert.match(migration, /'pastor-sherwin'/);
   assert.match(migration, /'ate-anj'/);
   assert.match(migration, /month_start date := date_trunc\('month', p_logical_date\)::date/);
-  assert.match(migration, /month_start \+ 23/);
+  assert.match(migration, /month_end date :=/);
+  assert.match(migration, /extract\(isodow from d\) in \(3, 7\)/);
+  assert.match(migration, /member_index % 5/);
   assert.match(migration, /rcmi_demo\.attendance/);
 });
 
@@ -30,6 +34,7 @@ test('restores the protected administrator password and leaves reset disabled', 
   const migration = [
     await read('supabase/migrations/20260722000300_rcmi_demo.sql'),
     await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql'),
+    await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql'),
   ].join('\n');
   assert.match(migration, /'admin_password_hash'.+'password'/s);
   assert.match(migration, /protect_default_password/);

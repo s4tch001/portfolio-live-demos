@@ -34,6 +34,7 @@ test('database protects demo credentials and rejects the reserved master usernam
   const migration = [
     await read('supabase/migrations/20260722000200_cn_demo.sql'),
     await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql'),
+    await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -49,22 +50,36 @@ test('database protects demo credentials and rejects the reserved master usernam
 });
 
 test('database seeds richer current-month CN preview data without exposing extra credentials', async () => {
-  const migration = await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql');
+  const migration = await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql');
   assert.match(migration, /month_start date := date_trunc\('month', p_logical_date\)::date/);
+  assert.match(migration, /month_end date :=/);
   assert.match(migration, /Grace Mendoza/);
   assert.match(migration, /Amanda Reyes/);
   assert.match(migration, /Miguel Santos/);
   assert.match(migration, /Sophia Lim/);
   assert.match(migration, /Isabella Ramos/);
-  assert.match(migration, /month_start \+ 23/);
+  assert.match(migration, /extract\(isodow from d\) between 1 and 5/);
+  assert.match(migration, /'17:00 - 17:45'/);
+  assert.match(migration, /six booked hours on weekdays and rest on weekends/);
   assert.match(migration, /'Late Notice'/);
-  assert.match(migration, /cancelled = excluded\.cancelled/);
+  assert.match(migration, /is_cancelled := schedule_id % 19 = 0/);
   assert.match(migration, /class_usage/);
   assert.match(migration, /low remaining class balance/);
-  assert.match(migration, /Emma Chen has a low remaining class balance/);
-  assert.match(migration, /'DEMO-RC-001', 'purchase', 3, 2/);
+  assert.match(migration, /'DEMO-RC-001', 'purchase', 36, 36/);
+  assert.match(migration, /update cn_demo\.class_transactions tx/);
   assert.match(migration, /activity_logs/);
   assert.doesNotMatch(await read('apps/cn/src/pages/LoginPage/LoginPage.jsx'), /amanda\.reyes|liam\.garcia|isabella\.ramos/);
+});
+
+test('CN Edge adapter returns frontend-ready receipts and yearly summaries', async () => {
+  const edge = await read('supabase/functions/cn-api/index.ts');
+  assert.match(edge, /return \{\s*receipts: page,/);
+  assert.match(edge, /nextBefore: page\.length/);
+  assert.match(edge, /hasMore: startIndex \+ limit < receipts\.length/);
+  assert.match(edge, /totalReceipts: receiptKeys\.size/);
+  assert.match(edge, /topStudents: \[\.\.\.reportStudentStats\.values\(\)\]/);
+  assert.match(edge, /monthlyFeeList/);
+  assert.match(edge, /cancelMonthlyList/);
 });
 
 test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', async () => {

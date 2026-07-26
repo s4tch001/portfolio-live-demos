@@ -16,7 +16,8 @@
       "20260722000900",
       "20260722001000",
       "20260722001100",
-      "20260726000100"
+      "20260726000100",
+      "20260726000200"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -40,7 +41,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 8, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 9, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -60,14 +61,14 @@
         "defaultLoginsVerified": ["admin", "testteacher", "teststudent"],
         "teacherCount": 4,
         "studentCount": 11,
-        "scheduleCount": 12,
-        "reportCount": 4,
+        "scheduleCount": 736,
+        "reportCount": 72,
         "credentialMutationRejected": true,
         "restrictedRoutesRejected": true
       },
       "rcmi": {
         "administratorLoginVerified": true,
-        "memberCount": 12,
+        "memberCount": 16,
         "passwordMutationRejected": true
       },
       "hours": {
@@ -112,12 +113,12 @@
         "cnDefaultLoginsVerified": ["admin", "testteacher", "teststudent"],
         "cnTeacherCount": 4,
         "cnStudentCount": 11,
-        "cnScheduleCount": 12,
-        "cnReportCount": 4,
+        "cnScheduleCount": 736,
+        "cnReportCount": 72,
         "cnCredentialMutationRejected": true,
         "cnRestrictedRouteRejected": true,
         "rcmiAdministratorLoginVerified": true,
-        "rcmiMemberCount": 12,
+        "rcmiMemberCount": 16,
         "rcmiPasswordMutationRejected": true,
         "hoursPasswordLoginVerified": true,
         "hoursEntryCount": 0,

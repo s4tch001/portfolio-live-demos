@@ -698,8 +698,120 @@ async function transactionRoutes(request: Request, path: string, database: any, 
   }
   if (path === "/annual-summary" && request.method === "GET") {
     const year = Number(params.get("year") ?? new Date().getFullYear());
-    const rows = await queryMany(database.from("class_transactions").select("date,type,total_classes,remaining_classes,amount").gte("date", `${year}-01-01`).lte("date", `${year}-12-31`));
-    return { year, generated: true, transactions: rows, totals: { records: rows.length } };
+    const compact = params.get("compact") === "1";
+    const start = `${year}-01-01`;
+    const end = `${year}-12-31`;
+    const [transactions, students, teachers, schedules, reports] = await Promise.all([
+      queryMany(database.from("class_transactions").select("*").gte("date", start).lte("date", end)),
+      queryMany(database.from("students").select("id,name,username,notes,status,teacher_id,created_at").order("name")),
+      queryMany(database.from("teachers").select("id,fullname,username,status,created_at").order("fullname")),
+      compact ? Promise.resolve([]) : queryMany(database.from("schedules").select("*").gte("date", start).lte("date", end)),
+      compact ? Promise.resolve([]) : queryMany(database.from("reports").select("*").gte("date", start).lte("date", end))
+    ]);
+    const studentById = new Map(students.map((row: any) => [Number(row.id), row]));
+    const teacherById = new Map(teachers.map((row: any) => [Number(row.id), row]));
+    const scheduleById = new Map(schedules.map((row: any) => [Number(row.id), row]));
+    const receiptKeys = new Set<string>();
+    const monthly = Array.from({ length: 12 }, (_, index) => ({ month: index + 1, receipts: 0, rmb: 0 }));
+    for (const row of transactions) {
+      const month = Math.max(1, Math.min(12, Number(String(row.date || "").slice(5, 7)) || 1));
+      const amount = Number(row.amount ?? 0) || 0;
+      monthly[month - 1].rmb += amount;
+      if (row.receipt_no) {
+        const key = `${row.student_id || 0}|${row.receipt_no}`;
+        if (!receiptKeys.has(key)) {
+          receiptKeys.add(key);
+          monthly[month - 1].receipts += 1;
+        }
+      }
+    }
+    const reportStudentStats = new Map<number, any>();
+    const reportTeacherStats = new Map<number, any>();
+    for (const report of reports) {
+      const schedule = scheduleById.get(Number(report.schedule_id));
+      if (!schedule) continue;
+      const studentIds = Array.isArray(schedule.student_ids) && schedule.student_ids.length
+        ? schedule.student_ids.map(Number).filter(Boolean)
+        : schedule.student_id
+          ? [Number(schedule.student_id)]
+          : [];
+      for (const studentId of studentIds) {
+        const student = studentById.get(studentId);
+        const current = reportStudentStats.get(studentId) ?? {
+          student_id: studentId,
+          student: student?.name ?? schedule.student ?? "Student",
+          username: student?.username ?? "",
+          notes: student?.notes ?? "",
+          present: 0,
+          absent: 0
+        };
+        if (report.absent) current.absent += 1;
+        else current.present += 1;
+        reportStudentStats.set(studentId, current);
+      }
+      const teacherId = Number(report.teacher_id || schedule.teacher_id || 0);
+      if (teacherId) {
+        const teacher = teacherById.get(teacherId);
+        const current = reportTeacherStats.get(teacherId) ?? {
+          teacher_id: teacherId,
+          teacher: teacher?.fullname ?? teacher?.username ?? "Teacher",
+          classes: 0,
+          cancelled: 0
+        };
+        current.classes += 1;
+        if (schedule.cancelled) current.cancelled += 1;
+        reportTeacherStats.set(teacherId, current);
+      }
+    }
+    const withStudentMeta = (row: any, studentId: number) => {
+      const student = studentById.get(studentId);
+      return {
+        ...row,
+        student_id: studentId,
+        name: student?.name ?? row.name ?? row.student ?? "Student",
+        student: student?.name ?? row.student ?? row.name ?? "Student",
+        username: student?.username ?? "",
+        notes: student?.notes ?? ""
+      };
+    };
+    const movedStudents = students
+      .filter((row: any) => row.status === "Inactive" || row.status === "End of Contract")
+      .map((row: any) => withStudentMeta({ type: row.status === "End of Contract" ? "Left" : "Inactive", date: String(row.created_at || "").slice(0, 10) }, Number(row.id)));
+    const newStudentsList = students
+      .filter((row: any) => String(row.created_at || "").slice(0, 4) === String(year))
+      .map((row: any) => withStudentMeta({ date: String(row.created_at || "").slice(0, 10) }, Number(row.id)));
+    const monthlyFeeList = transactions
+      .filter((row: any) => row.type === "monthly-fee" && row.status === "active")
+      .map((row: any) => withStudentMeta({ date: row.date, receipt_no: row.receipt_no, amount: Number(row.amount ?? 0) || 0 }, Number(row.student_id)));
+    const cancelMonthlyList = transactions
+      .filter((row: any) => row.type === "cancel-monthly-fee")
+      .map((row: any) => withStudentMeta({ date: row.date, receipt_no: row.receipt_no }, Number(row.student_id)));
+    const busiestMonth = monthly.reduce((best, item) => {
+      if (!best || item.receipts > best.receipts || item.rmb > best.rmb) return item;
+      return best;
+    }, null as any);
+    return {
+      year,
+      totalReceipts: receiptKeys.size,
+      totalRmb: monthly.reduce((sum, item) => sum + item.rmb, 0),
+      activeStudents: students.filter((row: any) => row.status === "Active").length,
+      newStudents: newStudentsList.length,
+      becameInactive: students.filter((row: any) => row.status === "Inactive").length,
+      leftStudents: students.filter((row: any) => row.status === "End of Contract").length,
+      teacherActive: teachers.filter((row: any) => row.status === "Active").length,
+      teacherInactive: teachers.filter((row: any) => row.status === "Inactive").length,
+      monthly,
+      busiestMonth,
+      topStudents: [...reportStudentStats.values()].sort((a, b) => (b.present + b.absent) - (a.present + a.absent)).slice(0, 5),
+      topTeachers: [...reportTeacherStats.values()].sort((a, b) => b.classes - a.classes).slice(0, 5),
+      movedStudents,
+      newStudentsList,
+      inactiveTeachers: teachers
+        .filter((row: any) => row.status === "Inactive")
+        .map((row: any) => ({ teacher_id: row.id, name: row.fullname || row.username, date: String(row.created_at || "").slice(0, 10) })),
+      monthlyFeeList,
+      cancelMonthlyList
+    };
   }
   if (path === "/receipts/check" && request.method === "GET") {
     const number = params.get("no") ?? "";
@@ -710,7 +822,54 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     return { receipt_no: `DEMO-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}` };
   }
   if (path === "/receipts" && request.method === "GET") {
-    return await queryMany(database.from("class_transactions").select("*").neq("receipt_no", "").order("date", { ascending: false }));
+    const year = Number(params.get("year") ?? new Date().getFullYear());
+    const search = String(params.get("search") ?? "").trim().toLowerCase();
+    const limit = Math.min(100, Math.max(1, Number(params.get("limit") ?? 30)));
+    const before = String(params.get("before") ?? "");
+    const [transactions, students] = await Promise.all([
+      queryMany(database.from("class_transactions").select("*").neq("receipt_no", "").gte("date", `${year}-01-01`).lte("date", `${year}-12-31`).order("date", { ascending: false }).order("id", { ascending: false })),
+      queryMany(database.from("students").select("id,name,username,notes,status"))
+    ]);
+    const studentById = new Map(students.map((row: any) => [Number(row.id), row]));
+    const groups = new Map<string, any>();
+    for (const row of transactions) {
+      const receiptNo = String(row.receipt_no || "").trim();
+      if (!receiptNo) continue;
+      const key = `${row.student_id || 0}|${receiptNo}`;
+      const student = studentById.get(Number(row.student_id));
+      const current = groups.get(key) ?? {
+        ...row,
+        receipt_no: receiptNo,
+        student_name: student?.name ?? "",
+        username: student?.username ?? "",
+        notes: student?.notes ?? "",
+        remaining: 0,
+        total_classes: 0,
+        amount: 0,
+        has_monthly: false,
+        cursor: `${row.date}|${row.id}`
+      };
+      current.remaining += Number(row.remaining_classes ?? 0) || 0;
+      current.total_classes += Number(row.total_classes ?? 0) || 0;
+      current.amount += Number(row.amount ?? 0) || 0;
+      current.has_monthly = current.has_monthly || (row.type === "monthly-fee" && row.status === "active");
+      groups.set(key, current);
+    }
+    let receipts = [...groups.values()].sort((a, b) => String(b.cursor).localeCompare(String(a.cursor)));
+    if (search) {
+      receipts = receipts.filter((row) =>
+        [row.receipt_no, row.student_name, row.username, row.notes, row.transaction_no]
+          .some((value) => String(value ?? "").toLowerCase().includes(search))
+      );
+    }
+    const startIndex = before ? Math.max(0, receipts.findIndex((row) => row.cursor === before) + 1) : 0;
+    const page = receipts.slice(startIndex, startIndex + limit);
+    return {
+      receipts: page,
+      nextBefore: page.length ? page[page.length - 1].cursor : null,
+      hasMore: startIndex + limit < receipts.length,
+      total: receipts.length
+    };
   }
   throw new ApiError(405, "method_not_allowed");
 }
