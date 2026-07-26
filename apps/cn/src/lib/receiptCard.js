@@ -54,11 +54,12 @@ export function monthlyPaymentLine(t, tr) {
   const txnNo = tr ? tr('rmod.transactionNo') : 'Transaction No';
   const amt = tr ? tr('rmod.amountRmb') : 'Amount (RMB)';
   const rem = tr ? tr('rmod.remarks') : 'Remarks';
+  const clean = (value) => String(value ?? '').trim() || '—';
   return (
     (t.date || '—') +
-    ' · ' + txnNo + ': ' + ((t.transaction_no || '').trim() || '—') +
-    ' · ' + amt + ': ' + ((t.amount || '').trim() || '—') +
-    ' · ' + rem + ': ' + ((t.notes || '').trim() || '—')
+    ' · ' + txnNo + ': ' + clean(t.transaction_no) +
+    ' · ' + amt + ': ' + clean(t.amount) +
+    ' · ' + rem + ': ' + clean(t.notes)
   );
 }
 

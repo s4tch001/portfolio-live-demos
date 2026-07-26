@@ -17,7 +17,8 @@
       "20260722001000",
       "20260722001100",
       "20260726000100",
-      "20260726000200"
+      "20260726000200",
+      "20260726000300"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -144,7 +145,7 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a656e267cac9a2003505968",
+        "productionDeployId": "6a6576b097faf3637b80f0d9",
         "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {

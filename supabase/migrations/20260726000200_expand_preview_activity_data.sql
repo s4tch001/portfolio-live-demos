@@ -23,14 +23,21 @@ declare
   is_absent boolean;
   report_limit integer := 72;
   slot_labels text[] := array[
-    '09:00 - 09:45',
-    '10:00 - 10:45',
-    '11:00 - 11:45',
-    '13:00 - 13:45',
-    '14:00 - 14:45',
-    '15:00 - 15:45',
-    '16:00 - 16:45',
-    '17:00 - 17:45'
+    '10:00 - 10:25',
+    '10:30 - 10:55',
+    '11:00 - 11:25',
+    '11:30 - 11:55',
+    '12:00 - 12:25',
+    '12:30 - 12:55',
+    '13:00 - 13:25',
+    '13:30 - 13:55',
+    '14:00 - 14:25',
+    '14:30 - 14:55',
+    '15:00 - 15:25',
+    '15:30 - 15:55',
+    '16:00 - 16:25',
+    '16:30 - 16:55',
+    '17:00 - 17:25'
   ];
 begin
   if p_logical_date is null then
@@ -144,7 +151,7 @@ begin
     where extract(isodow from d) between 1 and 5
   loop
     for teacher_id in 1..4 loop
-      for slot_index in 1..8 loop
+      for slot_index in 1..array_length(slot_labels, 1) loop
         schedule_id := schedule_id + 1;
         student_id := (((extract(day from seed_day)::integer + teacher_id::integer + slot_index) % 11) + 1);
         select s.name into student_name from cn_demo.students s where s.id = student_id;
@@ -159,7 +166,7 @@ begin
           student_name,
           student_id,
           array[student_id]::bigint[],
-          'Generated current-month preview schedule. Teachers work six booked hours on weekdays and rest on weekends.',
+          'Generated current-month preview schedule using the default 25-minute class slots. Teachers rest on weekends.',
           false,
           is_cancelled,
           case when is_cancelled then 'Generated preview cancellation; no class balance is deducted.' else '' end,
@@ -184,7 +191,7 @@ begin
               seed_day,
               case (slot_index % 4) when 0 then 'Reading Explorer Foundations' when 1 then 'Everybody Up 2' when 2 then 'Oxford Discover 1' else 'Conversation Builder' end,
               format('%s-%s', 10 + slot_index, 13 + slot_index),
-              '45 minutes',
+              '25 mins',
               case when is_absent then 'Late Notice' else '' end,
               '',
               case when is_absent then 'Absent - generated preview data.' else 'Present - generated preview data.' end,
@@ -199,7 +206,7 @@ begin
               schedule_id,
               seed_day,
               slot_start,
-              '45 minutes',
+              '25 mins',
               case (slot_index % 4) when 0 then 'Reading Explorer Foundations' when 1 then 'Everybody Up 2' when 2 then 'Oxford Discover 1' else 'Conversation Builder' end,
               format('%s-%s', 10 + slot_index, 13 + slot_index),
               case when is_absent then 'Absent report consumed one class in this demo.' else 'Present report consumed one class in this demo.' end,

@@ -51,6 +51,7 @@ test('database protects demo credentials and rejects the reserved master usernam
 
 test('database seeds richer current-month CN preview data without exposing extra credentials', async () => {
   const migration = await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql');
+  const slotMigration = await read('supabase/migrations/20260726000300_normalize_cn_preview_schedule_slots.sql');
   assert.match(migration, /month_start date := date_trunc\('month', p_logical_date\)::date/);
   assert.match(migration, /month_end date :=/);
   assert.match(migration, /Grace Mendoza/);
@@ -59,8 +60,17 @@ test('database seeds richer current-month CN preview data without exposing extra
   assert.match(migration, /Sophia Lim/);
   assert.match(migration, /Isabella Ramos/);
   assert.match(migration, /extract\(isodow from d\) between 1 and 5/);
-  assert.match(migration, /'17:00 - 17:45'/);
-  assert.match(migration, /six booked hours on weekdays and rest on weekends/);
+  assert.match(migration, /'10:00 - 10:25'/);
+  assert.match(migration, /'17:00 - 17:25'/);
+  assert.match(migration, /array_length\(slot_labels, 1\)/);
+  assert.match(migration, /default 25-minute class slots/);
+  assert.match(migration, /'25 mins'/);
+  assert.doesNotMatch(migration, /09:00 - 09:45|17:00 - 17:45|45 minutes/);
+  assert.match(slotMigration, /normalize_preview_schedule_slot/);
+  assert.match(slotMigration, /before insert or update of timeslot, note on cn_demo\.schedules/);
+  assert.match(slotMigration, /'09:00 - 09:45' then '10:00 - 10:25'/);
+  assert.match(slotMigration, /set class_duration = '25 mins'/);
+  assert.match(slotMigration, /set duration = '25 mins'/);
   assert.match(migration, /'Late Notice'/);
   assert.match(migration, /is_cancelled := schedule_id % 19 = 0/);
   assert.match(migration, /class_usage/);
@@ -84,6 +94,13 @@ test('CN Edge adapter returns frontend-ready receipts and yearly summaries', asy
   assert.match(edge, /reportedScheduleIds\.has\(Number\(schedule\.id\)\)/);
   assert.match(edge, /monthlyFeeList/);
   assert.match(edge, /cancelMonthlyList/);
+});
+
+test('CN annual monthly-fee details tolerate numeric Supabase amounts', async () => {
+  const receiptCard = await read('apps/cn/src/lib/receiptCard.js');
+  assert.match(receiptCard, /const clean = \(value\) => String\(value \?\? ''\)\.trim\(\) \|\| '—'/);
+  assert.match(receiptCard, /clean\(t\.amount\)/);
+  assert.doesNotMatch(receiptCard, /\(\(t\.amount \|\| ''\)\.trim\(\)/);
 });
 
 test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', async () => {
