@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import { REMAINING_TABS } from './remainingConstants.js';

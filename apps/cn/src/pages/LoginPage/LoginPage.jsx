@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import LanguageSwitcher from '../../components/ui/LanguageSwitcher.jsx';

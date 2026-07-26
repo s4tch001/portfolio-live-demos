@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { Routes, Route, NavLink, Navigate } from 'react-router';
 import AdminPage from './AdminPage.jsx';
 import { api } from './lib/api.js';
 import {

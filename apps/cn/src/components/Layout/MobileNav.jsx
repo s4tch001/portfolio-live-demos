@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import { visibleNavItems } from './navConfig.js';

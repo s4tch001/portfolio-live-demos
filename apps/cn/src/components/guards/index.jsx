@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 import { useAuth, defaultRouteFor } from '../../context/AuthContext.jsx';
 
 // Block unauthenticated access — redirect to login.

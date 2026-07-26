@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@pauuu-demo/demo-shell": "0.2.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-router-dom": "6.30.4"
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router": "8.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "6.0.3",

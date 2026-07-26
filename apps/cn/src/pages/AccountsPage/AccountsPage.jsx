@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { apiFetch } from '../../lib/apiClient.js';
 import { onRealtime } from '../../lib/realtime.js';
 import { useToast } from '../../context/ToastProvider.jsx';

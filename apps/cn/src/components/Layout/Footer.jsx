@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 
 // Site footer shown on every main (mobile-nav) page. Theme-aware via CSS vars.

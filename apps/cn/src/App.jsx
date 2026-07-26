@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';
 import { ThemeProvider } from './context/ThemeProvider.jsx';

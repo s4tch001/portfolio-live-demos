@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const SUPPORT_EMAIL = 'support@example.com';
 
