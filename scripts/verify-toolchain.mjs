@@ -21,7 +21,7 @@ function command(commandName, args) {
       cwd: workspaceRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
+      windowsHide: true
     }).trim();
   } catch {
     return null;
@@ -34,9 +34,7 @@ function majorVersion(version) {
 }
 
 function installedNpmVersion() {
-  const userAgentMatch = /(?:^|\s)npm\/([^\s]+)/.exec(
-    process.env.npm_config_user_agent ?? "",
-  );
+  const userAgentMatch = /(?:^|\s)npm\/([^\s]+)/.exec(process.env.npm_config_user_agent ?? "");
   if (userAgentMatch) {
     return userAgentMatch[1];
   }
@@ -45,13 +43,7 @@ function installedNpmVersion() {
     return command(process.execPath, [process.env.npm_execpath, "--version"]);
   }
 
-  const npmCliPath = path.join(
-    path.dirname(process.execPath),
-    "node_modules",
-    "npm",
-    "bin",
-    "npm-cli.js",
-  );
+  const npmCliPath = path.join(path.dirname(process.execPath), "node_modules", "npm", "bin", "npm-cli.js");
   return command(process.execPath, [npmCliPath, "--version"]);
 }
 
@@ -80,21 +72,15 @@ async function verifyWorkspacePackages(rootPackage) {
     try {
       workspacePackage = await readJson(location + "/package.json");
     } catch {
-      failures.push(
-        "Workspace package manifest is missing or invalid at " + location + ".",
-      );
+      failures.push("Workspace package manifest is missing or invalid at " + location + ".");
       continue;
     }
 
     if (workspacePackage.private !== true) {
-      failures.push(
-        "Workspace package must remain private at " + location + ".",
-      );
+      failures.push("Workspace package must remain private at " + location + ".");
     }
     if (!workspacePackage.name || names.has(workspacePackage.name)) {
-      failures.push(
-        "Workspace package name is missing or duplicated at " + location + ".",
-      );
+      failures.push("Workspace package name is missing or duplicated at " + location + ".");
     }
     names.add(workspacePackage.name);
   }
@@ -123,13 +109,8 @@ async function main() {
   if (rootPackage.packageManager !== "npm@11.11.0") {
     failures.push("packageManager must remain pinned to npm 11.11.0.");
   }
-  if (
-    rootPackage.engines?.node !== ">=24 <=26.5.0" ||
-    rootPackage.engines?.npm !== ">=11 <=12.0.1"
-  ) {
-    failures.push(
-      "package.json engine ranges do not match the supported toolchain.",
-    );
+  if (rootPackage.engines?.node !== ">=24 <25" || rootPackage.engines?.npm !== ">=11 <12") {
+    failures.push("package.json engine ranges do not match the supported toolchain.");
   }
   if (
     rootPackage.devEngines?.runtime?.onFail !== "error" ||
@@ -137,19 +118,11 @@ async function main() {
   ) {
     failures.push("Development engine mismatches must fail closed.");
   }
-  if (
-    !npmConfig.includes("engine-strict=true") ||
-    !npmConfig.includes("package-lock=true")
-  ) {
+  if (!npmConfig.includes("engine-strict=true") || !npmConfig.includes("package-lock=true")) {
     failures.push(".npmrc must enforce engines and the npm lockfile.");
   }
-  if (
-    lockfile.lockfileVersion !== 3 ||
-    lockfile.packages?.[""]?.name !== rootPackage.name
-  ) {
-    failures.push(
-      "package-lock.json is missing, stale, or uses an unexpected format.",
-    );
+  if (lockfile.lockfileVersion !== 3 || lockfile.packages?.[""]?.name !== rootPackage.name) {
+    failures.push("package-lock.json is missing, stale, or uses an unexpected format.");
   }
 
   const workspaceLocations = await verifyWorkspacePackages(rootPackage);
@@ -164,36 +137,25 @@ async function main() {
   if (inGitHubActions) {
     const repository = process.env.GITHUB_REPOSITORY;
     const ref = process.env.GITHUB_REF ?? "";
-    const allowedRef =
-      ref === "refs/heads/main" || /^refs\/pull\/\d+\/merge$/.test(ref);
+    const allowedRef = ref === "refs/heads/main" || /^refs\/pull\/\d+\/merge$/.test(ref);
     if (repository !== "s4tch001/portfolio-live-demos" || !allowedRef) {
-      failures.push(
-        "GitHub Actions must run for the intended repository and an allowed main or pull-request ref.",
-      );
+      failures.push("GitHub Actions must run for the intended repository and an allowed main or pull-request ref.");
     }
   } else {
-    const mainBranchExists =
-      command("git", ["show-ref", "--verify", "--hash", "refs/heads/main"]) !==
-      null;
+    const mainBranchExists = command("git", ["show-ref", "--verify", "--hash", "refs/heads/main"]) !== null;
     if (gitBranch !== "main" && !mainBranchExists) {
-      failures.push(
-        "The local repository must have main as its initialized default branch.",
-      );
+      failures.push("The local repository must have main as its initialized default branch.");
     }
   }
 
   const remoteUrl = command("git", ["remote", "get-url", "origin"]);
   const normalizedRemote = remoteUrl?.replace(/\.git$/, "");
   if (normalizedRemote !== "https://github.com/s4tch001/portfolio-live-demos") {
-    failures.push(
-      "Git origin must point to the intended private repository without embedded credentials.",
-    );
+    failures.push("Git origin must point to the intended private repository without embedded credentials.");
   }
 
   if (failures.length > 0) {
-    console.error(
-      "Toolchain audit failed with " + failures.length + " issue(s):",
-    );
+    console.error("Toolchain audit failed with " + failures.length + " issue(s):");
     for (const failure of failures) {
       console.error(" - " + failure);
     }
@@ -202,18 +164,8 @@ async function main() {
   }
 
   console.log("Toolchain audit passed.");
-  console.log(
-    " - Node.js " +
-      process.version +
-      " and npm " +
-      npmVersion +
-      " satisfy the supported majors.",
-  );
-  console.log(
-    " - " +
-      workspaceLocations.length +
-      " private workspaces are represented in the lockfile.",
-  );
+  console.log(" - Node.js " + process.version + " and npm " + npmVersion + " satisfy the supported majors.");
+  console.log(" - " + workspaceLocations.length + " private workspaces are represented in the lockfile.");
   console.log(" - Git context and credential-free origin are configured.");
 }
 
