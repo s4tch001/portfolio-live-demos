@@ -61,7 +61,7 @@
     "supabase:db-reset": "supabase db reset"
   },
   "devDependencies": {
-    "@supabase/server": "1.4.0",
+    "@supabase/server": "1.4.1",
     "supabase": "2.109.1"
   }
 }
