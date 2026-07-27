@@ -10,19 +10,19 @@
     "url": "git+https://github.com/s4tch001/portfolio-live-demos.git"
   },
   "engines": {
-    "node": ">=24 <25",
-    "npm": ">=11 <12"
+    "node": ">=24 <=26.5.0",
+    "npm": ">=11 <=12.0.1"
   },
   "packageManager": "npm@11.11.0",
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=24 <25",
+      "version": ">=24 <=26.5.0",
       "onFail": "error"
     },
     "packageManager": {
       "name": "npm",
-      "version": ">=11 <12",
+      "version": ">=11 <=12.0.1",
       "onFail": "error"
     }
   },
