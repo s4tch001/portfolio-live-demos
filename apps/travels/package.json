@@ -10,7 +10,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
     "@pauuu-demo/demo-shell": "0.2.0",
-    "react": "19.2.5",
+    "react": "19.2.8",
     "react-dom": "19.2.5"
   },
   "devDependencies": {
