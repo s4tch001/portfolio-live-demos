@@ -112,7 +112,8 @@ const styles = `
     font: inherit;
     font-size: 0.72rem;
     font-weight: 800;
-    justify-self: end;
+    grid-column: 1 / -1;
+    justify-self: center;
     letter-spacing: 0.02em;
     padding: 0.38rem 0.62rem;
     white-space: nowrap;
@@ -186,10 +187,6 @@ const styles = `
     }
 
     details {
-      justify-self: start;
-    }
-
-    .toggle {
       justify-self: start;
     }
 
