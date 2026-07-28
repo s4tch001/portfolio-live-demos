@@ -40,7 +40,8 @@ Server-only secrets, database passwords, Netlify tokens, GitHub tokens, and loca
 
 ## Local Setup
 
-Use Node.js 24 LTS and npm 11.
+Use the Node.js version in `.nvmrc` (`26`) with npm 11. The package engines
+allow Node.js `>=24 <27` and npm `>=11 <12`.
 
 ```powershell
 npm.cmd install --ignore-scripts
