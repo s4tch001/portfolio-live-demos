@@ -10,14 +10,14 @@
     "url": "git+https://github.com/s4tch001/portfolio-live-demos.git"
   },
   "engines": {
-    "node": ">=24 <25",
+    "node": ">=24 <27",
     "npm": ">=11 <12"
   },
   "packageManager": "npm@11.11.0",
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=24 <25",
+      "version": ">=24 <27",
       "onFail": "error"
     },
     "packageManager": {
@@ -31,6 +31,12 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "npm run dev:cn",
+    "dev:cn": "npm run dev --workspace @pauuu-demo/cn",
+    "dev:rcmi": "npm run dev --workspace @pauuu-demo/rcmi",
+    "dev:hours": "npm run dev --workspace @pauuu-demo/hours",
+    "dev:payroll": "npm run dev --workspace @pauuu-demo/payroll",
+    "dev:travels": "npm run dev --workspace @pauuu-demo/travels",
     "audit:isolation": "node scripts/verify-isolation.mjs",
     "audit:isolation:ci": "node scripts/verify-isolation.mjs --workspace-only",
     "audit:netlify:live": "node scripts/verify-netlify-live.mjs",

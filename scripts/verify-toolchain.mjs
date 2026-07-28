@@ -33,6 +33,11 @@ function majorVersion(version) {
   return match ? Number(match[1]) : null;
 }
 
+function supportedNodeMajor(version) {
+  const major = majorVersion(version);
+  return major !== null && major >= 24 && major < 27;
+}
+
 function installedNpmVersion() {
   const userAgentMatch = /(?:^|\s)npm\/([^\s]+)/.exec(process.env.npm_config_user_agent ?? "");
   if (userAgentMatch) {
@@ -94,8 +99,8 @@ async function main() {
   const nvmVersion = (await readText(".nvmrc")).trim();
   const npmConfig = await readText(".npmrc");
 
-  if (majorVersion(process.version) !== 24) {
-    failures.push("Node.js major version 24 is required.");
+  if (!supportedNodeMajor(process.version)) {
+    failures.push("Node.js major version 24, 25, or 26 is required.");
   }
 
   const npmVersion = installedNpmVersion();
@@ -103,13 +108,13 @@ async function main() {
     failures.push("npm major version 11 is required.");
   }
 
-  if (nvmVersion !== "24") {
-    failures.push(".nvmrc must select Node.js 24.");
+  if (nvmVersion !== "26") {
+    failures.push(".nvmrc must select Node.js 26.");
   }
   if (rootPackage.packageManager !== "npm@11.11.0") {
     failures.push("packageManager must remain pinned to npm 11.11.0.");
   }
-  if (rootPackage.engines?.node !== ">=24 <25" || rootPackage.engines?.npm !== ">=11 <12") {
+  if (rootPackage.engines?.node !== ">=24 <27" || rootPackage.engines?.npm !== ">=11 <12") {
     failures.push("package.json engine ranges do not match the supported toolchain.");
   }
   if (

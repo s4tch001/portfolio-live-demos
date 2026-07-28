@@ -39,6 +39,16 @@ const styles = `
     width: 100%;
   }
 
+  .notice.is-collapsed {
+    grid-template-columns: 1fr;
+    padding-block: 0.45rem;
+  }
+
+  .notice.is-collapsed .copy,
+  .notice.is-collapsed details {
+    display: none;
+  }
+
   .copy {
     min-width: 0;
   }
@@ -91,6 +101,32 @@ const styles = `
     list-style-position: inside;
     padding: 0.42rem 0.62rem;
     white-space: nowrap;
+  }
+
+  .toggle {
+    background: transparent;
+    border: 1px solid #6b7280;
+    border-radius: 999px;
+    color: var(--demo-notice-text);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+    justify-self: end;
+    letter-spacing: 0.02em;
+    padding: 0.38rem 0.62rem;
+    white-space: nowrap;
+  }
+
+  .toggle:hover,
+  .toggle:focus-visible {
+    border-color: var(--demo-notice-accent);
+    color: var(--demo-notice-accent);
+    outline: none;
+  }
+
+  .notice.is-collapsed .toggle {
+    justify-self: center;
   }
 
   .credentials {
@@ -150,6 +186,10 @@ const styles = `
     }
 
     details {
+      justify-self: start;
+    }
+
+    .toggle {
       justify-self: start;
     }
 
@@ -261,6 +301,7 @@ export function defineDemoNotice(
     }
 
     #contract;
+    #collapsed = false;
     #heightFrame;
     #resizeObserver;
 
@@ -274,6 +315,7 @@ export function defineDemoNotice(
     }
 
     connectedCallback() {
+      this.#collapsed = this.#readCollapsedPreference();
       this.render();
       this.#observeHeight();
     }
@@ -302,10 +344,8 @@ export function defineDemoNotice(
 
     #publishHeight() {
       const height = Math.ceil(Number(this.getBoundingClientRect?.().height ?? 0));
-      if (height > 0) {
-        const ownerDocument = this.ownerDocument ?? documentRef;
-        ownerDocument.documentElement?.style?.setProperty?.(DEMO_NOTICE_HEIGHT_PROPERTY, `${height}px`);
-      }
+      const ownerDocument = this.ownerDocument ?? documentRef;
+      ownerDocument.documentElement?.style?.setProperty?.(DEMO_NOTICE_HEIGHT_PROPERTY, `${Math.max(0, height)}px`);
     }
 
     #observeHeight() {
@@ -328,6 +368,38 @@ export function defineDemoNotice(
       }
     }
 
+    #preferenceKey() {
+      const model = buildDemoNoticeModel(this.#contract ?? this.getAttribute("project-id"));
+      return `pauuu-demo-notice:${model.projectId}:collapsed`;
+    }
+
+    #readCollapsedPreference() {
+      try {
+        return this.ownerDocument?.defaultView?.localStorage?.getItem(this.#preferenceKey()) === "true";
+      } catch {
+        return false;
+      }
+    }
+
+    #writeCollapsedPreference() {
+      try {
+        this.ownerDocument?.defaultView?.localStorage?.setItem(
+          this.#preferenceKey(),
+          this.#collapsed ? "true" : "false"
+        );
+      } catch {
+        // Storage can be blocked in private/sandboxed browsers; the button
+        // still works for the current render.
+      }
+    }
+
+    #toggleCollapsed() {
+      this.#collapsed = !this.#collapsed;
+      this.#writeCollapsedPreference();
+      this.render();
+      this.#observeHeight();
+    }
+
     render() {
       const ownerDocument = this.ownerDocument ?? documentRef;
       const model = buildDemoNoticeModel(this.#contract ?? this.getAttribute("project-id"));
@@ -336,7 +408,7 @@ export function defineDemoNotice(
       style.textContent = styles;
 
       const notice = ownerDocument.createElement("aside");
-      notice.className = "notice";
+      notice.className = this.#collapsed ? "notice is-collapsed" : "notice";
       notice.setAttribute("role", "note");
       notice.setAttribute("aria-label", "Portfolio demo notice");
       notice.setAttribute("part", "notice");
@@ -396,6 +468,14 @@ export function defineDemoNotice(
         details.append(summary, credentialPanel);
         notice.append(details);
       }
+
+      const toggle = ownerDocument.createElement("button");
+      toggle.className = "toggle";
+      toggle.type = "button";
+      toggle.textContent = this.#collapsed ? "Show demo notice" : "Hide notice";
+      toggle.setAttribute("aria-expanded", String(!this.#collapsed));
+      toggle.addEventListener("click", () => this.#toggleCollapsed());
+      notice.append(toggle);
 
       shadow.replaceChildren(style, notice);
       this.dataset.projectId = model.projectId;
