@@ -1,71 +1,85 @@
 # Portfolio Live Demos
 
-This public workspace contains isolated, resettable demo editions of five
-portfolio projects. It remains separate from every original project repository
-and is safe to publish because it does not commit Supabase secret keys,
-database passwords, Netlify tokens, GitHub tokens, or local `.env` files.
+Resettable public demos for the projects featured on [pauuu.dev](https://pauuu.dev).
+This repo is separate from the original project repositories, so portfolio
+visitors can try the apps without touching production data.
 
-Current state: Phase 4.5 is complete. CN Class Management, RCMI
-Attendance Checker, Hours Tracker, Payroll Splitter, and P Travels each have a
-buildable demo workspace, persistent preview notice, `noindex` protection, and
-an app-specific reset contract. CN and RCMI restore fictional sample records;
-CN, RCMI, and Hours enforce immutable default credentials at UI, API, and
-database layers. Payroll and Travels persist no visitor data.
-
-All five app-schema migrations are deployed to the dedicated Supabase project
-and remote lint reports zero errors. The `cn-api`, `rcmi-api`, and `hours-api`
-Edge Functions are active behind their exact app-specific publishable keys and
-have passed live authentication, key-isolation, CORS, sample-data, and immutable
-credential checks. Vault-backed Supabase Cron is active every 15 minutes and
-performs each app's idempotent daily reset using the Asia/Manila logical date.
-
-Five isolated production previews are live on Netlify Free through DNS-only
-Cloudflare subdomains:
+## Live Demos
 
 - [CN Class Management](https://cn-demo.pauuu.dev)
-- [RCMI Attendance Checker](https://rcmi-demo.pauuu.dev) — open `/administrator` manually for the administrator panel
+- [RCMI Attendance Checker](https://rcmi-demo.pauuu.dev) - open `/administrator` manually for the administrator panel
 - [Hours Tracker](https://hours-demo.pauuu.dev)
 - [Payroll Splitter](https://payroll-demo.pauuu.dev)
 - [P Travels](https://travels-demo.pauuu.dev)
 
-All five enforce HTTPS security headers, `noindex`, and immutable caching for
-hashed assets. The shared preview notice now publishes its measured responsive
-height so fixed navigation, loading layers, gates, and overlays always start
-below it. Portfolio edits remain gated behind the next subphase go signal.
+Each demo shows a persistent portfolio notice explaining that it is a shared
+preview. Visitor-created data is cleared daily, protected seed records are
+restored, and demo subdomains are marked `noindex` so only the main portfolio is
+intended for search indexing.
 
-## Local verification
+## What This Repo Contains
 
-Use Node.js 24 LTS and npm 11:
+- Isolated demo editions of five portfolio projects
+- Shared preview notices with hide/show controls
+- Netlify-ready frontend builds
+- Supabase schema, Edge Function, and reset tooling
+- Fictional seed data for CN Class Management and RCMI Attendance Checker
+- Daily reset behavior based on the Asia/Manila logical date
+- Security headers, robots controls, and immutable caching for hashed assets
+
+The demos use public Supabase publishable keys where browser access is required.
+Server-only secrets, database passwords, Netlify tokens, GitHub tokens, and local
+`.env` files must stay out of the repository.
+
+## Stack
+
+- Vite-based demo frontends
+- Netlify Free for hosting
+- Supabase for backend, database, Edge Functions, and scheduled reset jobs
+- Cloudflare DNS for demo subdomains under `pauuu.dev`
+
+## Local Setup
+
+Use Node.js 24 LTS and npm 11.
 
 ```powershell
 npm.cmd install --ignore-scripts
+```
+
+Copy `.env.example` into an ignored local env file when a command needs public
+demo configuration. Do not place service-role keys or other server secrets in
+Vite variables.
+
+## Common Commands
+
+```powershell
 npm.cmd run check
 npm.cmd run build:apps
 npm.cmd audit --audit-level=high
 ```
 
-The optional `npm.cmd run audit:netlify:live` command checks the custom domains
-by default and requires the three app-specific publishable keys in the
-environment. Set `DEMO_HOST_MODE=netlify` to check the original Netlify
-hostnames instead. The audit never prints or stores key values.
+Optional live audit:
 
-Public browser configuration is listed in `.env.example`. Supabase publishable
-keys are browser-facing by design; Supabase secret keys, database passwords,
-Netlify tokens, GitHub tokens, and personal access tokens must stay in provider
-dashboards, CLI secret stores, or ignored local `.env` files. Never place a
-server-only secret in a Vite variable or browser bundle.
+```powershell
+npm.cmd run audit:netlify:live
+```
 
-## Public repository safety
+`audit:netlify:live` checks the custom domains by default and requires the
+app-specific publishable keys in the environment. Set `DEMO_HOST_MODE=netlify`
+to check the original Netlify hostnames instead. The audit does not print or
+store key values.
 
-- Demo credentials shown in the preview notices are intentional, non-sensitive
-  test accounts for visitors.
-- Visitor-created records are reset daily; protected seed data is restored after
-  each reset.
-- Search indexing is disabled for the demo subdomains with `noindex` controls.
-- `.env.example` contains placeholders only. Copy it to an ignored local file or
-  configure values directly in Netlify/Supabase when deploying.
+## Demo Safety Rules
 
-## Project documentation
+- Demo credentials in preview notices are intentional test accounts.
+- Default credentials and protected seed data must survive daily resets.
+- Visitors must not be able to change protected default credentials.
+- CN, RCMI, and Hours use app-specific publishable keys and isolated API routes.
+- Payroll and Travels do not persist visitor data.
+- Demo pages should stay out of search results through `noindex` and robots
+  controls.
+
+## Documentation
 
 - Phase 3 completion and verification: `docs/phase-3-completion.md`
 - Phase 4.1 Supabase schema deployment: `docs/phase-4-1-supabase-schema-deployment.md`
