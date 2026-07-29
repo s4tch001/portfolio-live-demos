@@ -28,8 +28,8 @@ export default function Footer() {
         </nav>
 
         <div className="site-footer-contact">
-          <a href="mailto:esl.educonnect@gmail.com">
-            <i className="fa-solid fa-envelope" aria-hidden="true"></i> esl.educonnect@gmail.com
+          <a href="mailto:sample@example.com">
+            <i className="fa-solid fa-envelope" aria-hidden="true"></i> sample@example.com
           </a>
         </div>
 

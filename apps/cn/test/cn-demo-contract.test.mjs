@@ -35,6 +35,7 @@ test('database protects demo credentials and rejects the reserved master usernam
     await read('supabase/migrations/20260722000200_cn_demo.sql'),
     await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql'),
     await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql'),
+    await read('supabase/migrations/20260729000100_refine_cn_preview_school_data.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -50,7 +51,7 @@ test('database protects demo credentials and rejects the reserved master usernam
 });
 
 test('database seeds richer current-month CN preview data without exposing extra credentials', async () => {
-  const migration = await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql');
+  const migration = await read('supabase/migrations/20260729000100_refine_cn_preview_school_data.sql');
   const slotMigration = await read('supabase/migrations/20260726000300_normalize_cn_preview_schedule_slots.sql');
   assert.match(migration, /month_start date := date_trunc\('month', p_logical_date\)::date/);
   assert.match(migration, /month_end date :=/);
@@ -59,11 +60,17 @@ test('database seeds richer current-month CN preview data without exposing extra
   assert.match(migration, /Miguel Santos/);
   assert.match(migration, /Sophia Lim/);
   assert.match(migration, /Isabella Ramos/);
+  assert.match(migration, /Olivia Park/);
+  assert.match(migration, /s\.id between 1 and 16/);
   assert.match(migration, /extract\(isodow from d\) between 1 and 5/);
-  assert.match(migration, /'10:00 - 10:25'/);
+  assert.match(migration, /'08:00 - 08:25'/);
+  assert.match(migration, /'10:30 - 10:55'/);
+  assert.match(migration, /'13:00 - 13:25'/);
+  assert.match(migration, /'15:30 - 15:55'/);
   assert.match(migration, /'17:00 - 17:25'/);
-  assert.match(migration, /array_length\(slot_labels, 1\)/);
-  assert.match(migration, /default 25-minute class slots/);
+  assert.match(migration, /'19:30 - 19:55'/);
+  assert.match(migration, /'21:30 - 21:55'/);
+  assert.match(migration, /for student_row in/);
   assert.match(migration, /'25 mins'/);
   assert.doesNotMatch(migration, /09:00 - 09:45|17:00 - 17:45|45 minutes/);
   assert.match(slotMigration, /normalize_preview_schedule_slot/);
@@ -71,11 +78,13 @@ test('database seeds richer current-month CN preview data without exposing extra
   assert.match(slotMigration, /'09:00 - 09:45' then '10:00 - 10:25'/);
   assert.match(slotMigration, /set class_duration = '25 mins'/);
   assert.match(slotMigration, /set duration = '25 mins'/);
-  assert.match(migration, /'Late Notice'/);
-  assert.match(migration, /is_cancelled := schedule_id % 19 = 0/);
+  assert.match(migration, /New student; use short instructions/);
+  assert.match(migration, /Oxford Discover 2, pages 34-37/);
+  assert.match(migration, /else ''/);
+  assert.match(migration, /is_cancelled := .* % 19 = 0/);
   assert.match(migration, /class_usage/);
   assert.match(migration, /low remaining class balance/);
-  assert.match(migration, /'DEMO-RC-001', 'purchase', 36, 36/);
+  assert.match(migration, /https:\/\/example\.com\/demo-class-session/);
   assert.match(migration, /update cn_demo\.class_transactions tx/);
   assert.match(migration, /activity_logs/);
   assert.doesNotMatch(await read('apps/cn/src/pages/LoginPage/LoginPage.jsx'), /amanda\.reyes|liam\.garcia|isabella\.ramos/);
@@ -109,6 +118,10 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /ALLOWED_ORIGINS/);
   assert.match(edge, /https:\/\/pauuu-cn-demo\.netlify\.app/);
   assert.match(edge, /login_temporarily_locked/);
+  assert.match(edge, /new Set\(\["admin", "testteacher", "teststudent"\]\)/);
+  assert.match(edge, /isRateLimitExempt/);
+  assert.match(edge, /ipAttemptKey/);
+  assert.match(edge, /ipFailures >= 20/);
   assert.match(edge, /path\.startsWith\("\/dev\/"\)/);
   assert.match(edge, /path\.startsWith\("\/admin-permissions"\)/);
   assert.match(edge, /demo_credentials_immutable/);
@@ -123,6 +136,7 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /existing\.length >= 20/);
   assert.match(edge, /100 \* 1024 \* 1024/);
   assert.doesNotMatch(edge, /select\("id,username,password_hash,fullname,name,status,language"\)/);
+  assert.match(edge, /students"\)\.select\("id,name,username,notes,status"\)/);
   assert.match(edge, /candidate === "student"[\s\S]*password_hash,name,status,language[\s\S]*password_hash,fullname,status,language/);
   assert.match(edge, /role === "student"[\s\S]*id,username,name,status,language[\s\S]*id,username,fullname,status,language/);
 });
@@ -143,6 +157,7 @@ test('CN public pages describe student access and use a dummy support email', as
   const strings = await read('apps/cn/src/i18n/strings.js');
   const legal = await read('apps/cn/src/i18n/legal.js');
   const legalDoc = await read('apps/cn/src/pages/public/LegalDoc.jsx');
+  const footer = await read('apps/cn/src/components/Layout/Footer.jsx');
   assert.match(landing, /landing\.audience\.students/);
   assert.match(landing, /landing\.audience\.admins[\s\S]*landing\.audience\.teachers[\s\S]*landing\.audience\.students/);
   assert.match(strings, /Students/);
@@ -152,6 +167,8 @@ test('CN public pages describe student access and use a dummy support email', as
   assert.match(legal, /Students must not attempt to access another student/);
   assert.match(legalDoc, /support@example\.com/);
   assert.doesNotMatch(legalDoc, /educonnect@gmail\.com/);
+  assert.match(footer, /mailto:sample@example\.com/);
+  assert.doesNotMatch(footer, /educonnect@gmail\.com/);
 });
 
 test('CN frontend uses only environment-provided public Supabase configuration', async () => {

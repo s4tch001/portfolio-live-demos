@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "phase": "4.5",
-  "updatedAt": "2026-07-28",
+  "updatedAt": "2026-07-29",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
     "migrationVersions": [
@@ -18,7 +18,8 @@
       "20260722001100",
       "20260726000100",
       "20260726000200",
-      "20260726000300"
+      "20260726000300",
+      "20260729000100"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -42,7 +43,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 10, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 11, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -61,9 +62,9 @@
       "cn": {
         "defaultLoginsVerified": ["admin", "testteacher", "teststudent"],
         "teacherCount": 4,
-        "studentCount": 11,
-        "scheduleCount": 736,
-        "reportCount": 72,
+        "studentCount": 16,
+        "scheduleCount": 368,
+        "reportCount": 319,
         "credentialMutationRejected": true,
         "restrictedRoutesRejected": true
       },
@@ -113,9 +114,9 @@
       "postResetBaselines": {
         "cnDefaultLoginsVerified": ["admin", "testteacher", "teststudent"],
         "cnTeacherCount": 4,
-        "cnStudentCount": 11,
-        "cnScheduleCount": 736,
-        "cnReportCount": 72,
+        "cnStudentCount": 16,
+        "cnScheduleCount": 368,
+        "cnReportCount": 319,
         "cnCredentialMutationRejected": true,
         "cnRestrictedRouteRejected": true,
         "rcmiAdministratorLoginVerified": true,

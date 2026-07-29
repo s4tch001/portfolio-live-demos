@@ -222,10 +222,30 @@ async function login(request: Request, database: any) {
     throw new ApiError(401, "invalid_credentials");
   }
 
-  const clientMarker = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  // The fixed portfolio credentials must always remain testable. Other
+  // usernames retain both per-account and global per-IP brute-force limits.
+  const exemptUsernames = new Set(["admin", "testteacher", "teststudent"]);
+  const isRateLimitExempt = exemptUsernames.has(username);
+  const forwarded = (request.headers.get("x-forwarded-for") ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const clientMarker = request.headers.get("cf-connecting-ip")?.trim()
+    || forwarded.at(-1)
+    || "unknown";
   const attemptKey = (await sha256(`${username}|${clientMarker}`)).slice(0, 64);
-  const rate = await queryOne(database.from("login_rate_limits").select("failed_count,locked_until").eq("attempt_key", attemptKey).maybeSingle());
-  if (rate?.locked_until && new Date(String(rate.locked_until)).getTime() > Date.now()) {
+  const ipAttemptKey = (await sha256(`*|${clientMarker}`)).slice(0, 64);
+  const [rate, ipRate] = isRateLimitExempt
+    ? [null, null]
+    : await Promise.all([
+        queryOne(database.from("login_rate_limits").select("failed_count,locked_until").eq("attempt_key", attemptKey).maybeSingle()),
+        queryOne(database.from("login_rate_limits").select("failed_count,locked_until").eq("attempt_key", ipAttemptKey).maybeSingle())
+      ]);
+  if (
+    [rate, ipRate].some(
+      (entry) => entry?.locked_until && new Date(String(entry.locked_until)).getTime() > Date.now()
+    )
+  ) {
     throw new ApiError(429, "login_temporarily_locked");
   }
 
@@ -253,18 +273,36 @@ async function login(request: Request, database: any) {
   }
 
   if (!valid || !account || !role) {
+    if (isRateLimitExempt) throw new ApiError(401, "invalid_credentials");
+
     const failures = Math.min(20, Number(rate?.failed_count ?? 0) + 1);
     const lockedUntil = failures >= 8 ? new Date(Date.now() + 2 * 60 * 1000).toISOString() : null;
-    await database.from("login_rate_limits").upsert({
-      attempt_key: attemptKey,
-      failed_count: failures,
-      locked_until: lockedUntil,
-      updated_at: new Date().toISOString()
-    });
+    const ipFailures = Math.min(20, Number(ipRate?.failed_count ?? 0) + 1);
+    const ipLockedUntil = ipFailures >= 20 ? new Date(Date.now() + 2 * 60 * 1000).toISOString() : null;
+    const updatedAt = new Date().toISOString();
+    await Promise.all([
+      database.from("login_rate_limits").upsert({
+        attempt_key: attemptKey,
+        failed_count: failures,
+        locked_until: lockedUntil,
+        updated_at: updatedAt
+      }),
+      database.from("login_rate_limits").upsert({
+        attempt_key: ipAttemptKey,
+        failed_count: ipFailures,
+        locked_until: ipLockedUntil,
+        updated_at: updatedAt
+      })
+    ]);
     throw new ApiError(401, "invalid_credentials");
   }
 
-  await database.from("login_rate_limits").delete().eq("attempt_key", attemptKey);
+  if (!isRateLimitExempt) {
+    await Promise.all([
+      database.from("login_rate_limits").delete().eq("attempt_key", attemptKey),
+      database.from("login_rate_limits").delete().eq("attempt_key", ipAttemptKey)
+    ]);
+  }
   const token = randomToken();
   const tokenHash = await sha256(token);
   const remember = body.remember_me === true;
@@ -685,7 +723,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     return await queryMany(query);
   }
   if (path === "/class-balances" && request.method === "GET") {
-    const students = await queryMany(database.from("students").select("id,name,status").order("name"));
+    const students = await queryMany(database.from("students").select("id,name,username,notes,status").order("name"));
     const transactions = await queryMany(database.from("class_transactions").select("student_id,remaining_classes,type,status"));
     return students.map((student) => {
       const own = transactions.filter((row) => Number(row.student_id) === Number(student.id));
