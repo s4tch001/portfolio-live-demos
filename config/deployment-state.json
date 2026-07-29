@@ -20,7 +20,8 @@
       "20260726000200",
       "20260726000300",
       "20260729000100",
-      "20260729000200"
+      "20260729000200",
+      "20260729000300"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -66,6 +67,8 @@
         "studentCount": 16,
         "scheduleCount": 368,
         "reportCount": 319,
+        "absentReportCount": 24,
+        "absentReasonsVerified": ["Late Notice", "No Notice", "Other"],
         "loginMaxFailed": 5,
         "loginBlockExemptUsernames": ["admin", "testteacher", "teststudent"],
         "nonDefaultAccountLockoutVerified": true,

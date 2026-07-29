@@ -39,7 +39,7 @@ const admin = await adminResponse.json();
 assert.equal(typeof admin.token, 'string');
 
 const rateCheckUsername = `ratecheck${Date.now().toString(36)}`;
-for (let attempt = 0; attempt < 8; attempt += 1) {
+for (let attempt = 0; attempt < 5; attempt += 1) {
   const response = await login(rateCheckUsername, `wrong-${attempt}`);
   assert.equal(response.status, 401, 'non-demo login should be counted before lockout');
 }
@@ -81,6 +81,20 @@ assert.ok(reports.length > 0, 'current-month reports are unavailable');
 assert.ok(reports.every((report) => /^https:\/\/example\.com\/demo-class-session\/\d+$/.test(report.link)), 'dummy report links are incomplete');
 assert.ok(balances.every((student) => student.username && student.notes), 'class balances omit student username or info');
 
+const absentReports = reports.filter((report) => report.absent);
+const absentReasons = new Set(absentReports.map((report) => report.absent_reason));
+assert.deepEqual(
+  [...absentReasons].sort(),
+  ['Late Notice', 'No Notice', 'Other'].sort(),
+  'preview absences must showcase all three absence reasons',
+);
+assert.ok(
+  absentReports
+    .filter((report) => report.absent_reason === 'Other')
+    .every((report) => String(report.absent_other || '').trim()),
+  'Other absences must include a short explanation',
+);
+
 const studentDays = new Set();
 const teacherDays = new Map();
 let notedSchedules = 0;
@@ -118,6 +132,8 @@ console.log(JSON.stringify({
   students: students.length,
   schedules: schedules.length,
   reports: reports.length,
+  absentReports: absentReports.length,
+  absentReasons: [...absentReasons].sort(),
   selectiveNotes: notedSchedules,
   weekdaysOnly: true,
   oneClassPerStudentPerDay: true,

@@ -37,6 +37,7 @@ test('database protects demo credentials and rejects the reserved master usernam
     await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql'),
     await read('supabase/migrations/20260729000100_refine_cn_preview_school_data.sql'),
     await read('supabase/migrations/20260729000200_enable_cn_login_blocked_status.sql'),
+    await read('supabase/migrations/20260729000300_vary_cn_preview_absence_reasons.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -50,6 +51,11 @@ test('database protects demo credentials and rejects the reserved master usernam
   assert.match(migration, /set database_reset_ready = true/);
   assert.match(migration, /status in \('Active', 'Inactive', 'Login Blocked'\)/);
   assert.match(migration, /status in \('Active', 'Inactive', 'End of Contract', 'Login Blocked'\)/);
+  assert.match(migration, /new\.absent_reason := 'Late Notice'/);
+  assert.match(migration, /new\.absent_reason := 'No Notice'/);
+  assert.match(migration, /new\.absent_reason := 'Other'/);
+  assert.match(migration, /new\.absent_other := 'Family schedule conflict'/);
+  assert.match(migration, /current_setting\('cn_demo\.reset_context', true\) = 'on'/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
 
