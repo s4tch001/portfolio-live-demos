@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';
 import { ThemeProvider } from './context/ThemeProvider.jsx';
@@ -34,6 +34,7 @@ const AccountsPage = lazy(() => import('./pages/AccountsPage/AccountsPage.jsx'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage/ReportsPage.jsx'));
 const RemainingClassesPage = lazy(() => import('./pages/RemainingClassesPage/RemainingClassesPage.jsx'));
 const SecurityPage = lazy(() => import('./pages/SecurityPage/SecurityPage.jsx'));
+const PUBLIC_PATHS = new Set(['/', '/login', '/privacy', '/terms']);
 
 // /schedule serves two very different pages by role: students/parents get a
 // simple placeholder; admins/teachers get the full scheduling UI. A wrapper
@@ -63,14 +64,16 @@ function AccountsIndexRedirect() {
 function AppBody() {
   const { maintenance, ready } = useMaintenance();
   const { isMasterAdmin } = useAuth();
+  const { pathname } = useLocation();
   const devpau = isMasterAdmin();
   if (!devpau) {
     // Show maintenance immediately when we know (or last knew) it's on — no flash.
     // Every path is gated; only a logged-in devpau (e.g. Remember Me) gets through.
     if (maintenance) return <MaintenancePage />;
-    // Status not yet confirmed: hold first paint behind a tiny splash so the
-    // target page never flashes before a possible redirect to maintenance.
-    if (!ready) {
+    // Keep authenticated routes gated until the status is confirmed. Public
+    // pages may paint immediately and will switch to maintenance if it is on;
+    // this avoids holding their first render behind a network round trip.
+    if (!ready && !PUBLIC_PATHS.has(pathname)) {
       return (
         <div style={{ position: 'fixed', inset: 'var(--portfolio-demo-notice-height, 0px) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
           <span className="spinner" aria-label="Loading"></span>
