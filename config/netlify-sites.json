@@ -56,7 +56,7 @@
       "preferredSiteName": "pauuu-travels-demo",
       "siteId": "e0648fcd-8d3a-4d9f-8043-c957146de9dc",
       "netlifyUrl": "https://pauuu-travels-demo.netlify.app",
-      "productionDeployId": "6a69b8a261f469e330a07cab",
+      "productionDeployId": "6a69c17d4ea3630580c4623c",
       "packageDirectory": "apps/travels",
       "publishDirectory": "apps/travels/dist",
       "customHostname": "travels-demo.pauuu.dev",
