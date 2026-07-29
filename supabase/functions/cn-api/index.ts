@@ -12,6 +12,8 @@ const COLOR = /^#[0-9a-f]{6}$/i;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_JSON_BYTES = 64 * 1024;
 const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+const LOGIN_MAX_FAILED = 5;
+const LOGIN_MAX_FAILED_PER_IP = 20;
 const ALLOWED_UPLOAD_TYPES = new Map([
   ["image/webp", "webp"],
   ["image/png", "png"],
@@ -233,7 +235,7 @@ async function login(request: Request, database: any) {
   const clientMarker = request.headers.get("cf-connecting-ip")?.trim()
     || forwarded.at(-1)
     || "unknown";
-  const attemptKey = (await sha256(`${username}|${clientMarker}`)).slice(0, 64);
+  const attemptKey = (await sha256(`account|${username}`)).slice(0, 64);
   const ipAttemptKey = (await sha256(`*|${clientMarker}`)).slice(0, 64);
   const [rate, ipRate] = isRateLimitExempt
     ? [null, null]
@@ -251,6 +253,7 @@ async function login(request: Request, database: any) {
 
   let account: Record<string, unknown> | null = null;
   let role: DemoUser["role"] | null = null;
+  let accountTable: "admins" | "teachers" | "students" | null = null;
   for (const candidate of ["admin", "teacher", "student"] as const) {
     const table = candidate === "admin" ? "admins" : candidate === "teacher" ? "teachers" : "students";
     const accountColumns = candidate === "student"
@@ -259,12 +262,13 @@ async function login(request: Request, database: any) {
     account = await queryOne(database.from(table).select(accountColumns).eq("username", username).maybeSingle());
     if (account) {
       role = candidate;
+      accountTable = table;
       break;
     }
   }
 
   let valid = false;
-  if (account && role && account.status === "Active") {
+  if (account && role) {
     const { data, error } = await database.rpc("verify_password", {
       p_password: password,
       p_password_hash: account.password_hash
@@ -272,13 +276,30 @@ async function login(request: Request, database: any) {
     valid = !error && data === true;
   }
 
-  if (!valid || !account || !role) {
+  if (valid && account && role && account.status !== "Active") {
+    if (!isRateLimitExempt) {
+      await Promise.all([
+        database.from("login_rate_limits").delete().eq("attempt_key", attemptKey),
+        database.from("login_rate_limits").delete().eq("attempt_key", ipAttemptKey)
+      ]);
+    }
+    if (account.status === "Login Blocked") {
+      throw new ApiError(403, "account_blocked");
+    }
+    throw new ApiError(403, "account_inactive");
+  }
+
+  if (!valid || !account || !role || !accountTable) {
     if (isRateLimitExempt) throw new ApiError(401, "invalid_credentials");
 
     const failures = Math.min(20, Number(rate?.failed_count ?? 0) + 1);
-    const lockedUntil = failures >= 8 ? new Date(Date.now() + 2 * 60 * 1000).toISOString() : null;
+    // Existing accounts are persistently marked Login Blocked below. A short
+    // lock is only needed for unknown usernames, where no account row exists.
+    const lockedUntil = failures >= LOGIN_MAX_FAILED && !account
+      ? new Date(Date.now() + 2 * 60 * 1000).toISOString()
+      : null;
     const ipFailures = Math.min(20, Number(ipRate?.failed_count ?? 0) + 1);
-    const ipLockedUntil = ipFailures >= 20 ? new Date(Date.now() + 2 * 60 * 1000).toISOString() : null;
+    const ipLockedUntil = ipFailures >= LOGIN_MAX_FAILED_PER_IP ? new Date(Date.now() + 2 * 60 * 1000).toISOString() : null;
     const updatedAt = new Date().toISOString();
     await Promise.all([
       database.from("login_rate_limits").upsert({
@@ -294,6 +315,27 @@ async function login(request: Request, database: any) {
         updated_at: updatedAt
       })
     ]);
+    await writeLog(database, null, request, "Failed login attempt", 401, { username });
+
+    if (failures >= LOGIN_MAX_FAILED && account && role && accountTable && account.status === "Active") {
+      const blocked = await queryOne(
+        database
+          .from(accountTable)
+          .update({ status: "Login Blocked" })
+          .eq("id", account.id)
+          .eq("status", "Active")
+          .select("id")
+          .maybeSingle()
+      );
+      if (blocked) {
+        await writeLog(database, null, request, "Account Login Blocked", 403, {
+          account_id: account.id,
+          username,
+          role,
+          reason: `Too many failed login attempts (${LOGIN_MAX_FAILED})`
+        });
+      }
+    }
     throw new ApiError(401, "invalid_credentials");
   }
 
@@ -373,7 +415,7 @@ async function accountRoutes(request: Request, path: string, database: any, sess
   }
 
   const existing = id
-    ? await queryOne(database.from(group.path).select("protected,username").eq("id", id).maybeSingle())
+    ? await queryOne(database.from(group.path).select("protected,username,status").eq("id", id).maybeSingle())
     : null;
   if (id && !existing) throw new ApiError(404, "not_found");
   if (existing?.protected && body.password !== undefined) {
@@ -427,6 +469,10 @@ async function accountRoutes(request: Request, path: string, database: any, sess
       ? "id,username,fullname,color,status,language,protected"
       : "id,name,notes,teacher_id,status,username,language,protected";
   const row = await queryOne(mutation.select(columns).single());
+  if (id && existing?.status === "Login Blocked" && row?.status === "Active" && existing.username) {
+    const accountAttemptKey = (await sha256(`account|${String(existing.username).toLowerCase()}`)).slice(0, 64);
+    await database.from("login_rate_limits").delete().eq("attempt_key", accountAttemptKey);
+  }
   await writeLog(database, session, request, `${id ? "Updated" : "Created"} ${group.role} account`, 200, {
     account_id: row?.id,
     username: row?.username,

@@ -185,7 +185,8 @@ async function main() {
     "20260726000100",
     "20260726000200",
     "20260726000300",
-    "20260729000100"
+    "20260729000100",
+    "20260729000200"
   ];
   if (
     !["4.4", "4.5"].includes(deployment.phase) ||
@@ -245,7 +246,7 @@ async function main() {
   ) {
     failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
   }
-  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 11], ["rcmi-api", 6], ["hours-api", 6]]) {
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 13], ["rcmi-api", 6], ["hours-api", 6]]) {
     const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
     if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
       failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);

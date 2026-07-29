@@ -36,6 +36,7 @@ test('database protects demo credentials and rejects the reserved master usernam
     await read('supabase/migrations/20260726000100_enrich_cn_rcmi_preview_data.sql'),
     await read('supabase/migrations/20260726000200_expand_preview_activity_data.sql'),
     await read('supabase/migrations/20260729000100_refine_cn_preview_school_data.sql'),
+    await read('supabase/migrations/20260729000200_enable_cn_login_blocked_status.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -47,6 +48,8 @@ test('database protects demo credentials and rejects the reserved master usernam
   assert.match(migration, /delete from cn_demo\.sessions/);
   assert.match(migration, /where app_id = 'cn'/);
   assert.match(migration, /set database_reset_ready = true/);
+  assert.match(migration, /status in \('Active', 'Inactive', 'Login Blocked'\)/);
+  assert.match(migration, /status in \('Active', 'Inactive', 'End of Contract', 'Login Blocked'\)/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
 
@@ -120,8 +123,15 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /login_temporarily_locked/);
   assert.match(edge, /new Set\(\["admin", "testteacher", "teststudent"\]\)/);
   assert.match(edge, /isRateLimitExempt/);
+  assert.match(edge, /const LOGIN_MAX_FAILED = 5/);
+  assert.match(edge, /sha256\(`account\|\$\{username\}`\)/);
+  assert.match(edge, /failures >= LOGIN_MAX_FAILED/);
+  assert.match(edge, /\.update\(\{ status: "Login Blocked" \}\)/);
+  assert.match(edge, /account\.status === "Login Blocked"/);
+  assert.match(edge, /"Account Login Blocked"/);
+  assert.match(edge, /existing\?\.status === "Login Blocked" && row\?\.status === "Active"/);
   assert.match(edge, /ipAttemptKey/);
-  assert.match(edge, /ipFailures >= 20/);
+  assert.match(edge, /ipFailures >= LOGIN_MAX_FAILED_PER_IP/);
   assert.match(edge, /path\.startsWith\("\/dev\/"\)/);
   assert.match(edge, /path\.startsWith\("\/admin-permissions"\)/);
   assert.match(edge, /demo_credentials_immutable/);

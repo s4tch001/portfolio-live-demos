@@ -13,7 +13,13 @@ function loginErrorMessage(data, t) {
   if (data?.account_blocked) {
     return t('login.blocked');
   }
+  if (data?.error === 'account_blocked') {
+    return t('login.blocked');
+  }
   if (data?.account_inactive) {
+    return t('login.inactive');
+  }
+  if (data?.error === 'account_inactive') {
     return t('login.inactive');
   }
   // Plain wrong credentials — no attempt count shown.

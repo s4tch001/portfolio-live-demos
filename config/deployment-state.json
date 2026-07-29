@@ -19,7 +19,8 @@
       "20260726000100",
       "20260726000200",
       "20260726000300",
-      "20260729000100"
+      "20260729000100",
+      "20260729000200"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -43,7 +44,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 11, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 13, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -65,6 +66,10 @@
         "studentCount": 16,
         "scheduleCount": 368,
         "reportCount": 319,
+        "loginMaxFailed": 5,
+        "loginBlockExemptUsernames": ["admin", "testteacher", "teststudent"],
+        "nonDefaultAccountLockoutVerified": true,
+        "unblockCounterCleanupVerified": true,
         "credentialMutationRejected": true,
         "restrictedRoutesRejected": true
       },
@@ -146,7 +151,7 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a6a194ef547e434c84e68c8",
+        "productionDeployId": "6a6a1f91c7a41740bc4eb8b8",
         "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {
