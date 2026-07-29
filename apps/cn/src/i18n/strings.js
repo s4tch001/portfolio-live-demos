@@ -818,6 +818,7 @@ export const STRINGS = {
   'sched.cannotScheduleInactive': { us: 'Failed — "{student}" is inactive and cannot be scheduled.', cn: '失败 — “{student}” 已停用，无法安排课程。', hk: '失敗 — “{student}” 已停用，無法安排課程。', tw: '失敗 — “{student}” 已停用，無法安排課程。' },
   'sched.cannotScheduleEoc': { us: 'Failed — "{student}" has ended their contract and cannot be scheduled.', cn: '失败 — “{student}” 合同已结束，无法安排课程。', hk: '失敗 — “{student}” 合約已結束，無法安排課程。', tw: '失敗 — “{student}” 合約已結束，無法安排課程。' },
   'sched.notOnList': { us: 'Failed — "{student}" is not on the student list. Pick an existing student or tick Trial Class.', cn: '失败 — “{student}” 不在学生名单中。请选择现有学生或勾选试听课。', hk: '失敗 — “{student}” 不在學生名單中。請選擇現有學生或勾選試聽課。', tw: '失敗 — “{student}” 不在學生名單中。請選擇現有學生或勾選試聽課。' },
+  'sched.noRemainingClasses': { us: 'Failed — "{student}" has no remaining classes available. Add classes or cancel a pending schedule first.', cn: '失败 — “{student}” 没有可用的剩余课时。请先添加课时或取消待上课程。', hk: '失敗 — “{student}” 沒有可用的剩餘課時。請先新增課時或取消待上課程。', tw: '失敗 — “{student}” 沒有可用的剩餘課時。請先新增課時或取消待上課程。' },
   'sched.saveError': { us: 'Error saving schedule: {msg}', cn: '保存课程安排出错：{msg}', hk: '儲存課程安排時發生錯誤：{msg}', tw: '儲存課程安排時發生錯誤：{msg}' },
   'sched.updated': { us: 'Schedule updated!', cn: '课程安排已更新！', hk: '課程安排已更新！', tw: '課程安排已更新！' },
   'sched.added': { us: 'Schedule added!', cn: '课程已添加！', hk: '課程已新增！', tw: '課程已新增！' },

@@ -139,7 +139,16 @@ function publicAccount(row: Record<string, unknown>, role?: DemoUser["role"]) {
 
 async function queryOne(query: PromiseLike<{ data: unknown; error: unknown }>) {
   const { data, error } = await query;
-  if (error) throw new ApiError(503, "database_unavailable");
+  if (error) {
+    const message = String((error as { message?: unknown }).message ?? "");
+    if (message.includes("student_no_remaining_classes")) {
+      throw new ApiError(409, "student_no_remaining_classes");
+    }
+    if (message.includes("schedule_student_required")) {
+      throw new ApiError(400, "schedule_student_required");
+    }
+    throw new ApiError(503, "database_unavailable");
+  }
   return data as Record<string, unknown> | null;
 }
 
@@ -497,6 +506,53 @@ function scheduleValues(body: Record<string, unknown>) {
   };
 }
 
+async function requireScheduleCapacity(
+  database: any,
+  values: Record<string, unknown>,
+  excludeScheduleId?: number | null
+) {
+  if (values.trial === true) return;
+  const studentId = Number(values.student_id);
+  if (!studentId) throw new ApiError(400, "schedule_student_required");
+
+  const student = await queryOne(
+    database.from("students").select("id,status").eq("id", studentId).maybeSingle()
+  );
+  if (!student) throw new ApiError(400, "schedule_student_required");
+  if (student.status === "Inactive" || student.status === "End of Contract") {
+    throw new ApiError(409, "student_not_schedulable");
+  }
+
+  const transactions = await queryMany(
+    database
+      .from("class_transactions")
+      .select("remaining_classes,type,status")
+      .eq("student_id", studentId)
+  );
+  if (transactions.some((row) => row.type === "monthly-fee" && row.status === "active")) return;
+
+  const numericBalance = transactions
+    .filter((row) => row.type !== "monthly-fee")
+    .reduce((sum, row) => sum + Number(row.remaining_classes ?? 0), 0);
+  let scheduleQuery = database
+    .from("schedules")
+    .select("id")
+    .eq("student_id", studentId)
+    .eq("trial", false)
+    .eq("cancelled", false);
+  if (excludeScheduleId) scheduleQuery = scheduleQuery.neq("id", excludeScheduleId);
+  const schedules = await queryMany(scheduleQuery);
+  const scheduleIds = schedules.map((row) => Number(row.id)).filter(Boolean);
+  const reports = scheduleIds.length
+    ? await queryMany(database.from("reports").select("schedule_id").in("schedule_id", scheduleIds))
+    : [];
+  const reportedScheduleIds = new Set(reports.map((row) => Number(row.schedule_id)));
+  const reservedClasses = scheduleIds.filter((id) => !reportedScheduleIds.has(id)).length;
+  if (numericBalance - reservedClasses <= 0) {
+    throw new ApiError(409, "student_no_remaining_classes");
+  }
+}
+
 async function scheduleRoutes(request: Request, path: string, database: any, session: Session) {
   if (path === "/schedules" && request.method === "GET") {
     const params = new URL(request.url).searchParams;
@@ -511,11 +567,15 @@ async function scheduleRoutes(request: Request, path: string, database: any, ses
   const cancel = path.match(/^\/schedules\/(\d+)\/cancel$/);
   requireStaff(session);
   if (path === "/schedules" && request.method === "POST") {
-    const row = await queryOne(database.from("schedules").insert(scheduleValues(await bodyJson(request))).select("*").single());
+    const values = scheduleValues(await bodyJson(request));
+    await requireScheduleCapacity(database, values);
+    const row = await queryOne(database.from("schedules").insert(values).select("*").single());
     return row;
   }
   if (id && request.method === "PUT") {
-    const row = await queryOne(database.from("schedules").update(scheduleValues(await bodyJson(request))).eq("id", id).select("*").single());
+    const values = scheduleValues(await bodyJson(request));
+    await requireScheduleCapacity(database, values, id);
+    const row = await queryOne(database.from("schedules").update(values).eq("id", id).select("*").single());
     return row;
   }
   if (id && request.method === "DELETE") {

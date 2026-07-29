@@ -39,6 +39,7 @@ test('database protects demo credentials and rejects the reserved master usernam
     await read('supabase/migrations/20260729000200_enable_cn_login_blocked_status.sql'),
     await read('supabase/migrations/20260729000300_vary_cn_preview_absence_reasons.sql'),
     await read('supabase/migrations/20260730000100_enforce_cn_completed_class_usage.sql'),
+    await read('supabase/migrations/20260730000200_enforce_cn_schedule_capacity.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -65,6 +66,10 @@ test('database protects demo credentials and rejects the reserved master usernam
   assert.match(migration, /create trigger refund_cancelled_schedule_usage/);
   assert.match(migration, /create trigger refund_deleted_schedule_usage/);
   assert.match(migration, /remaining_classes = remaining_classes \+ 1/);
+  assert.match(migration, /create trigger enforce_schedule_capacity/);
+  assert.match(migration, /pg_advisory_xact_lock\(new\.student_id\)/);
+  assert.match(migration, /numeric_balance - reserved_classes <= 0/);
+  assert.match(migration, /message = 'student_no_remaining_classes'/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
 
@@ -158,6 +163,9 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /report_absent_reason: report\?\.absent_reason/);
   assert.match(edge, /report_tracker_remarks: report\?\.tracker_remarks/);
   assert.match(edge, /params\.get\("schedule_id"\)/);
+  assert.match(edge, /requireScheduleCapacity/);
+  assert.match(edge, /numericBalance - reservedClasses <= 0/);
+  assert.match(edge, /student_no_remaining_classes/);
   assert.match(edge, /requireReportScheduleAccess/);
   assert.match(edge, /cannot_move_report_schedule/);
   assert.match(edge, /path !== "\/logs"/);

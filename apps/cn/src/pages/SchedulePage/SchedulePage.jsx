@@ -220,7 +220,11 @@ export default function SchedulePage() {
           });
         }
       } catch (e) {
-        toast(t('sched.saveError', { msg: e.message || '' }));
+        if (e?.data?.error === 'student_no_remaining_classes') {
+          toast(t('sched.noRemainingClasses', { student }));
+        } else {
+          toast(t('sched.saveError', { msg: e.message || '' }));
+        }
         throw e;
       }
       toast(editId ? t('sched.updated') : t('sched.added'));

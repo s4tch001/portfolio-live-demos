@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "phase": "4.5",
-  "updatedAt": "2026-07-29",
+  "updatedAt": "2026-07-30",
   "supabase": {
     "projectRef": "ivqfxdibluhgyttgxbmz",
     "migrationVersions": [
@@ -22,7 +22,8 @@
       "20260729000100",
       "20260729000200",
       "20260729000300",
-      "20260730000100"
+      "20260730000100",
+      "20260730000200"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -46,7 +47,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 14, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 15, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -75,6 +76,11 @@
         "completedClassBalanceDeductionVerified": true,
         "reportEditIdempotencyVerified": true,
         "cancelledClassBalanceRefundVerified": true,
+        "zeroBalanceScheduleRejected": true,
+        "pendingScheduleCapacityReserved": true,
+        "releasedScheduleCapacityReusable": true,
+        "trialScheduleBalanceExempt": true,
+        "monthlyFeeScheduleBalanceExempt": true,
         "loginMaxFailed": 5,
         "loginBlockExemptUsernames": ["admin", "testteacher", "teststudent"],
         "nonDefaultAccountLockoutVerified": true,
@@ -160,7 +166,7 @@
         "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
         "siteName": "pauuu-cn-demo",
         "url": "https://pauuu-cn-demo.netlify.app",
-        "productionDeployId": "6a6a1f91c7a41740bc4eb8b8",
+        "productionDeployId": "6a6a2bc91adaf9e8b41dfa4c",
         "customUrl": "https://cn-demo.pauuu.dev"
       },
       "rcmi": {

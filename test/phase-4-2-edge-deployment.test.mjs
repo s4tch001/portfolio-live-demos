@@ -23,7 +23,7 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
 test('each persistent app API accepts only its exact named publishable key', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
   const functions = {
-    'cn-api': ['cn_demo', 14],
+    'cn-api': ['cn_demo', 15],
     'rcmi-api': ['rcmi_demo', 6],
     'hours-api': ['hours_demo', 6],
   };
@@ -50,6 +50,11 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
   assert.equal(verification.missingKeyRejected, true);
   assert.equal(verification.crossKeyRejected, true);
   assert.deepEqual(verification.cn.defaultLoginsVerified, ['admin', 'testteacher', 'teststudent']);
+  assert.equal(verification.cn.zeroBalanceScheduleRejected, true);
+  assert.equal(verification.cn.pendingScheduleCapacityReserved, true);
+  assert.equal(verification.cn.releasedScheduleCapacityReusable, true);
+  assert.equal(verification.cn.trialScheduleBalanceExempt, true);
+  assert.equal(verification.cn.monthlyFeeScheduleBalanceExempt, true);
   assert.deepEqual(
     [verification.cn.teacherCount, verification.cn.studentCount, verification.cn.scheduleCount, verification.cn.reportCount],
     [4, 16, 368, 319],
