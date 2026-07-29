@@ -23,7 +23,7 @@ test('Phase 4.2 records only the reviewed Data API schemas', async () => {
 test('each persistent app API accepts only its exact named publishable key', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
   const functions = {
-    'cn-api': ['cn_demo', 13],
+    'cn-api': ['cn_demo', 14],
     'rcmi-api': ['rcmi_demo', 6],
     'hours-api': ['hours_demo', 6],
   };

@@ -21,7 +21,8 @@
       "20260726000300",
       "20260729000100",
       "20260729000200",
-      "20260729000300"
+      "20260729000300",
+      "20260730000100"
     ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
@@ -45,7 +46,7 @@
     },
     "edgeFunctions": {
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
-      "cn-api": { "status": "active", "version": 13, "verifyJwt": false },
+      "cn-api": { "status": "active", "version": 14, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 6, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 6, "verifyJwt": false }
     },
@@ -69,6 +70,11 @@
         "reportCount": 319,
         "absentReportCount": 24,
         "absentReasonsVerified": ["Late Notice", "No Notice", "Other"],
+        "receiptScheduledTeacherVerified": true,
+        "receiptReportRemarksVerified": true,
+        "completedClassBalanceDeductionVerified": true,
+        "reportEditIdempotencyVerified": true,
+        "cancelledClassBalanceRefundVerified": true,
         "loginMaxFailed": 5,
         "loginBlockExemptUsernames": ["admin", "testteacher", "teststudent"],
         "nonDefaultAccountLockoutVerified": true,

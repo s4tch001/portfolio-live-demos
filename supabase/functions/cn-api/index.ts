@@ -528,7 +528,6 @@ async function scheduleRoutes(request: Request, path: string, database: any, ses
     const reason = requiredString(body.reason, "reason", 500);
     const scheduleId = positiveId(cancel[1]);
     const row = await queryOne(database.from("schedules").update({ cancelled: true, cancel_reason: reason }).eq("id", scheduleId).select("*").single());
-    await refundScheduleUsage(database, scheduleId);
     await writeLog(database, session, request, "Cancelled class", 200, { schedule_id: scheduleId, reason });
     return row;
   }
@@ -564,69 +563,6 @@ async function studentScheduleIds(database: any, studentId: number, start?: stri
   if (start) query = query.gte("date", start);
   if (end) query = query.lte("date", end);
   return (await queryMany(query)).map((row) => Number(row.id)).filter(Boolean);
-}
-
-async function refundScheduleUsage(database: any, scheduleId: number) {
-  const usage = await queryMany(database.from("class_usage").select("id,transaction_id").eq("schedule_id", scheduleId));
-  for (const row of usage) {
-    const transactionId = Number(row.transaction_id);
-    const transaction = await queryOne(database.from("class_transactions").select("remaining_classes").eq("id", transactionId).maybeSingle());
-    if (transaction) {
-      await database.from("class_transactions").update({
-        remaining_classes: Number(transaction.remaining_classes ?? 0) + 1,
-        updated_at: new Date().toISOString()
-      }).eq("id", transactionId);
-    }
-  }
-  if (usage.length) await database.from("class_usage").delete().eq("schedule_id", scheduleId);
-}
-
-async function chargeReportUsage(database: any, report: Record<string, unknown>) {
-  const schedule = await queryOne(database.from("schedules").select("*").eq("id", report.schedule_id).maybeSingle());
-  if (!schedule || schedule.cancelled || schedule.trial) {
-    if (schedule?.cancelled) await refundScheduleUsage(database, Number(schedule.id));
-    return;
-  }
-
-  const studentIds = Array.isArray(schedule.student_ids) && schedule.student_ids.length
-    ? schedule.student_ids.map(Number).filter(Boolean)
-    : schedule.student_id
-      ? [Number(schedule.student_id)]
-      : [];
-  if (!studentIds.length) return;
-
-  const existingUsage = await queryMany(database.from("class_usage").select("transaction_id").eq("schedule_id", schedule.id));
-  const chargedTransactionIds = new Set(existingUsage.map((row) => Number(row.transaction_id)));
-  for (const studentId of studentIds) {
-    const transactions = await queryMany(
-      database
-        .from("class_transactions")
-        .select("id,remaining_classes,type")
-        .eq("student_id", studentId)
-        .gt("remaining_classes", 0)
-        .order("date")
-        .order("id")
-    );
-    const transaction = transactions.find((row) => row.type !== "monthly-fee" && !chargedTransactionIds.has(Number(row.id)));
-    if (!transaction) continue;
-    const nextRemaining = Math.max(0, Number(transaction.remaining_classes ?? 0) - 1);
-    await database.from("class_transactions").update({
-      remaining_classes: nextRemaining,
-      updated_at: new Date().toISOString()
-    }).eq("id", transaction.id);
-    await database.from("class_usage").insert({
-      transaction_id: transaction.id,
-      schedule_id: schedule.id,
-      date: report.date,
-      time: String(schedule.timeslot ?? ""),
-      duration: String(report.class_duration ?? ""),
-      materials: String(report.book ?? ""),
-      pages: String(report.pages ?? ""),
-      remarks: report.absent ? String(report.absent_reason || "Absent") : "Present",
-      charged: true
-    });
-    chargedTransactionIds.add(Number(transaction.id));
-  }
 }
 
 async function requireReportScheduleAccess(
@@ -668,7 +604,6 @@ async function reportRoutes(request: Request, path: string, database: any, sessi
     if (session.user.role === "teacher" && values.teacher_id !== session.user.id) throw new ApiError(403, "forbidden");
     await requireReportScheduleAccess(database, session, values.schedule_id);
     const row = await queryOne(database.from("reports").insert(values).select("*").single());
-    if (row) await chargeReportUsage(database, row);
     await writeLog(database, session, request, "Submitted class report", 201, {
       schedule_id: values.schedule_id,
       absent: values.absent
@@ -680,7 +615,6 @@ async function reportRoutes(request: Request, path: string, database: any, sessi
     if (session.user.role === "teacher" && values.teacher_id !== session.user.id) throw new ApiError(403, "forbidden");
     await requireReportScheduleAccess(database, session, values.schedule_id, id);
     const row = await queryOne(database.from("reports").update(values).eq("id", id).select("*").single());
-    if (row) await chargeReportUsage(database, row);
     await writeLog(database, session, request, "Updated class report", 200, {
       report_id: id,
       schedule_id: values.schedule_id,
@@ -766,7 +700,38 @@ async function transactionRoutes(request: Request, path: string, database: any, 
   if (path === "/class-usage" && request.method === "GET") {
     let query = database.from("class_usage").select("*").order("date", { ascending: false });
     if (params.get("transaction_id")) query = query.eq("transaction_id", positiveId(params.get("transaction_id"), "transaction_id"));
-    return await queryMany(query);
+    if (params.get("schedule_id")) query = query.eq("schedule_id", positiveId(params.get("schedule_id"), "schedule_id"));
+    const usageRows = await queryMany(query);
+    const scheduleIds = [...new Set(usageRows.map((row) => Number(row.schedule_id)).filter(Boolean))];
+    if (!scheduleIds.length) return usageRows;
+
+    const [schedules, reports] = await Promise.all([
+      queryMany(database.from("schedules").select("id,teacher_id").in("id", scheduleIds)),
+      queryMany(
+        database
+          .from("reports")
+          .select("id,schedule_id,book,pages,class_duration,absent,absent_reason,absent_other,tracker_remarks")
+          .in("schedule_id", scheduleIds)
+      )
+    ]);
+    const schedulesById = new Map(schedules.map((row) => [Number(row.id), row]));
+    const reportsByScheduleId = new Map(reports.map((row) => [Number(row.schedule_id), row]));
+    return usageRows.map((row) => {
+      const schedule = schedulesById.get(Number(row.schedule_id));
+      const report = reportsByScheduleId.get(Number(row.schedule_id));
+      return {
+        ...row,
+        schedule_teacher_id: schedule?.teacher_id ?? null,
+        report_id: report?.id ?? null,
+        report_book: report?.book ?? "",
+        report_pages: report?.pages ?? "",
+        report_duration: report?.class_duration ?? "",
+        report_absent: report?.absent ?? false,
+        report_absent_reason: report?.absent_reason ?? "",
+        report_absent_other: report?.absent_other ?? "",
+        report_tracker_remarks: report?.tracker_remarks ?? ""
+      };
+    });
   }
   if (path === "/class-balances" && request.method === "GET") {
     const students = await queryMany(database.from("students").select("id,name,username,notes,status").order("name"));

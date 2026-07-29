@@ -38,6 +38,7 @@ test('database protects demo credentials and rejects the reserved master usernam
     await read('supabase/migrations/20260729000100_refine_cn_preview_school_data.sql'),
     await read('supabase/migrations/20260729000200_enable_cn_login_blocked_status.sql'),
     await read('supabase/migrations/20260729000300_vary_cn_preview_absence_reasons.sql'),
+    await read('supabase/migrations/20260730000100_enforce_cn_completed_class_usage.sql'),
   ].join('\n');
   assert.match(migration, /lower\(coalesce\(new\.username, ''\)\) = 'devpau'/);
   assert.match(migration, /old\.protected/);
@@ -56,6 +57,14 @@ test('database protects demo credentials and rejects the reserved master usernam
   assert.match(migration, /new\.absent_reason := 'Other'/);
   assert.match(migration, /new\.absent_other := 'Family schedule conflict'/);
   assert.match(migration, /current_setting\('cn_demo\.reset_context', true\) = 'on'/);
+  assert.match(migration, /create trigger charge_completed_report/);
+  assert.match(migration, /schedule_row\.cancelled or schedule_row\.trial/);
+  assert.match(migration, /remaining_classes = greatest\(0, remaining_classes - 1\)/);
+  assert.match(migration, /where usage\.schedule_id = schedule_row\.id/);
+  assert.match(migration, /and transaction\.student_id = target_student_id/);
+  assert.match(migration, /create trigger refund_cancelled_schedule_usage/);
+  assert.match(migration, /create trigger refund_deleted_schedule_usage/);
+  assert.match(migration, /remaining_classes = remaining_classes \+ 1/);
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
 
@@ -142,8 +151,13 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /path\.startsWith\("\/admin-permissions"\)/);
   assert.match(edge, /demo_credentials_immutable/);
   assert.match(edge, /protected_demo_admin_must_stay_active/);
-  assert.match(edge, /chargeReportUsage/);
-  assert.match(edge, /refundScheduleUsage/);
+  assert.doesNotMatch(edge, /refundScheduleUsage/);
+  assert.doesNotMatch(edge, /chargeReportUsage/);
+  assert.match(edge, /schedule_teacher_id: schedule\?\.teacher_id/);
+  assert.match(edge, /report_id: report\?\.id/);
+  assert.match(edge, /report_absent_reason: report\?\.absent_reason/);
+  assert.match(edge, /report_tracker_remarks: report\?\.tracker_remarks/);
+  assert.match(edge, /params\.get\("schedule_id"\)/);
   assert.match(edge, /requireReportScheduleAccess/);
   assert.match(edge, /cannot_move_report_schedule/);
   assert.match(edge, /path !== "\/logs"/);
