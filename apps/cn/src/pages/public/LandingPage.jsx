@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useAuth, defaultRouteFor } from '../../context/AuthContext.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import LanguageSwitcher from '../../components/ui/LanguageSwitcher.jsx';
+import DeferredBackgroundVideo from '../../components/ui/DeferredBackgroundVideo.jsx';
 import Footer from '../../components/Layout/Footer.jsx';
 
 const AUDIENCE = [
@@ -54,16 +55,7 @@ export default function LandingPage() {
         {/* Hero */}
         <section className='landing-hero'>
           <div className='landing-hero-bg' aria-hidden='true'>
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload='auto'
-              fetchPriority='high'
-              poster='/assets/video/login-background-poster.webp'
-              src='/assets/video/login-background.webm'
-            ></video>
+            <DeferredBackgroundVideo />
           </div>
           <div className='landing-hero-inner'>
             <img

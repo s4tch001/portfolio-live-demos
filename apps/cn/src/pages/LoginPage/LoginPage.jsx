@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import LanguageSwitcher from '../../components/ui/LanguageSwitcher.jsx';
+import DeferredBackgroundVideo from '../../components/ui/DeferredBackgroundVideo.jsx';
 
 // Build the error message from the server's failure payload (legacy
 // showLoginFailure, app.js:1030-1058).
@@ -65,17 +66,7 @@ export default function LoginPage() {
         />
       </div>
       <div className="login-bg-layer" aria-hidden="true">
-        <video
-          id="login-bg-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          fetchPriority="high"
-          poster="/assets/video/login-background-poster.webp"
-          src="/assets/video/login-background.webm"
-        ></video>
+        <DeferredBackgroundVideo id="login-bg-video" />
       </div>
       <form className="login-card" onSubmit={submit}>
         <div className="login-logo">
