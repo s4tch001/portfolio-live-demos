@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/assets/fonts/inter-latin.woff2') format('woff2');
+}
+
 *,
 *::before,
 *::after {
@@ -17,8 +25,8 @@
   --accent3: #ff6b6b;
   --gold: #ffd166;
   --text: #e8eaf0;
-  --text-muted: #6b7280;
-  --text-dim: #9ca3af;
+  --text-muted: #9199a7;
+  --text-dim: #aab1bd;
   --radius: 14px;
   --radius-sm: 8px;
 }
@@ -272,7 +280,7 @@ input.readonly-field:focus {
   padding: 0;
   line-height: 1;
 }
-.btn-emp i {
+.btn-emp__icon {
   font-size: 0.7rem;
   line-height: 1;
   display: flex;
@@ -280,6 +288,12 @@ input.readonly-field:focus {
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.clock-icon {
+  display: inline-block;
+  font-size: 0.85rem;
+  line-height: 1;
 }
 .btn-emp:hover:not(:disabled) {
   background: var(--surface);
@@ -359,7 +373,6 @@ input.readonly-field:focus {
   color: var(--text-muted);
   letter-spacing: 0.02em;
   padding-left: 0.2rem;
-  opacity: 0.65;
 }
 
 .emp-hours-wrap {
@@ -633,6 +646,12 @@ input.readonly-field:focus {
 .btn-clear:active {
   transform: scale(0.97);
 }
+
+.btn-emp:focus-visible,
+.btn-clear:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
 .btn-clear svg {
   width: 15px;
   height: 15px;
@@ -696,5 +715,19 @@ footer {
   }
   .total-hours-inner {
     grid-template-columns: 130px 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

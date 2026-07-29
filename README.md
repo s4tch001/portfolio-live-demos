@@ -14,8 +14,8 @@ visitors can try the apps without touching production data.
 
 Each demo shows a persistent portfolio notice explaining that it is a shared
 preview. Visitor-created data is cleared daily, protected seed records are
-restored, and demo subdomains are marked `noindex` so only the main portfolio is
-intended for search indexing.
+restored, and every demo subdomain includes its own P-Devs metadata, canonical
+URL, sitemap, robots policy, and `llms.txt`.
 
 ## What This Repo Contains
 
@@ -77,8 +77,8 @@ store key values.
 - Visitors must not be able to change protected default credentials.
 - CN, RCMI, and Hours use app-specific publishable keys and isolated API routes.
 - Payroll and Travels do not persist visitor data.
-- Demo pages should stay out of search results through `noindex` and robots
-  controls.
+- Demo pages are indexable portfolio showcases. Keep their canonical URLs,
+  sitemaps, robots policies, and reset-data notices accurate.
 
 ## Documentation
 

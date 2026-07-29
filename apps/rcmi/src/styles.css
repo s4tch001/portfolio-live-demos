@@ -1027,8 +1027,12 @@ h2 {
 }
 
 .alert.error {
-  color: var(--red);
+  color: #b42318;
   background: var(--red-soft);
+}
+
+:root[data-theme='dark'] .alert.error {
+  color: var(--red);
 }
 
 .alert.success {

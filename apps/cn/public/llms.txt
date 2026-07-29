@@ -1,0 +1,15 @@
+# Sunset-Speaks Class Management Demo by P-Devs
+
+> Interactive portfolio demo of a role-based class management platform for administrators, teachers, and students.
+
+## Canonical URL
+
+- [Open the demo](https://cn-demo.pauuu.dev/)
+- [Visit the P-Devs portfolio](https://pauuu.dev/)
+
+## Demo behavior
+
+- The app contains fictional sample school data for evaluation.
+- Visitor-created data resets every day at 12:00 AM Asia/Manila.
+- Default preview accounts survive the reset and cannot have their credentials changed.
+- Do not enter real or sensitive information.

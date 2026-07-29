@@ -20,7 +20,7 @@ const Navbar = () => {
               aria-expanded={showLinks}
               onClick={() => setShowLinks(!showLinks)}
             >
-              <i className={showLinks ? 'fas fa-times' : 'fas fa-bars'}></i>
+              <span aria-hidden='true'>{showLinks ? '×' : '☰'}</span>
             </button>
           </div>
 

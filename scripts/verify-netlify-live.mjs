@@ -41,7 +41,21 @@ async function verifySite(name, baseUrl) {
   assert(response.headers.get('x-frame-options') === 'DENY', `${name} X-Frame-Options is not DENY`);
   assert(response.headers.get('x-content-type-options') === 'nosniff', `${name} nosniff is missing`);
   assert((response.headers.get('strict-transport-security') ?? '').includes('max-age=31536000'), `${name} HSTS is missing`);
-  assert((response.headers.get('x-robots-tag') ?? '').includes('noindex'), `${name} noindex header is missing`);
+  assert(!(response.headers.get('x-robots-tag') ?? '').includes('noindex'), `${name} is still blocked by X-Robots-Tag`);
+  assert(html.includes('index, follow, max-image-preview:large'), `${name} indexable robots metadata is missing`);
+
+  const robots = await fetch(`${baseUrl}/robots.txt`, { signal: timeout() }).then(async (robotsResponse) => {
+    assert(robotsResponse.status === 200, `${name} robots.txt returned ${robotsResponse.status}`);
+    return robotsResponse.text();
+  });
+  assert(robots.includes('Allow: /'), `${name} robots.txt does not allow crawling`);
+  assert(robots.includes(`Sitemap: ${baseUrl}/sitemap.xml`), `${name} robots.txt sitemap is missing`);
+
+  const llms = await fetch(`${baseUrl}/llms.txt`, { signal: timeout() }).then(async (llmsResponse) => {
+    assert(llmsResponse.status === 200, `${name} llms.txt returned ${llmsResponse.status}`);
+    return llmsResponse.text();
+  });
+  assert(/^#\s+\S/m.test(llms), `${name} llms.txt is missing an H1`);
 
   const assetPath = html.match(/(?:src|href)="(\/assets\/[^"]+)"/)?.[1];
   assert(assetPath, `${name} root has no hashed asset`);

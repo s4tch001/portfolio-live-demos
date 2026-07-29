@@ -10,7 +10,7 @@ Phase 3 contains five isolated portfolio demo applications:
 | `payroll` | Vanilla/Vite | None; calculations remain in the page |
 | `travels` | React/Vite | None; static showcase |
 
-Every app imports `@pauuu-demo/demo-shell`, ships static `noindex` metadata,
+Every app imports `@pauuu-demo/demo-shell`, ships indexable SEO metadata,
 and has a private daily reset handler contract. Payroll and Travels handlers
 are explicit no-ops because those pages do not persist visitor values.
 

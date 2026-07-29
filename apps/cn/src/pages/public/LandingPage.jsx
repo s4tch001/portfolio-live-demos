@@ -60,13 +60,15 @@ export default function LandingPage() {
               loop
               playsInline
               preload='auto'
-              src='/assets/video/login-background.mp4'
+              fetchPriority='high'
+              poster='/assets/video/login-background-poster.webp'
+              src='/assets/video/login-background.webm'
             ></video>
           </div>
           <div className='landing-hero-inner'>
             <img
               className='landing-hero-logo'
-              src='/assets/img/logo/android-chrome-512x512.png'
+              src='/assets/img/logo/android-chrome-192x192.png'
               alt=''
             />
             <h1>{t('landing.heroTitle')}</h1>

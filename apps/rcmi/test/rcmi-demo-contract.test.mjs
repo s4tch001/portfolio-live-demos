@@ -43,14 +43,15 @@ test('restores the protected administrator password and leaves reset disabled', 
   assert.doesNotMatch(migration, /set[^;]*enabled\s*=\s*true/i);
 });
 
-test('RCMI demo root tells crawlers not to index or crawl the disposable preview', async () => {
+test('RCMI demo root is indexable and points crawlers to its sitemap', async () => {
   const index = await read('apps/rcmi/index.html');
   const robots = await read('apps/rcmi/public/robots.txt');
   const netlify = await read('apps/rcmi/netlify.toml');
-  assert.match(index, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+  assert.match(index, /index, follow, max-image-preview:large/);
   assert.match(robots, /User-agent: \*/);
-  assert.match(robots, /Disallow: \//);
-  assert.match(netlify, /X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"/);
+  assert.match(robots, /Allow: \//);
+  assert.match(robots, /Sitemap: https:\/\/rcmi-demo\.pauuu\.dev\/sitemap\.xml/);
+  assert.doesNotMatch(netlify, /X-Robots-Tag/);
 });
 
 test('shows the default password hint and removes password mutation controls', async () => {

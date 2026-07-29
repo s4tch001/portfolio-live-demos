@@ -11,12 +11,18 @@ const Tours = () => {
           ({ id, img, date, title, text, location, duration, price }) => (
             <article className='tour-card' key={id}>
               <div className='tour-img-container'>
-                <img src={img} className='tour-img' alt={title} />
+                <img
+                  src={img}
+                  className='tour-img'
+                  alt={title}
+                  loading='lazy'
+                  decoding='async'
+                />
                 <p className='tour-date'>{date}</p>
               </div>
               <div className='tour-info'>
                 <div className='tour-title'>
-                  <h4>{title}</h4>
+                  <h3>{title}</h3>
                 </div>
                 <p>{text}</p>
                 <div className='tour-footer'>

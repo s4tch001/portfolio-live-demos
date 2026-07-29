@@ -3,9 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-    <meta name="description" content="Disposable portfolio preview of the Hours Tracker." />
-    <title>Hours Tracker — Portfolio Preview</title>
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="P-Devs" />
+    <meta name="description" content="Try the interactive Hours Tracker demo by P-Devs, a resettable calendar-based tool for recording daily work hours and reviewing monthly totals." />
+    <link rel="canonical" href="https://hours-demo.pauuu.dev/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="P-Devs Demos" />
+    <meta property="og:title" content="Hours Tracker Demo | P-Devs" />
+    <meta property="og:description" content="Interactive P-Devs calendar demo for recording and reviewing work hours." />
+    <meta property="og:url" content="https://hours-demo.pauuu.dev/" />
+    <meta property="og:image" content="https://pauuu.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hours Tracker Demo | P-Devs" />
+    <meta name="twitter:description" content="Interactive P-Devs calendar demo for recording and reviewing work hours." />
+    <meta name="twitter:image" content="https://pauuu.dev/og-image.png" />
+    <title>Hours Tracker Demo | P-Devs</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Hours Tracker Demo","url":"https://hours-demo.pauuu.dev/","description":"Interactive P-Devs calendar demo for recording and reviewing work hours.","applicationCategory":"BusinessApplication","operatingSystem":"Web","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Pau","alternateName":"P-Devs","url":"https://pauuu.dev/"},"isPartOf":{"@type":"WebSite","name":"P-Devs Portfolio","url":"https://pauuu.dev/"}}
+    </script>
+    <style>
+      portfolio-demo-notice:not(:defined) {
+        display: block;
+        min-height: 8.5rem;
+        background: #111827;
+      }
+
+      @media (max-width: 44rem) {
+        portfolio-demo-notice:not(:defined) {
+          min-height: 14.5625rem;
+        }
+      }
+    </style>
     <link
       href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -36,7 +71,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <main class="container">
       <header>
         <div class="logo" style="display: flex; align-items: center; gap: 12px">
           <span>Hours Tracker</span>
@@ -70,7 +105,7 @@
       </div>
 
       <div class="stats-bar" id="statsBar"></div>
-    </div>
+    </main>
 
     <div class="overlay" id="overlay">
       <div class="modal" id="modal">

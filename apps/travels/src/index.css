@@ -19,7 +19,7 @@ Variables
   --clr-grey-2: hsl(211, 39%, 23%);
   --clr-grey-3: hsl(209, 34%, 30%);
   --clr-grey-4: hsl(209, 28%, 39%);
-  --clr-grey-5: hsl(210, 22%, 49%);
+  --clr-grey-5: hsl(210, 25%, 38%);
   --clr-grey-6: hsl(209, 23%, 60%);
   --clr-grey-7: hsl(211, 27%, 70%);
   --clr-grey-8: hsl(210, 31%, 80%);
@@ -504,9 +504,13 @@ Featured Tours
   flex-wrap: wrap;
 }
 .tour-title p,
-.tour-title h4 {
+.tour-title h3 {
   margin-bottom: 0.75rem;
   line-height: 1.25;
+}
+.service-title,
+.tour-title h3 {
+  font-size: 0.875rem;
 }
 .tour-title p {
   color: var(--clr-grey-7);

@@ -9,7 +9,7 @@ import {
 
 export const DEMO_NOTICE_ELEMENT = "portfolio-demo-notice";
 export const DEMO_NOTICE_HEIGHT_PROPERTY = "--portfolio-demo-notice-height";
-export const ROBOTS_DIRECTIVE = "noindex,nofollow,noarchive,nosnippet,noimageindex";
+export const ROBOTS_DIRECTIVE = "index,follow,max-image-preview:large";
 
 const styles = `
   :host {

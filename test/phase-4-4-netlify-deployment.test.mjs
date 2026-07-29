@@ -60,7 +60,7 @@ test('deployment record captures five isolated Free production previews', async 
     if (state.phase === '4.5') assert.equal(site.customUrl, metadata.sites[appId].customUrl);
   }
 
-  for (const marker of ['completed', 'https200', 'securityHeaders', 'noindex', 'immutableAssets', 'spaRoutes', 'appApis']) {
+  for (const marker of ['completed', 'https200', 'securityHeaders', 'indexable', 'immutableAssets', 'spaRoutes', 'appApis']) {
     assert.equal(state.netlify.liveVerification[marker], true);
   }
 });
@@ -80,10 +80,10 @@ test('every site applies the public-preview security header baseline', async () 
       'Strict-Transport-Security',
       'X-Content-Type-Options = "nosniff"',
       'X-Frame-Options = "DENY"',
-      'X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"',
     ]) {
       assert.ok(config.includes(marker), `${appId} is missing ${marker}`);
     }
+    assert.doesNotMatch(config, /X-Robots-Tag/);
     assert.doesNotMatch(config, /sb_(?:secret|publishable)_[A-Za-z0-9_-]{20,}/);
     assert.doesNotMatch(config, /service_role|SUPABASE_SECRET_KEY|SUPABASE_DB_PASSWORD/);
   }
@@ -117,6 +117,12 @@ test('router apps use SPA fallbacks and CN has no inline executable script', asy
 
   const cnHtml = await read('apps/cn/index.html');
   assert.match(cnHtml, /<script src="\/prepaint-theme\.js"><\/script>/);
-  assert.doesNotMatch(cnHtml, /<script(?![^>]*\bsrc=)[^>]*>/i);
+  const cnWithoutStructuredData = cnHtml.replace(
+    /<script type="application\/ld\+json">[\s\S]*?<\/script>/i,
+    '',
+  );
+  assert.doesNotMatch(cnWithoutStructuredData, /<script(?![^>]*\bsrc=)[^>]*>/i);
+  assert.match(cnHtml, /<script type="application\/ld\+json">/);
+  assert.match(await read('apps/cn/netlify.toml'), /script-src 'self' 'sha256-[A-Za-z0-9+/]+=*'/);
   assert.match(await read('apps/cn/public/prepaint-theme.js'), /document\.documentElement\.setAttribute\('data-theme'/);
 });

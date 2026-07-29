@@ -19,10 +19,10 @@ test('all five application workspaces are buildable Phase 3 demos', async () => 
   }
 });
 
-test('all five static documents include crawler directives', async () => {
+test('all five static documents include indexable crawler directives', async () => {
   for (const appId of appIds) {
     const html = await read(`apps/${appId}/index.html`);
-    assert.match(html, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+    assert.match(html, /index, follow, max-image-preview:large/);
   }
 });
 

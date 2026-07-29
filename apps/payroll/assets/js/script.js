@@ -104,10 +104,11 @@ function renderEmployees() {
         <div class="emp-name-wrap">
           <div class="emp-dot" style="background:${color};"></div>
           <input
-            type="text"
-            class="emp-name-input"
-            id="nameEmp_${emp.id}"
-            placeholder="Person #${emp.id}"
+          type="text"
+          class="emp-name-input"
+          id="nameEmp_${emp.id}"
+          aria-label="Name for person ${emp.id}"
+          placeholder="Person #${emp.id}"
             value="${escHtml(emp.name)}"
             maxlength="30"
             autocomplete="off"
@@ -119,12 +120,13 @@ function renderEmployees() {
       </div>
       <div class="emp-hours-wrap">
         <span class="emp-hours-prefix" style="color:${color};">
-          <i class="fa-regular fa-clock"></i>
+          <span class="clock-icon" aria-hidden="true">◷</span>
         </span>
         <input
           type="number"
           class="emp-hours-input"
           id="hoursEmp_${emp.id}"
+          aria-label="Hours rendered by person ${emp.id}"
           placeholder="0"
           min="0"
           max="10000"

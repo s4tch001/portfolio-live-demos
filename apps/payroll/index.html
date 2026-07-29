@@ -3,36 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-    <meta name="description" content="Disposable portfolio preview of the Payroll Splitter." />
-    <title>Payroll Splitter — Portfolio Preview</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="P-Devs" />
+    <meta name="description" content="Try the interactive Payroll Splitter demo by P-Devs to divide USD and PHP pay across multiple people using hours rendered and a conversion rate." />
+    <link rel="canonical" href="https://payroll-demo.pauuu.dev/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="P-Devs Demos" />
+    <meta property="og:title" content="Payroll Splitter Demo | P-Devs" />
+    <meta property="og:description" content="Interactive P-Devs payroll calculator demo for splitting USD and PHP pay by hours rendered." />
+    <meta property="og:url" content="https://payroll-demo.pauuu.dev/" />
+    <meta property="og:image" content="https://pauuu.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Payroll Splitter Demo | P-Devs" />
+    <meta name="twitter:description" content="Interactive P-Devs payroll calculator demo for splitting pay by hours rendered." />
+    <meta name="twitter:image" content="https://pauuu.dev/og-image.png" />
+    <title>Payroll Splitter Demo | P-Devs</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Payroll Splitter Demo","url":"https://payroll-demo.pauuu.dev/","description":"Interactive P-Devs payroll calculator demo for splitting USD and PHP pay by hours rendered.","applicationCategory":"FinanceApplication","operatingSystem":"Web","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Pau","alternateName":"P-Devs","url":"https://pauuu.dev/"},"isPartOf":{"@type":"WebSite","name":"P-Devs Portfolio","url":"https://pauuu.dev/"}}
+    </script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/assets/fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      rel="stylesheet"
-    />
+    <style>
+      portfolio-demo-notice:not(:defined) {
+        display: block;
+        min-height: 8.5rem;
+        background: #111827;
+      }
+
+      @media (max-width: 44rem) {
+        portfolio-demo-notice:not(:defined) {
+          min-height: 13.95rem;
+        }
+      }
+    </style>
     <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
   <body>
     <portfolio-demo-notice project-id="payroll"></portfolio-demo-notice>
-    <div class="wrapper">
+    <main class="wrapper">
       <!-- HEADER -->
       <header>
-        <div class="header-badge">Payroll Splitter</div>
+        <h1 class="header-badge">Payroll Splitter</h1>
         <div class="header-sub">Salary Split · USD ↔ PHP</div>
       </header>
 
       <!-- ─── SECTION 1: USD INPUTS ─── -->
-      <div class="section-label">USD Setup</div>
+      <h2 class="section-label">USD Setup</h2>
       <div class="card">
         <div class="input-grid">
           <div class="field">
-            <label>Total Pay (USD)</label>
+            <label for="totalUSD">Total Pay (USD)</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
               <input
@@ -46,7 +78,7 @@
             </div>
           </div>
           <div class="field">
-            <label>Rate per Hour (USD)</label>
+            <label for="rateUSD">Rate per Hour (USD)</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
               <input
@@ -60,7 +92,7 @@
             </div>
           </div>
           <div class="field">
-            <label>USD → PHP Conversion Rate</label>
+            <label for="conversionRate">USD → PHP Conversion Rate</label>
             <div class="currency-wrap">
               <span class="currency-prefix">₱</span>
               <input
@@ -80,7 +112,7 @@
       </div>
 
       <!-- ─── SECTION 2: HOURS ─── -->
-      <div class="section-label">Hours Rendered</div>
+      <h2 class="section-label">Hours Rendered</h2>
       <div class="card">
         <!-- Employee Manager Controls -->
         <div class="employee-manager">
@@ -91,19 +123,23 @@
           </div>
           <div class="employee-controls">
             <button
+              type="button"
               class="btn-emp minus"
               id="btnRemoveEmp"
               title="Remove person"
+              aria-label="Remove person"
             >
-              <i class="fa-solid fa-minus"></i>
+              <span class="btn-emp__icon" aria-hidden="true">−</span>
             </button>
             <span class="emp-count-label" id="empCountLabel">2 employees</span>
             <button
+              type="button"
               class="btn-emp plus"
               id="btnAddEmp"
               title="Add person"
+              aria-label="Add person"
             >
-              <i class="fa-solid fa-plus"></i>
+              <span class="btn-emp__icon" aria-hidden="true">+</span>
             </button>
           </div>
         </div>
@@ -117,13 +153,13 @@
         <!-- Total Hours row -->
         <div class="total-hours-row">
           <div class="total-hours-inner">
-            <div class="total-hours-label">
-              <i class="fa-regular fa-clock" style="font-size: 0.75rem"></i>
+            <label class="total-hours-label" for="totalHours">
+              <span class="clock-icon" aria-hidden="true">◷</span>
               Total Hours
-            </div>
+            </label>
             <div class="emp-hours-wrap">
               <span class="emp-hours-prefix" style="color: var(--text-muted)">
-                <i class="fa-regular fa-clock"></i>
+                <span class="clock-icon" aria-hidden="true">◷</span>
               </span>
               <input
                 type="number"
@@ -141,14 +177,14 @@
         <!-- Employee rows -->
         <div id="employeeList"></div>
 
-        <div class="warn-text" id="hoursWarn">
+        <div class="warn-text" id="hoursWarn" role="status" aria-live="polite">
           ⚠ Combined person hours do not match the Total Hours.
         </div>
       </div>
 
       <!-- ─── SECTION 3: RESULTS ─── -->
-      <div class="section-label">Computation</div>
-      <div id="resultsArea">
+      <h2 class="section-label">Computation</h2>
+      <div id="resultsArea" aria-live="polite">
         <div class="results-card">
           <div class="empty-state">
             <div class="empty-icon">🧮</div>
@@ -158,12 +194,12 @@
       </div>
 
       <footer>Payroll Splitter · USD ↔ PHP</footer>
-    </div>
+    </main>
 
     <!-- STICKY CLEAR BUTTON -->
     <div class="sticky-bar">
-      <button class="btn-clear" id="btnClear">
-        <svg viewBox="0 0 24 24">
+      <button type="button" class="btn-clear" id="btnClear">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
           <polyline points="1 4 1 10 7 10" />
           <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
         </svg>

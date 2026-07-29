@@ -1,0 +1,15 @@
+# Hours Tracker Demo by P-Devs
+
+> Interactive portfolio demo of a calendar-based work-hours tracker.
+
+## Canonical URL
+
+- [Open the demo](https://hours-demo.pauuu.dev/)
+- [Visit the P-Devs portfolio](https://pauuu.dev/)
+
+## Demo behavior
+
+- Use the preview password shown inside the app.
+- Visitor-created data resets every day at 12:00 AM Asia/Manila.
+- The default preview password survives the reset and cannot be changed.
+- Do not enter real or sensitive information.

@@ -1,6 +1,6 @@
 {
-  "short_name": "P Travels Preview",
-  "name": "P Travels Portfolio Preview",
+  "short_name": "P Travels Demo",
+  "name": "P Travels Demo by P-Devs",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

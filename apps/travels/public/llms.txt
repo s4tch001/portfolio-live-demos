@@ -1,0 +1,14 @@
+# P Travels Demo by P-Devs
+
+> Interactive portfolio demo of a responsive Philippine travel showcase.
+
+## Canonical URL
+
+- [Open the demo](https://travels-demo.pauuu.dev/)
+- [Visit the P-Devs portfolio](https://pauuu.dev/)
+
+## Demo behavior
+
+- Destinations, packages, prices, and booking details are fictional portfolio content.
+- Visitor-entered data resets every day at 12:00 AM Asia/Manila.
+- Do not enter real or sensitive information.

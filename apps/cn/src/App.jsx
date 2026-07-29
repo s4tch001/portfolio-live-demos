@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';
@@ -7,7 +8,6 @@ import { ConfirmProvider } from './context/ConfirmProvider.jsx';
 import { NotificationsProvider } from './context/NotificationsProvider.jsx';
 import { DataProvider } from './context/DataContext.jsx';
 import { MaintenanceProvider, useMaintenance } from './context/MaintenanceProvider.jsx';
-import AppShell from './components/Layout/AppShell.jsx';
 import OfflineIndicator from './components/Layout/OfflineIndicator.jsx';
 import MaintenancePage from './pages/public/MaintenancePage.jsx';
 import {
@@ -21,17 +21,19 @@ import {
   LandingRoute,
 } from './components/guards/index.jsx';
 
-import LoginPage from './pages/LoginPage/LoginPage.jsx';
 import LandingPage from './pages/public/LandingPage.jsx';
-import PrivacyPolicy from './pages/public/PrivacyPolicy.jsx';
-import TermsOfService from './pages/public/TermsOfService.jsx';
-import SchedulePage from './pages/SchedulePage/SchedulePage.jsx';
-import StudentSchedulePage from './pages/StudentHome/StudentSchedulePage.jsx';
-import LessonTrackerPage from './pages/LessonTrackerPage/LessonTrackerPage.jsx';
-import AccountsPage from './pages/AccountsPage/AccountsPage.jsx';
-import ReportsPage from './pages/ReportsPage/ReportsPage.jsx';
-import RemainingClassesPage from './pages/RemainingClassesPage/RemainingClassesPage.jsx';
-import SecurityPage from './pages/SecurityPage/SecurityPage.jsx';
+
+const AppShell = lazy(() => import('./components/Layout/AppShell.jsx'));
+const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage.jsx'));
+const PrivacyPolicy = lazy(() => import('./pages/public/PrivacyPolicy.jsx'));
+const TermsOfService = lazy(() => import('./pages/public/TermsOfService.jsx'));
+const SchedulePage = lazy(() => import('./pages/SchedulePage/SchedulePage.jsx'));
+const StudentSchedulePage = lazy(() => import('./pages/StudentHome/StudentSchedulePage.jsx'));
+const LessonTrackerPage = lazy(() => import('./pages/LessonTrackerPage/LessonTrackerPage.jsx'));
+const AccountsPage = lazy(() => import('./pages/AccountsPage/AccountsPage.jsx'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage/ReportsPage.jsx'));
+const RemainingClassesPage = lazy(() => import('./pages/RemainingClassesPage/RemainingClassesPage.jsx'));
+const SecurityPage = lazy(() => import('./pages/SecurityPage/SecurityPage.jsx'));
 
 // /schedule serves two very different pages by role: students/parents get a
 // simple placeholder; admins/teachers get the full scheduling UI. A wrapper
@@ -77,7 +79,23 @@ function AppBody() {
     }
   }
   return (
-    <Routes>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            alignItems: 'center',
+            background: 'var(--bg)',
+            display: 'flex',
+            inset: 'var(--portfolio-demo-notice-height, 0px) 0 0',
+            justifyContent: 'center',
+            position: 'fixed',
+          }}
+        >
+          <span className="spinner" aria-label="Loading"></span>
+        </div>
+      }
+    >
+      <Routes>
       {/* Public — accessible without login. */}
       <Route
         path="/"
@@ -137,7 +155,8 @@ function AppBody() {
       </Route>
 
       <Route path="*" element={<IndexRedirect />} />
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }
 

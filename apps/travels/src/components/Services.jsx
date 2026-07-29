@@ -12,7 +12,7 @@ const Services = () => {
               <i className={icon}></i>
             </span>
             <div className='service-info'>
-              <h4 className='service-title'>{title}</h4>
+              <h3 className='service-title'>{title}</h3>
               <p className='service-text'>{text}</p>
             </div>
           </article>

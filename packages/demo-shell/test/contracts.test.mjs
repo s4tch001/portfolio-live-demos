@@ -156,7 +156,7 @@ test("rejects unknown contract ids without reflecting them into markup", () => {
   assert.equal(model.navigationHint, null);
 });
 
-test("installs a noindex robots guard without requiring a browser framework", () => {
+test("installs an indexable robots guard without requiring a browser framework", () => {
   const appended = [];
   const head = {
     querySelector: () => null,

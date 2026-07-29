@@ -127,14 +127,15 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /role === "student"[\s\S]*id,username,name,status,language[\s\S]*id,username,fullname,status,language/);
 });
 
-test('CN demo root tells crawlers not to index or crawl the disposable preview', async () => {
+test('CN demo root is indexable and points crawlers to its sitemap', async () => {
   const index = await read('apps/cn/index.html');
   const robots = await read('apps/cn/public/robots.txt');
   const netlify = await read('apps/cn/netlify.toml');
-  assert.match(index, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+  assert.match(index, /index, follow, max-image-preview:large/);
   assert.match(robots, /User-agent: \*/);
-  assert.match(robots, /Disallow: \//);
-  assert.match(netlify, /X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"/);
+  assert.match(robots, /Allow: \//);
+  assert.match(robots, /Sitemap: https:\/\/cn-demo\.pauuu\.dev\/sitemap\.xml/);
+  assert.doesNotMatch(netlify, /X-Robots-Tag/);
 });
 
 test('CN public pages describe student access and use a dummy support email', async () => {

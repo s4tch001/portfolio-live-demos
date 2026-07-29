@@ -72,7 +72,9 @@ export default function LoginPage() {
           loop
           playsInline
           preload="auto"
-          src="/assets/video/login-background.mp4"
+          fetchPriority="high"
+          poster="/assets/video/login-background-poster.webp"
+          src="/assets/video/login-background.webm"
         ></video>
       </div>
       <form className="login-card" onSubmit={submit}>

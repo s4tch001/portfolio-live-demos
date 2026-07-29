@@ -1,0 +1,14 @@
+# Payroll Splitter Demo by P-Devs
+
+> Interactive portfolio demo for splitting USD and PHP payroll by hours rendered.
+
+## Canonical URL
+
+- [Open the demo](https://payroll-demo.pauuu.dev/)
+- [Visit the P-Devs portfolio](https://pauuu.dev/)
+
+## Demo behavior
+
+- Calculations run entirely in the browser.
+- Visitor-entered values reset when the page is refreshed and during the daily demo reset.
+- Do not enter real or sensitive payroll information.

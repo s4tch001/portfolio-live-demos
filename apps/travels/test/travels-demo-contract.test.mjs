@@ -26,15 +26,16 @@ test('keeps eight fictional Philippine tour cards', async () => {
   assert.match(data, /Batanes Nature Escape/);
 });
 
-test('uses the shared preview notice and noindex metadata', async () => {
+test('uses the shared preview notice and indexable metadata', async () => {
   const [entry, html, robots] = await Promise.all([
     read('apps/travels/src/main.jsx'),
     read('apps/travels/index.html'),
     read('apps/travels/public/robots.txt'),
   ]);
   assert.match(entry, /portfolio-demo-notice project-id="travels"/);
-  assert.match(html, /noindex, nofollow/);
-  assert.match(robots, /Disallow: \//);
+  assert.match(html, /index, follow, max-image-preview:large/);
+  assert.match(robots, /Allow: \//);
+  assert.match(robots, /Sitemap: https:\/\/travels-demo\.pauuu\.dev\/sitemap\.xml/);
 });
 
 test('keeps the fixed navbar and mobile menu below the dynamic preview notice', async () => {

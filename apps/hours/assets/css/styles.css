@@ -5,17 +5,18 @@
   --surface3: #22222f;
   --border: #2a2a3a;
   --border2: #3a3a50;
-  --accent: #7c6fff;
+  --accent: #6354df;
   --accent2: #a78bfa;
   --accent-glow: rgba(124, 111, 255, 0.15);
   --text: #e8e8f0;
   --text2: #9090a8;
-  --text3: #5a5a72;
+  --text3: #9494ab;
+  --muted: #9494ab;
   --success: #4ade80;
   --danger: #f87171;
   --saturday: #ff9f5a;
   --sunday: #f87171;
-  --today: #7c6fff;
+  --today: #6354df;
 }
 
 * {
@@ -222,11 +223,9 @@ header {
 
 .weekday:first-child {
   color: var(--sunday);
-  opacity: 0.7;
 }
 .weekday:last-child {
   color: var(--saturday);
-  opacity: 0.7;
 }
 
 .days-grid {

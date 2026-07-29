@@ -11,3 +11,15 @@ root.render(
     <App />
   </React.StrictMode>,
 );
+
+const loadIconStyles = () => {
+  import('@fortawesome/fontawesome-free/css/all.min.css');
+};
+
+window.addEventListener(
+  'load',
+  () => {
+    window.setTimeout(loadIconStyles, 1000);
+  },
+  { once: true },
+);

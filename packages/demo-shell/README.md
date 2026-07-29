@@ -14,7 +14,7 @@ Place the notice first inside the page body or application root:
 
 Supported project ids are cn, rcmi, hours, payroll, and travels. React renders the same custom-element tag; plain HTML apps can import the module through their later build setup.
 
-The component uses Shadow DOM and text nodes only. It adds a robots noindex directive as defense in depth, but every app must also include the same directive statically in its HTML head because crawlers may inspect the document before JavaScript executes.
+The component uses Shadow DOM and text nodes only. It keeps the indexable robots directive in sync at runtime, while every app also includes the same directive statically in its HTML head for crawlers that inspect the document before JavaScript executes.
 
 The notice identifies fictional baseline records that return after reset and identifies Netlify as the demo frontend host plus Supabase as the demo backend/database. These labels distinguish the disposable preview from any production deployment shown on the portfolio.
 

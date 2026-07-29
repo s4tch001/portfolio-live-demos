@@ -181,7 +181,7 @@
       "completed": true,
       "https200": true,
       "securityHeaders": true,
-      "noindex": true,
+      "indexable": true,
       "immutableAssets": true,
       "spaRoutes": true,
       "appApis": true,

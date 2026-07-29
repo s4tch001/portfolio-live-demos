@@ -75,14 +75,15 @@ test('persistent APIs allow exact custom origins without wildcard CORS', async (
   }
 });
 
-test('all demo sites are explicitly blocked from indexing and crawling', async () => {
+test('all demo sites are explicitly available for indexing and crawling', async () => {
   for (const appId of appIds) {
     const index = await read(`apps/${appId}/index.html`);
     const netlify = await read(`apps/${appId}/netlify.toml`);
     const robots = await read(`apps/${appId}/public/robots.txt`);
-    assert.match(index, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
-    assert.match(netlify, /X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"/);
+    assert.match(index, /index, follow, max-image-preview:large/);
+    assert.doesNotMatch(netlify, /X-Robots-Tag/);
     assert.match(robots, /User-agent: \*/);
-    assert.match(robots, /Disallow: \//);
+    assert.match(robots, /Allow: \//);
+    assert.match(robots, new RegExp(`Sitemap: https://${appId}-demo\\.pauuu\\.dev/sitemap\\.xml`));
   }
 });

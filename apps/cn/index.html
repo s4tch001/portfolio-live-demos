@@ -6,24 +6,72 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="P-Devs" />
     <meta
-      name="robots"
-      content="noindex, nofollow, noarchive, nosnippet, noimageindex"
+      name="description"
+      content="Explore the interactive Sunset-Speaks class management demo by P-Devs, with admin, teacher, and student schedules, reports, and sample school data."
     />
-    <meta name="description" content="Disposable portfolio preview of the Sunset-Speaks class management project." />
-    <title>Sunset-Speaks Class Management — Portfolio Preview</title>
+    <link rel="canonical" href="https://cn-demo.pauuu.dev/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="P-Devs Demos" />
+    <meta property="og:title" content="Sunset-Speaks Class Management Demo | P-Devs" />
+    <meta property="og:description" content="Interactive P-Devs demo of a role-based class management platform for administrators, teachers, and students." />
+    <meta property="og:url" content="https://cn-demo.pauuu.dev/" />
+    <meta property="og:image" content="https://pauuu.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sunset-Speaks Class Management Demo | P-Devs" />
+    <meta name="twitter:description" content="Interactive P-Devs demo of a role-based class management platform." />
+    <meta name="twitter:image" content="https://pauuu.dev/og-image.png" />
+    <title>Sunset-Speaks Class Management Demo | P-Devs</title>
     <link rel="icon" href="/assets/img/logo/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/logo/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/logo/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/assets/img/logo/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/img/logo/site.webmanifest" />
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/video/login-background-poster.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Sunset-Speaks Class Management Demo","url":"https://cn-demo.pauuu.dev/","description":"Interactive P-Devs demo of a role-based class management platform for administrators, teachers, and students.","applicationCategory":"EducationalApplication","operatingSystem":"Web","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Pau","alternateName":"P-Devs","url":"https://pauuu.dev/"},"isPartOf":{"@type":"WebSite","name":"P-Devs Portfolio","url":"https://pauuu.dev/"}}
+    </script>
     <!-- Pre-paint theme: set data-theme before first paint to avoid FOUC.
          Ported verbatim from the legacy theme.js — must run before React mounts. -->
     <script src="/prepaint-theme.js"></script>
     <!-- All libraries self-hosted (China deployment: no Google/CDN hosts) -->
+    <link
+      rel="preload"
+      href="/vendor/fonts/dm-sans-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/vendor/fonts/dm-sans-latin-600-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link href="/vendor/fonts/fonts.css" rel="stylesheet" />
+    <link
+      rel="preload"
+      href="/vendor/fonts/dm-sans-latin-700-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link href="/vendor/fontawesome/css/all.min.css" rel="stylesheet" />
-    <script src="/vendor/dompurify/purify.min.js"></script>
-    <script src="/vendor/exceljs/exceljs.min.js"></script>
-    <script src="/vendor/html2canvas/html2canvas.min.js"></script>
-    <script src="/vendor/jszip/jszip.min.js"></script>
+    <script defer src="/vendor/dompurify/purify.min.js"></script>
+    <script defer src="/vendor/exceljs/exceljs.min.js"></script>
+    <script defer src="/vendor/html2canvas/html2canvas.min.js"></script>
+    <script defer src="/vendor/jszip/jszip.min.js"></script>
   </head>
   <body>
     <div id="root"></div>

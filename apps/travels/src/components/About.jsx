@@ -8,7 +8,13 @@ const About = () => {
 
       <div className='section-center about-center'>
         <div className='about-img'>
-          <img src={about} className='about-photo' alt='awesome beach' />
+          <img
+            src={about}
+            className='about-photo'
+            alt='A tropical beach destination in the Philippines'
+            loading='lazy'
+            decoding='async'
+          />
         </div>
         <article className='about-info'>
           <h3>explore the difference</h3>
