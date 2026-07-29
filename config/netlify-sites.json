@@ -8,7 +8,7 @@
       "preferredSiteName": "pauuu-cn-demo",
       "siteId": "1ee2468e-f514-467f-b289-438125a12a36",
       "netlifyUrl": "https://pauuu-cn-demo.netlify.app",
-      "productionDeployId": "6a69bd9b637befd792ba5a4d",
+      "productionDeployId": "6a6a194ef547e434c84e68c8",
       "packageDirectory": "apps/cn",
       "publishDirectory": "apps/cn/dist",
       "customHostname": "cn-demo.pauuu.dev",
