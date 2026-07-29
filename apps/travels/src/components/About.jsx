@@ -1,4 +1,4 @@
-import about from '../images/about2.jpeg';
+import about from '../images/about2.webp';
 import Title from './Title';
 
 const About = () => {

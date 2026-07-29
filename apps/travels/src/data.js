@@ -1,11 +1,11 @@
-import tour1 from './images/boracay.jpeg';
-import tour2 from './images/palawan.jpeg';
-import tour3 from './images/siargao.jpeg';
-import tour4 from './images/baguio.jpeg';
-import tour5 from './images/bohol.jpeg';
-import tour6 from './images/vigan.jpeg';
-import tour7 from './images/batanes.jpeg';
-import tour8 from './images/cebu.jpeg';
+import tour1 from './images/boracay.webp';
+import tour2 from './images/palawan.webp';
+import tour3 from './images/siargao.webp';
+import tour4 from './images/baguio.webp';
+import tour5 from './images/bohol.webp';
+import tour6 from './images/vigan.webp';
+import tour7 from './images/batanes.webp';
+import tour8 from './images/cebu.webp';
 
 export const pageLinks = [
   { id: 1, href: '#home', text: 'Home' },
