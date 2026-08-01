@@ -28,6 +28,7 @@ coverage/
 .cache/
 .vite/
 .eslintcache
+.local-state/
 
 # Runtime data must never be imported from the original projects
 /data/

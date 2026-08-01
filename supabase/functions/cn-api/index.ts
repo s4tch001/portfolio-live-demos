@@ -943,7 +943,25 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     return { taken: Boolean(row) };
   }
   if (path === "/receipts/next" && request.method === "GET") {
-    return { receipt_no: `DEMO-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}` };
+    const currentYear = new Date().getFullYear();
+    const requestedYear = Number(params.get("year") ?? currentYear);
+    const year = Number.isInteger(requestedYear) && requestedYear >= 1000 && requestedYear <= 9999
+      ? requestedYear
+      : currentYear;
+    const receiptRows = await queryMany(
+      database
+        .from("class_transactions")
+        .select("receipt_no")
+        .like("receipt_no", `${year}-%`)
+    );
+    const receiptPattern = new RegExp(`^${year}-(\\d{3,})$`);
+    const highestSequence = receiptRows.reduce((highest, row) => {
+      const match = String(row.receipt_no ?? "").match(receiptPattern);
+      if (!match) return highest;
+      const sequence = Number(match[1]);
+      return Number.isSafeInteger(sequence) && sequence > highest ? sequence : highest;
+    }, 0);
+    return { receipt_no: `${year}-${String(highestSequence + 1).padStart(3, "0")}` };
   }
   if (path === "/receipts" && request.method === "GET") {
     const year = Number(params.get("year") ?? new Date().getFullYear());
@@ -1025,6 +1043,28 @@ async function logRoutes(request: Request, path: string, database: any, session:
   };
 }
 
+function browserReachableStorageUrl(signedUrl: string) {
+  const localPublicUrl = String(Deno.env.get("CN_LOCAL_PUBLIC_SUPABASE_URL") ?? "").trim();
+  if (!localPublicUrl) return signedUrl;
+
+  try {
+    const publicBase = new URL(localPublicUrl);
+    const signed = new URL(signedUrl);
+    const isLoopback = publicBase.hostname === "127.0.0.1" || publicBase.hostname === "localhost";
+    if (publicBase.protocol !== "http:" || !isLoopback || publicBase.port !== "54321") {
+      throw new Error("invalid local Storage base URL");
+    }
+    if (!signed.pathname.startsWith("/storage/v1/")) {
+      throw new Error("invalid signed Storage path");
+    }
+    signed.protocol = publicBase.protocol;
+    signed.host = publicBase.host;
+    return signed.toString();
+  } catch {
+    throw new ApiError(503, "upload_unavailable");
+  }
+}
+
 async function upload(request: Request, database: any, storage: any, session: Session) {
   requireStaff(session);
   const form = await request.formData().catch(() => null);
@@ -1048,7 +1088,7 @@ async function upload(request: Request, database: any, storage: any, session: Se
   }
   const signed = await storage.from("cn-private").createSignedUrl(objectPath, 60 * 60);
   if (signed.error || !signed.data?.signedUrl) throw new ApiError(503, "upload_unavailable");
-  return { url: signed.data.signedUrl };
+  return { url: browserReachableStorageUrl(signed.data.signedUrl) };
 }
 
 async function handle(request: Request, context: any) {

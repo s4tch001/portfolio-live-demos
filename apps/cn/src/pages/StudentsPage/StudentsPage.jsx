@@ -107,14 +107,13 @@ export default function StudentsPage({ embedded = false, openAddSignal = 0 }) {
     setModalOpen(true);
   };
 
-  // Embedded mode: the parent owns the "+ Add Student" button and bumps
-  // openAddSignal to trigger the add modal here (skip the initial render).
-  const firstAddSignal = useRef(true);
+  // Embedded mode: open only when the parent actually changes the signal.
+  // Comparing with the initial value keeps React Strict Mode's mount-effect
+  // replay from opening the modal as soon as /accounts/students loads.
+  const previousAddSignal = useRef(openAddSignal);
   useEffect(() => {
-    if (firstAddSignal.current) {
-      firstAddSignal.current = false;
-      return;
-    }
+    if (openAddSignal === previousAddSignal.current) return;
+    previousAddSignal.current = openAddSignal;
     openAdd();
   }, [openAddSignal]);
   const openEdit = (s) => {

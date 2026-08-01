@@ -40,11 +40,36 @@ Server-only secrets, database passwords, Netlify tokens, GitHub tokens, and loca
 
 ## Local Setup
 
-Use the Node.js version in `.nvmrc` (`26`) with npm 11. The package engines
-allow Node.js `>=24 <27` and npm `>=11 <12`.
+Use the Node.js version in `.nvmrc` (`26`). npm 11 remains the pinned deployment
+toolchain, while local development also accepts npm 12.
 
 ```powershell
 npm.cmd install --ignore-scripts
+```
+
+To start the CN frontend, Edge API, and a freshly reset local-only database with
+only the three protected preview accounts, open Docker Desktop and run:
+
+```powershell
+npm.cmd run dev:cn-local
+```
+
+This command builds an isolated local migration profile, skips the hosted reset
+scheduler migrations, uses explicit local Supabase flags, refuses non-loopback
+API URLs, and never reads or writes the deployed demo database.
+
+The blank local database contains only `admin`, `testteacher`, and `teststudent`;
+all three use `password`. It contains no schedules, reports, class packages, or
+other sample records. Image uploads use the local private Storage bucket and
+return loopback-only signed URLs; they never use the hosted Supabase project.
+Stopping through the helper deletes this isolated project's ephemeral database
+and Storage volumes so uploaded files do not accumulate on disk.
+
+On Windows, the interactive helper can start or stop the CN app, its exact
+local Supabase project, and optionally Docker Desktop:
+
+```powershell
+.\tool.ps1
 ```
 
 Copy `.env.example` into an ignored local env file when a command needs public

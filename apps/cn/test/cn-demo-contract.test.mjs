@@ -20,6 +20,51 @@ test('shows only the three approved immutable preview credentials', async () => 
   assert.match(login, /cannot be changed/i);
 });
 
+test('local walkthrough launcher is loopback-only and starts with only the three default accounts', async () => {
+  const launcher = await read('scripts/dev-cn-local.mjs');
+  const localSeed = await read('supabase/local/cn-default-accounts.sql');
+  assert.match(launcher, /db', 'reset', '--local'/);
+  assert.match(launcher, /db', 'query', '--local'/);
+  assert.match(launcher, /Refusing to start CN local development against a non-loopback Supabase URL/);
+  assert.match(launcher, /replace\('auth: "publishable:cn_demo"', 'auth: "publishable"'\)/);
+  assert.match(launcher, /portfolio-live-demos-cn-local/);
+  assert.match(launcher, /deploymentOnlyMigrations/);
+  assert.match(launcher, /CN_LOCAL_PUBLIC_SUPABASE_URL=\$\{apiUrl\}/);
+  assert.match(launcher, /'--env-file',[\s\S]*localFunctionEnv/);
+  assert.doesNotMatch(launcher, /ivqfxdibluhgyttgxbmz|\.supabase\.co/);
+  assert.match(localSeed, /where app_id = 'cn'/);
+  assert.match(localSeed, /delete from cn_demo\.teachers/);
+  assert.match(localSeed, /delete from cn_demo\.students/);
+  assert.match(localSeed, /'admin'[\s\S]*'password'/);
+  assert.match(localSeed, /'testteacher'[\s\S]*'password'/);
+  assert.match(localSeed, /'teststudent'[\s\S]*'password'/);
+  assert.match(localSeed, /delete from cn_demo\.schedules/);
+  assert.match(localSeed, /delete from cn_demo\.reports/);
+  assert.match(localSeed, /delete from cn_demo\.class_transactions/);
+  assert.doesNotMatch(launcher, /VITE_CN_LOCAL_ADMIN_ONLY/);
+});
+
+test('Windows local tool manages only the isolated CN project', async () => {
+  const tool = await read('tool.ps1');
+  assert.match(tool, /portfolio-live-demos-cn-local/);
+  assert.match(tool, /npm\.cmd run dev:cn-local/);
+  assert.match(tool, /stop --project-id \$LocalProjectId --no-backup/);
+  assert.match(tool, /docker desktop start/);
+  assert.match(tool, /docker desktop stop/);
+  assert.match(tool, /1\. START[\s\S]*2\. STOP[\s\S]*3\. STOP ALL[\s\S]*4\. STATUS/);
+  assert.match(tool, /Invalid selection/);
+  assert.match(tool, /Warning: this can stop other local Docker projects/);
+  assert.match(tool, /GetTempPath\(\)/);
+  assert.match(tool, /CnTempPrefix = 'cn-local-'/);
+  assert.match(tool, /Refusing cleanup outside the expected CN temp path/);
+  assert.match(tool, /Keeping active CN temp workdir/);
+  assert.match(tool, /Remove-Item -LiteralPath \$target -Recurse -Force/);
+  assert.match(tool, /Supabase emits a UTF-8 animated spinner/);
+  assert.match(tool, /stop --project-id \$LocalProjectId --no-backup \*> \$null/);
+  assert.match(tool, /Could not stop the CN local Supabase containers/);
+  assert.doesNotMatch(tool, /--linked|db push|ivqfxdibluhgyttgxbmz|\.supabase\.co/);
+});
+
 test('keeps restricted CN navigation behind non-preview master checks', async () => {
   const navigation = await read('apps/cn/src/components/Layout/navConfig.js');
   const remaining = await read('apps/cn/src/pages/RemainingClassesPage/remainingConstants.js');
@@ -173,6 +218,13 @@ test('CN Edge adapter is origin-bound, rate-limited, and denies master APIs', as
   assert.match(edge, /MAX_UPLOAD_BYTES = 2 \* 1024 \* 1024/);
   assert.match(edge, /existing\.length >= 20/);
   assert.match(edge, /100 \* 1024 \* 1024/);
+  assert.match(edge, /Deno\.env\.get\("CN_LOCAL_PUBLIC_SUPABASE_URL"\)/);
+  assert.match(edge, /publicBase\.hostname === "127\.0\.0\.1"/);
+  assert.match(edge, /signed\.pathname\.startsWith\("\/storage\/v1\/"\)/);
+  assert.match(edge, /browserReachableStorageUrl\(signed\.data\.signedUrl\)/);
+  assert.match(edge, /new RegExp\(`\^\$\{year\}-\(\\\\d\{3,\}\)\$`\)/);
+  assert.match(edge, /String\(highestSequence \+ 1\)\.padStart\(3, "0"\)/);
+  assert.doesNotMatch(edge, /`DEMO-\$\{new Date\(\)\.getFullYear\(\)\}-\$\{crypto\.randomUUID/);
   assert.doesNotMatch(edge, /select\("id,username,password_hash,fullname,name,status,language"\)/);
   assert.match(edge, /students"\)\.select\("id,name,username,notes,status"\)/);
   assert.match(edge, /candidate === "student"[\s\S]*password_hash,name,status,language[\s\S]*password_hash,fullname,status,language/);
@@ -235,4 +287,11 @@ test('keeps the authenticated app shell below the preview notice without a doubl
   for (const selector of ['modal-overlay', 'link-modal', 'lightbox', 'maintenance-screen', 'hamburger-menu']) {
     assert.match(css, new RegExp(`\\.${selector}\\s*\\{[\\s\\S]*?inset: var\\(--portfolio-demo-notice-height, 0px\\) 0 0`));
   }
+});
+
+test('does not open the Add Student modal during the Strict Mode mount replay', async () => {
+  const studentsPage = await read('apps/cn/src/pages/StudentsPage/StudentsPage.jsx');
+  assert.match(studentsPage, /const previousAddSignal = useRef\(openAddSignal\)/);
+  assert.match(studentsPage, /if \(openAddSignal === previousAddSignal\.current\) return/);
+  assert.doesNotMatch(studentsPage, /firstAddSignal/);
 });

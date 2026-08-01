@@ -25,6 +25,9 @@ test('deductions consume the oldest receipt before newer receipts', () => {
 });
 
 test('receipt numbers accept more than three sequence digits', () => {
+  assert.equal(isValidReceiptNo('2026-001'), true);
+  assert.equal(isValidReceiptNo('2026-0001'), true);
   assert.equal(isValidReceiptNo('2026-1000'), true);
   assert.equal(isValidReceiptNo('2026-99'), false);
+  assert.equal(isValidReceiptNo('DEMO-2026-001'), false);
 });

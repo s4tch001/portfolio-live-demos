@@ -3,7 +3,7 @@
 ## Supported versions
 
 - Node.js: major version 24, an LTS release line
-- npm: major version 11
+- npm: major version 11 or 12 (npm 11.11.0 remains the pinned deployment version)
 - Git default branch: main
 - Intended private remote: https://github.com/s4tch001/portfolio-live-demos
 

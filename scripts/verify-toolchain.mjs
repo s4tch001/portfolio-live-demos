@@ -104,8 +104,8 @@ async function main() {
   }
 
   const npmVersion = installedNpmVersion();
-  if (majorVersion(npmVersion) !== 11) {
-    failures.push("npm major version 11 is required.");
+  if (![11, 12].includes(majorVersion(npmVersion))) {
+    failures.push("npm major version 11 or 12 is required.");
   }
 
   if (nvmVersion !== "26") {
@@ -114,7 +114,7 @@ async function main() {
   if (rootPackage.packageManager !== "npm@11.11.0") {
     failures.push("packageManager must remain pinned to npm 11.11.0.");
   }
-  if (rootPackage.engines?.node !== ">=24 <27" || rootPackage.engines?.npm !== ">=11 <12") {
+  if (rootPackage.engines?.node !== ">=24 <27" || rootPackage.engines?.npm !== ">=11 <13") {
     failures.push("package.json engine ranges do not match the supported toolchain.");
   }
   if (
