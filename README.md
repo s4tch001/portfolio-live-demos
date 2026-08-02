@@ -1,86 +1,82 @@
 # Portfolio Live Demos
 
-Resettable public demos for the projects featured on [pauuu.dev](https://pauuu.dev).
-This repo is separate from the original project repositories, so portfolio
-visitors can try the apps without touching production data.
+Resettable public demos for the projects featured on [pauuu.dev](https://pauuu.dev). This repository is separate from the original project repositories so visitors can try the apps without touching production data.
 
-## Live Demos
+## Live demos
 
-- [CN Class Management](https://cn-demo.pauuu.dev)
-- [RCMI Attendance Checker](https://rcmi-demo.pauuu.dev) - open `/administrator` manually for the administrator panel
-- [Hours Tracker](https://hours-demo.pauuu.dev)
-- [Payroll Splitter](https://payroll-demo.pauuu.dev)
-- [P Travels](https://travels-demo.pauuu.dev)
+| Demo | Public URL | Runtime/data model |
+| --- | --- | --- |
+| CN Class Management / Sunset-Speaks | [cn-demo.pauuu.dev](https://cn-demo.pauuu.dev) | React/Vite, Supabase Edge API, private CN schema and bounded Storage uploads |
+| RCMI Attendance Checker | [rcmi-demo.pauuu.dev](https://rcmi-demo.pauuu.dev) | React/Vite, Supabase Edge API, private directory and attendance schema |
+| Hours Tracker | [hours-demo.pauuu.dev](https://hours-demo.pauuu.dev) | Vanilla JavaScript/Vite, Supabase Edge API, session-isolated hour entries |
+| Payroll Splitter | [payroll-demo.pauuu.dev](https://payroll-demo.pauuu.dev) | Vanilla JavaScript/Vite, browser-only calculations |
+| P Travels | [travels-demo.pauuu.dev](https://travels-demo.pauuu.dev) | React/Vite static showcase with no persistence |
 
-Each demo shows a persistent portfolio notice explaining that it is a shared
-preview. Visitor-created data is cleared daily, protected seed records are
-restored, and every demo subdomain includes its own P-Devs metadata, canonical
-URL, sitemap, robots policy, and `llms.txt`.
+The RCMI administrator preview is available at `/administrator`. Each demo displays a shared portfolio notice explaining that it is a disposable preview. Visitor-created data is cleared daily, protected seed records are restored, and demo credentials must not be changed or reused elsewhere.
 
-## What This Repo Contains
+## What this repository contains
 
-- Isolated demo editions of five portfolio projects
-- Shared preview notices with hide/show controls
-- Netlify-ready frontend builds
-- Supabase schema, Edge Function, and reset tooling
+- Isolated Vite demo editions of five portfolio projects
+- Shared `@pauuu-demo/demo-shell` notices with hide/show controls
+- Netlify-ready frontend builds for five custom demo subdomains
+- Supabase schemas, Edge Functions, and reset-coordinator tooling
 - Fictional seed data for CN Class Management and RCMI Attendance Checker
 - Daily reset behavior based on the Asia/Manila logical date
-- Security headers, robots controls, and immutable caching for hashed assets
+- Security headers, robots policies, `llms.txt` files, and immutable caching for hashed assets
 
-The demos use public Supabase publishable keys where browser access is required.
-Server-only secrets, database passwords, Netlify tokens, GitHub tokens, and local
-`.env` files must stay out of the repository.
+The demo metadata is intentionally kept per application: every app owns its title, canonical URL, social cards, structured data, sitemap, robots policy, and `llms.txt`. These are portfolio previews and should not be mistaken for the canonical P-Devs website or production client systems.
+
+## Deployment status
+
+Deployment evidence is tracked in `config/deployment-state.json`. The recorded Phase 4.5 state confirms:
+
+- Five Netlify sites and their `pauuu.dev` custom domains are configured.
+- HTTPS, custom domains, security headers, immutable assets, SPA routes, and app APIs have live-verification evidence.
+- CN, RCMI, and Hours Edge APIs use app-specific publishable keys and protected server-side operations.
+- The Supabase reset coordinator and scheduled daily reset workflow are active and idempotent.
+- All five demo applications are enabled in the deployment state.
 
 ## Stack
 
 - Vite-based demo frontends
-- Netlify Free for hosting
-- Supabase for backend, database, Edge Functions, and scheduled reset jobs
-- Cloudflare DNS for demo subdomains under `pauuu.dev`
+- React 19 for CN, RCMI, and Travels
+- Vanilla JavaScript for Hours and Payroll
+- Netlify for frontend hosting
+- Supabase for database, Edge Functions, Storage, and scheduled reset jobs
+- Cloudflare DNS for the demo subdomains under `pauuu.dev`
 
-## Local Setup
+## Local setup
 
-Use the Node.js version in `.nvmrc` (`26`). npm 11 remains the pinned deployment
-toolchain, while local development also accepts npm 12.
+Use the Node.js version in `.nvmrc` (`26`). The repository requires Node `>=24 <27` and npm `>=11 <13`.
 
 ```powershell
 npm.cmd install --ignore-scripts
 ```
 
-To start the CN frontend, Edge API, and a freshly reset local-only database with
-only the three protected preview accounts, open Docker Desktop and run:
+To start the CN frontend, Edge API, and a freshly reset local-only database with the protected preview accounts, open Docker Desktop and run:
 
 ```powershell
 npm.cmd run dev:cn-local
 ```
 
-This command builds an isolated local migration profile, skips the hosted reset
-scheduler migrations, uses explicit local Supabase flags, refuses non-loopback
-API URLs, and never reads or writes the deployed demo database.
+This command builds an isolated local migration profile, skips hosted reset-scheduler migrations, uses explicit local Supabase flags, refuses non-loopback API URLs, and never reads or writes the deployed demo database.
 
-The blank local database contains only `admin`, `testteacher`, and `teststudent`;
-all three use `password`. It contains no schedules, reports, class packages, or
-other sample records. Image uploads use the local private Storage bucket and
-return loopback-only signed URLs; they never use the hosted Supabase project.
-Stopping through the helper deletes this isolated project's ephemeral database
-and Storage volumes so uploaded files do not accumulate on disk.
+The blank local database contains only `admin`, `testteacher`, and `teststudent`; all three use the documented demo password. It contains no schedules, reports, class packages, or other sample records. Image uploads use the local private Storage bucket and return loopback-only signed URLs.
 
-On Windows, the interactive helper can start or stop the CN app, its exact
-local Supabase project, and optionally Docker Desktop:
+On Windows, the interactive helper can start or stop the CN app, its exact local Supabase project, and optionally Docker Desktop:
 
 ```powershell
 .\tool.ps1
 ```
 
-Copy `.env.example` into an ignored local env file when a command needs public
-demo configuration. Do not place service-role keys or other server secrets in
-Vite variables.
+Copy `.env.example` into an ignored local env file when a command needs public demo configuration. Never place service-role keys or other server secrets in Vite variables.
 
-## Common Commands
+## Common commands
 
 ```powershell
 npm.cmd run check
 npm.cmd run build:apps
+npm.cmd test
 npm.cmd audit --audit-level=high
 ```
 
@@ -90,20 +86,17 @@ Optional live audit:
 npm.cmd run audit:netlify:live
 ```
 
-`audit:netlify:live` checks the custom domains by default and requires the
-app-specific publishable keys in the environment. Set `DEMO_HOST_MODE=netlify`
-to check the original Netlify hostnames instead. The audit does not print or
-store key values.
+`audit:netlify:live` checks the custom domains by default and requires the app-specific publishable keys in the environment. Set `DEMO_HOST_MODE=netlify` to check the original Netlify hostnames instead. The audit does not print or store key values.
 
-## Demo Safety Rules
+## Demo safety rules
 
 - Demo credentials in preview notices are intentional test accounts.
 - Default credentials and protected seed data must survive daily resets.
 - Visitors must not be able to change protected default credentials.
 - CN, RCMI, and Hours use app-specific publishable keys and isolated API routes.
 - Payroll and Travels do not persist visitor data.
-- Demo pages are indexable portfolio showcases. Keep their canonical URLs,
-  sitemaps, robots policies, and reset-data notices accurate.
+- Do not enter real personal, school, attendance, payroll, or client information.
+- Keep each app's canonical URL, sitemap, robots policy, `llms.txt`, and reset-data notice accurate.
 
 ## Documentation
 
@@ -117,6 +110,5 @@ store key values.
 - System design: `docs/architecture/system-design.md`
 - Daily reset contract: `docs/architecture/reset-contract.md`
 - Source isolation rules: `config/source-import-policy.json`
-- Supabase setup/deployment history: `docs/supabase-setup.md` and
-  `docs/supabase-deployment.md`
+- Supabase setup and deployment history: `docs/supabase-setup.md` and `docs/supabase-deployment.md`
 - Preview baseline requirements: `specs/demo-preview-baselines.spec.md`
