@@ -46,23 +46,37 @@ test('isolates visitor entries by server-issued session and bounds stored hours'
   assert.match(edge, /delete\(\)\.eq\("token_hash", tokenHash\)/);
 });
 
-test('generates a stable, bounded Hours baseline inside the Manila logical month', () => {
+test('adds Hours samples only after each Manila workday is complete', () => {
   const julyStart = createHoursSampleEntries('2026-07-01');
+  const julySecond = createHoursSampleEntries('2026-07-02');
   const julyEnd = createHoursSampleEntries('2026-07-31');
   const august = createHoursSampleEntries('2026-08-01');
+  const augustSaturday = createHoursSampleEntries('2026-08-08');
+  const augustSunday = createHoursSampleEntries('2026-08-09');
+  const augustTuesday = createHoursSampleEntries('2026-08-11');
 
-  assert.deepEqual(julyStart, julyEnd);
-  assert.notDeepEqual(julyStart, august);
-  assert.equal(julyStart.length, 12);
-  assert.ok(julyStart.every((entry) => entry.dateKey.startsWith('2026-07-')));
+  assert.deepEqual(julyStart, []);
+  assert.equal(julySecond.length, 1);
+  assert.equal(julySecond[0].dateKey, '2026-07-01');
+  assert.ok(julyEnd.length > julySecond.length && julyEnd.length <= 23);
+  assert.deepEqual(august, []);
+  assert.equal(augustSaturday.length, 5);
+  assert.deepEqual(augustSaturday, augustSunday);
+  assert.equal(augustTuesday.length, 6);
+  assert.ok(julyEnd.every((entry) => entry.dateKey.startsWith('2026-07-')));
   assert.ok(august.every((entry) => entry.dateKey.startsWith('2026-08-')));
-  assert.ok(julyStart.every((entry) => (
+  assert.ok(julyEnd.every((entry) => (
     entry.hoursList.length >= 1
     && entry.hoursList.every((hours) => hours > 0 && hours <= 24)
     && entry.hoursList.reduce((sum, hours) => sum + hours, 0) <= 24
   )));
   assert.equal(monthKeyFromLogicalDate('2028-02-29'), '2028-02');
   assert.throws(() => monthKeyFromLogicalDate('2027-02-29'), TypeError);
+});
+
+test('allows an empty first-of-month Hours baseline without failing login', async () => {
+  const edge = await read('supabase/functions/hours-api/index.ts');
+  assert.match(edge, /if \(sampleRows\.length > 0\)/);
 });
 
 test('changes the logical month exactly at midnight in Asia/Manila', () => {

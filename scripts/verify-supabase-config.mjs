@@ -192,10 +192,13 @@ async function main() {
     "20260730000200",
     "20260808000100"
   ];
+  const expectedPendingMigrationVersions = ["20260808000200"];
   if (
     !["4.4", "4.5"].includes(deployment.phase) ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
+    JSON.stringify(deployment.supabase?.pendingMigrationVersions) !== JSON.stringify(expectedPendingMigrationVersions) ||
+    JSON.stringify(deployment.supabase?.pendingEdgeFunctions) !== JSON.stringify(["hours-api"]) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {

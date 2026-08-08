@@ -32,12 +32,15 @@ test('seeds realistic current-month RCMI preview directory and attendance data',
   assert.match(migration, /rcmi_demo\.attendance/);
 });
 
-test('anchors all visible RCMI baseline dates to the Manila month', async () => {
-  const migration = await read('supabase/migrations/20260808000100_anchor_demo_dates_to_manila_month.sql');
-  assert.match(migration, /perform rcmi_demo\.reset_demo_data_month_source\(month_start\)/);
-  assert.match(migration, /created_at = month_start \+/);
-  assert.match(migration, /set effective_date = member\.created_at/);
-  assert.match(migration, /revoke all on function rcmi_demo\.reset_demo_data_month_source\(date\)/);
+test('adds RCMI attendance only after each Manila service date is complete', async () => {
+  const anchorMigration = await read('supabase/migrations/20260808000100_anchor_demo_dates_to_manila_month.sql');
+  const dailyMigration = await read('supabase/migrations/20260808000200_progress_demo_data_after_day_end.sql');
+  assert.match(anchorMigration, /revoke all on function rcmi_demo\.reset_demo_data_month_source\(date\)/);
+  assert.match(dailyMigration, /reset_demo_data_month_source\(p_logical_date\)/);
+  assert.match(dailyMigration, /attendance\.attendance_date >= p_logical_date/);
+  assert.match(dailyMigration, /created_at = month_start \+/);
+  assert.match(dailyMigration, /set effective_date = member\.created_at/);
+  assert.match(dailyMigration, /revoke all on function rcmi_demo\.reset_demo_data\(date\)/);
   assert.equal(formatMonth(todayAtStart(new Date('2026-07-31T15:59:59.999Z'))), '07-2026');
   assert.equal(formatMonth(todayAtStart(new Date('2026-07-31T16:00:00.000Z'))), '08-2026');
 });

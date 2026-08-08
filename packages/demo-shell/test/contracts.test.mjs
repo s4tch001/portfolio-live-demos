@@ -113,20 +113,22 @@ test("locks the persistent fictional CN baseline and restricted admin access", (
   assert.equal(Object.isFrozen(cn), true);
 });
 
-test("publishes one Manila monthly-rollover policy for dated demo data", () => {
+test("publishes one Manila daily-progression policy for dated demo data", () => {
   assert.deepEqual(MONTHLY_DEMO_DATE_POLICY, {
     timezone: "Asia/Manila",
     rolloverLocalTime: "00:00",
     rolloverDay: 1,
-    stableWithinMonth: true,
+    stableWithinMonth: false,
+    progressesDaily: true,
+    completedDateRule: "strictly-before-current-manila-date",
     projects: {
-      cn: "schedules-reports-transactions-and-usage",
-      rcmi: "directory-role-history-and-attendance",
-      hours: "session-isolated-hour-entries"
+      cn: "monthly-schedules-with-completed-date-reports",
+      rcmi: "directory-role-history-and-completed-date-attendance",
+      hours: "completed-workday-session-entries"
     }
   });
-  assert.equal(getPersistentDemoBaseline("cn").dateStrategy, "stable-within-manila-logical-month");
-  assert.equal(getPersistentDemoBaseline("rcmi").dateStrategy, "stable-within-manila-logical-month");
+  assert.equal(getPersistentDemoBaseline("cn").dateStrategy, "current-manila-month-with-completed-date-progression");
+  assert.equal(getPersistentDemoBaseline("rcmi").dateStrategy, "current-manila-month-with-completed-date-progression");
   assert.equal(Object.isFrozen(MONTHLY_DEMO_DATE_POLICY.projects), true);
 });
 

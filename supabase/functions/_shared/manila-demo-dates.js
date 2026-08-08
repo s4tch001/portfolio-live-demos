@@ -36,9 +36,8 @@ export function monthKeyFromLogicalDate(logicalDate) {
 }
 
 export function createHoursSampleEntries(logicalDate) {
-  const { year, month } = parseDateKey(logicalDate);
+  const { year, month, day: logicalDay } = parseDateKey(logicalDate);
   const monthKey = `${year}-${String(month).padStart(2, "0")}`;
-  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const hourPatterns = [
     [4],
     [3.5, 2],
@@ -55,13 +54,13 @@ export function createHoursSampleEntries(logicalDate) {
   ];
 
   const workdays = [];
-  for (let day = 1; day <= daysInMonth && workdays.length < hourPatterns.length; day += 1) {
+  for (let day = 1; day < logicalDay; day += 1) {
     const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
     if (weekday !== 0 && weekday !== 6) workdays.push(day);
   }
 
   return workdays.map((day, index) => ({
     dateKey: `${monthKey}-${String(day).padStart(2, "0")}`,
-    hoursList: [...hourPatterns[index]]
+    hoursList: [...hourPatterns[index % hourPatterns.length]]
   }));
 }

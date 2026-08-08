@@ -131,10 +131,12 @@ async function authenticate(request: Request, database: any) {
     date_key: entry.dateKey,
     hours_list: entry.hoursList
   }));
-  const sampleInsert = await database.from("entries").insert(sampleRows);
-  if (sampleInsert.error) {
-    await database.from("sessions").delete().eq("token_hash", tokenHash);
-    throw new ApiError(503, "database_unavailable");
+  if (sampleRows.length > 0) {
+    const sampleInsert = await database.from("entries").insert(sampleRows);
+    if (sampleInsert.error) {
+      await database.from("sessions").delete().eq("token_hash", tokenHash);
+      throw new ApiError(503, "database_unavailable");
+    }
   }
 
   return { token, logicalDate: currentLogicalDate, timezone: MANILA_TIMEZONE };

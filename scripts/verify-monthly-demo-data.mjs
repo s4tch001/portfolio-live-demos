@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 
+import { createHoursSampleEntries } from '../supabase/functions/_shared/manila-demo-dates.js';
+
 const SUPABASE_URL = 'https://ivqfxdibluhgyttgxbmz.supabase.co';
 const TIMEZONE = 'Asia/Manila';
 const timeout = () => AbortSignal.timeout(20_000);
@@ -60,13 +62,17 @@ const [schedules, reports, transactions] = await Promise.all([
   request('cn', `/reports?${range}`, { token: cnLogin.token }),
   request('cn', '/class-transactions', { token: cnLogin.token }),
 ]);
-assert.ok(schedules.length > 0 && reports.length > 0 && transactions.length > 0, 'CN monthly baseline is incomplete');
+assert.ok(schedules.length > 0 && transactions.length > 0, 'CN monthly baseline is incomplete');
 assert.ok(schedules.every((row) => String(row.date).startsWith(`${monthKey}-`)), 'CN schedule escaped the Manila month');
 assert.ok(reports.every((row) => String(row.date).startsWith(`${monthKey}-`)), 'CN report escaped the Manila month');
+assert.ok(reports.every((row) => String(row.date) < logicalDate), 'CN report exists before its schedule day is complete');
 assert.ok(transactions.every((row) => String(row.date).startsWith(`${monthKey}-`)), 'CN transaction escaped the Manila month');
 const absentReports = reports.filter((row) => row.absent);
 const absentReasons = [...new Set(absentReports.map((row) => row.absent_reason))].sort();
-assert.deepEqual(absentReasons, ['Late Notice', 'No Notice', 'Other'].sort(), 'CN absence examples are incomplete');
+assert.ok(
+  absentReasons.every((reason) => ['Late Notice', 'No Notice', 'Other'].includes(reason)),
+  'CN absence example is invalid',
+);
 
 const [rcmiMembers, rcmiAttendance] = await Promise.all([
   request('rcmi', '/members'),
@@ -78,10 +84,16 @@ assert.ok(
   'RCMI member date escaped the Manila month',
 );
 const attendanceDates = Object.keys(rcmiAttendance.days ?? {});
-assert.ok(attendanceDates.length > 0, 'RCMI attendance baseline is unavailable');
 assert.ok(
   attendanceDates.every((date) => date.endsWith(`-${year}`) && date.startsWith(`${String(month).padStart(2, '0')}-`)),
   'RCMI attendance date escaped the Manila month',
+);
+assert.ok(
+  attendanceDates.every((date) => {
+    const [dateMonth, dateDay, dateYear] = date.split('-');
+    return `${dateYear}-${dateMonth}-${dateDay}` < logicalDate;
+  }),
+  'RCMI attendance exists before its Manila day is complete',
 );
 
 const hoursLogin = await request('hours', '/session', {
@@ -90,8 +102,13 @@ const hoursLogin = await request('hours', '/session', {
 });
 assert.equal(hoursLogin.logicalDate, logicalDate, 'Hours API returned the wrong Manila logical date');
 const hours = await request('hours', `/entries?month=${monthKey}`, { token: hoursLogin.token });
-assert.equal(hours.entries.length, 12, 'Hours monthly baseline count is incorrect');
+assert.equal(
+  hours.entries.length,
+  createHoursSampleEntries(logicalDate).length,
+  'Hours completed-workday baseline count is incorrect',
+);
 assert.ok(hours.entries.every((row) => row.dateKey.startsWith(`${monthKey}-`)), 'Hours entry escaped the Manila month');
+assert.ok(hours.entries.every((row) => row.dateKey < logicalDate), 'Hours entry exists before its Manila day is complete');
 
 console.log(JSON.stringify({
   ok: true,

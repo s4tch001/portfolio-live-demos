@@ -26,6 +26,9 @@
       "20260730000200",
       "20260808000100"
     ],
+    "pendingMigrationVersions": [
+      "20260808000200"
+    ],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
     "dataApi": {
@@ -52,6 +55,7 @@
       "rcmi-api": { "status": "active", "version": 7, "verifyJwt": false },
       "hours-api": { "status": "active", "version": 7, "verifyJwt": false }
     },
+    "pendingEdgeFunctions": ["hours-api"],
     "namedKeys": {
       "automations": "configured",
       "cn_demo": "configured",
@@ -243,7 +247,7 @@
       },
       "rcmiAdministratorNavigationHint": true
     },
-    "frontendRedeployRequired": false
+    "frontendRedeployRequired": true
   },
   "cloudflare": {
     "plan": "Free",

@@ -8,14 +8,21 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
 const appIds = ['cn', 'rcmi', 'hours', 'payroll', 'travels'];
 
-test('deployment record matches all committed migration versions', async () => {
+test('deployment record accounts for applied and explicitly pending migration versions', async () => {
   const state = JSON.parse(await read('config/deployment-state.json'));
   const files = await readdir(path.join(root, 'supabase', 'migrations'));
   const versions = files
     .filter((filename) => /^\d{14}_.+\.sql$/.test(filename))
     .map((filename) => filename.slice(0, 14))
     .sort();
-  assert.deepEqual(state.supabase.migrationVersions, versions);
+  const recordedVersions = [
+    ...state.supabase.migrationVersions,
+    ...state.supabase.pendingMigrationVersions,
+  ].sort();
+  assert.deepEqual(recordedVersions, versions);
+  assert.equal(new Set(recordedVersions).size, recordedVersions.length);
+  assert.deepEqual(state.supabase.pendingMigrationVersions, ['20260808000200']);
+  assert.deepEqual(state.supabase.pendingEdgeFunctions, ['hours-api']);
   assert.equal(state.supabase.remoteMigrationHistoryVerified, true);
   assert.equal(state.supabase.remoteLintErrorCount, 0);
 });

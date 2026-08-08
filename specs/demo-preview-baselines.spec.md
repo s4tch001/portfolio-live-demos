@@ -51,9 +51,9 @@ While the `admin` default account is authenticated, when it directly requests a 
 
 While the `admin` default account is authenticated, the system shall show the generated teachers, students, relative-date schedules, submitted class reports, receipts, class balances, usage, and annual/reporting views that it is allowed to access.
 
-### FR-CN-007: Manila-month schedule dates
+### FR-CN-007: Manila-month schedules with completed-day reports
 
-When the daily reset restores CN baseline schedules, reports, transactions, and usage, the system shall derive their dates from the current logical `Asia/Manila` month. The generated date set shall remain stable inside that month and shift on the first day of the next month at 00:00 Manila time.
+When the daily reset restores CN baseline schedules, reports, transactions, and usage, the system shall derive their dates from the current logical `Asia/Manila` month. Schedules shall cover the month, while a generated report and its usage shall appear only when the schedule date is strictly earlier than the current Manila logical date.
 
 ### FR-RCMI-001: Generated directory baseline
 
@@ -61,11 +61,11 @@ Where the RCMI demo is active, the system shall restore a small fictional direct
 
 ### FR-RCMI-002: Generated attendance baseline
 
-When the daily reset restores RCMI directory, role-history, and attendance records, the system shall keep all visible sample dates inside the current logical `Asia/Manila` month and use a stable date set within that month.
+When the daily reset restores RCMI directory, role-history, and attendance records, the system shall keep all visible sample dates inside the current logical `Asia/Manila` month. Generated attendance shall appear only for service dates strictly earlier than the current Manila logical date.
 
-### FR-HOURS-001: Session-isolated monthly sample entries
+### FR-HOURS-001: Session-isolated completed-workday entries
 
-When a visitor successfully unlocks Hours Tracker, the system shall create a bounded fictional hours baseline for that session only. Every sample entry shall use the current logical `Asia/Manila` month, and the visitor may edit or delete the isolated entries without affecting another session.
+When a visitor successfully unlocks Hours Tracker, the system shall create a bounded fictional hours baseline for that session only. It shall create one sample entry for each completed weekday in the current logical `Asia/Manila` month, excluding the current day, and the visitor may edit or delete the isolated entries without affecting another session.
 
 ### FR-RESET-001: Baseline preservation
 
@@ -112,7 +112,8 @@ Where a portfolio project has both a live production link and a demo link, the p
 
 - Baseline restore operations must be deterministic and idempotent.
 - Partial reset retries must converge to one complete baseline without duplicates.
-- Monthly demo dates must use the logical `Asia/Manila` month, not the Edge Function region or browser timezone.
+- Monthly demo dates and completed-day cutoffs must use the logical `Asia/Manila` date, not the Edge Function region or browser timezone.
+- At 00:00 Manila time, the previous day becomes eligible for generated reports, hours, and attendance.
 
 ### Usability and accessibility
 
@@ -140,6 +141,13 @@ Given the visitor signs in as `admin`
 When they open accounts, schedules, reports, and allowed remaining-class views
 Then the generated teachers, students, schedules, reports, receipts, balances, and usage are visible
 And the records are identified collectively as fictional preview data.
+
+### AC-002A: Completed-day progression
+
+Given the current Manila logical date is within a demo month
+When the daily reset completes
+Then CN reports, Hours entries, and RCMI attendance contain no current-day or future-dated generated records
+And eligible completed dates appear after the next 00:00 Manila reset.
 
 ### AC-003: CN restricted controls are absent
 

@@ -8,18 +8,20 @@ export const MONTHLY_DEMO_DATE_POLICY = Object.freeze({
   timezone: "Asia/Manila",
   rolloverLocalTime: "00:00",
   rolloverDay: 1,
-  stableWithinMonth: true,
+  stableWithinMonth: false,
+  progressesDaily: true,
+  completedDateRule: "strictly-before-current-manila-date",
   projects: Object.freeze({
-    cn: "schedules-reports-transactions-and-usage",
-    rcmi: "directory-role-history-and-attendance",
-    hours: "session-isolated-hour-entries"
+    cn: "monthly-schedules-with-completed-date-reports",
+    rcmi: "directory-role-history-and-completed-date-attendance",
+    hours: "completed-workday-session-entries"
   })
 });
 
 const cnBaseline = {
   projectId: "cn",
   timezone: "Asia/Manila",
-  dateStrategy: "stable-within-manila-logical-month",
+  dateStrategy: "current-manila-month-with-completed-date-progression",
   resetPolicy: "restore-protected-baseline-after-visitor-data-purge",
   generated: true,
   accounts: {
@@ -284,7 +286,7 @@ const cnBaseline = {
 const rcmiBaseline = {
   projectId: "rcmi",
   timezone: "Asia/Manila",
-  dateStrategy: "stable-within-manila-logical-month",
+  dateStrategy: "current-manila-month-with-completed-date-progression",
   resetPolicy: "restore-protected-baseline-after-visitor-data-purge",
   generated: true,
   roleHistoryStrategy: "one-relative-baseline-row-per-member",
@@ -339,16 +341,16 @@ const rcmiBaseline = {
     }
   ],
   attendance: [
-    { memberKey: "leader-a", dayOffset: 0 },
-    { memberKey: "leader-b", dayOffset: 0 },
-    { memberKey: "member-a", dayOffset: 0 },
-    { memberKey: "member-c", dayOffset: 0 },
-    { memberKey: "guest-a", dayOffset: 0 },
     { memberKey: "leader-a", dayOffset: -1 },
+    { memberKey: "leader-b", dayOffset: -1 },
     { memberKey: "member-a", dayOffset: -1 },
-    { memberKey: "member-b", dayOffset: -1 },
-    { memberKey: "leader-b", dayOffset: -2 },
-    { memberKey: "member-d", dayOffset: -2 }
+    { memberKey: "member-c", dayOffset: -1 },
+    { memberKey: "guest-a", dayOffset: -1 },
+    { memberKey: "leader-a", dayOffset: -2 },
+    { memberKey: "member-a", dayOffset: -2 },
+    { memberKey: "member-b", dayOffset: -2 },
+    { memberKey: "leader-b", dayOffset: -3 },
+    { memberKey: "member-d", dayOffset: -3 }
   ]
 };
 
