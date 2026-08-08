@@ -92,6 +92,7 @@ function App() {
   // Session cache of present-by-day data, keyed by "MM-YYYY" -> days. Lives until
   // the page is refreshed, so revisiting a month never refetches from Supabase.
   const monthCache = useRef(new Map());
+  const manilaMonthKey = useRef(formatMonth(todayAtStart()));
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -101,6 +102,30 @@ function App() {
   useEffect(() => {
     loadMembers();
     loadSettings();
+  }, []);
+
+  useEffect(() => {
+    function refreshManilaMonth() {
+      const manilaToday = todayAtStart();
+      const nextMonthKey = formatMonth(manilaToday);
+      if (nextMonthKey === manilaMonthKey.current) return;
+      manilaMonthKey.current = nextMonthKey;
+      monthCache.current.clear();
+      setViewerViewDate(manilaToday);
+      setEditorViewDate(manilaToday);
+      setSelectedDate(formatDate(manilaToday));
+    }
+
+    function refreshWhenVisible() {
+      if (!document.hidden) refreshManilaMonth();
+    }
+
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    window.addEventListener('focus', refreshManilaMonth);
+    return () => {
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+      window.removeEventListener('focus', refreshManilaMonth);
+    };
   }, []);
 
   // The viewer month drives the present-by-day data (one request per month).

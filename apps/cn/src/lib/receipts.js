@@ -1,6 +1,7 @@
 import { apiFetch, queryPath } from './apiClient.js';
 import { getReceiptGroups } from './receiptSelection.js';
 import { isValidReceiptNo } from './receiptValidation.js';
+import { manilaToday } from './format.js';
 
 export { getOldestReceiptAllocations } from './receiptSelection.js';
 export { isValidReceiptNo } from './receiptValidation.js';
@@ -22,7 +23,7 @@ export async function isReceiptTaken(no) {
 
 export async function getNextReceiptNo() {
   try {
-    const d = await apiFetch(queryPath('/receipts/next', { year: new Date().getFullYear() }));
+    const d = await apiFetch(queryPath('/receipts/next', { year: manilaToday().getFullYear() }));
     return d && d.receipt_no ? d.receipt_no : '';
   } catch (e) {
     return '';

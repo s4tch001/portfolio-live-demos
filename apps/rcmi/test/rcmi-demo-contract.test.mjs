@@ -4,6 +4,8 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { formatMonth, todayAtStart } from '../src/lib/date.js';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
 
@@ -28,6 +30,16 @@ test('seeds realistic current-month RCMI preview directory and attendance data',
   assert.match(migration, /extract\(isodow from d\) in \(3, 7\)/);
   assert.match(migration, /member_index % 5/);
   assert.match(migration, /rcmi_demo\.attendance/);
+});
+
+test('anchors all visible RCMI baseline dates to the Manila month', async () => {
+  const migration = await read('supabase/migrations/20260808000100_anchor_demo_dates_to_manila_month.sql');
+  assert.match(migration, /perform rcmi_demo\.reset_demo_data_month_source\(month_start\)/);
+  assert.match(migration, /created_at = month_start \+/);
+  assert.match(migration, /set effective_date = member\.created_at/);
+  assert.match(migration, /revoke all on function rcmi_demo\.reset_demo_data_month_source\(date\)/);
+  assert.equal(formatMonth(todayAtStart(new Date('2026-07-31T15:59:59.999Z'))), '07-2026');
+  assert.equal(formatMonth(todayAtStart(new Date('2026-07-31T16:00:00.000Z'))), '08-2026');
 });
 
 test('restores the protected administrator password and leaves reset disabled', async () => {

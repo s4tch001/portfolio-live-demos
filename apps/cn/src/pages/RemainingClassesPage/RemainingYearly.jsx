@@ -3,7 +3,7 @@ import { apiFetch, queryPath } from '../../lib/apiClient.js';
 import { useData } from '../../context/DataContext.jsx';
 import { onRealtime } from '../../lib/realtime.js';
 import { useT } from '../../i18n/LanguageProvider.jsx';
-import { uiLocale } from '../../lib/format.js';
+import { manilaToday, uiLocale } from '../../lib/format.js';
 import AnnualDownloadModal from './AnnualDownloadModal.jsx';
 import AnnualMonthlyDetailsModal from './AnnualMonthlyDetailsModal.jsx';
 
@@ -195,7 +195,7 @@ export default function RemainingYearly() {
   const { teachers, students, ensureStudents } = useData();
   // `t` is used as the teacher arrow-param in a Top-5 map, so the translator is `tr`.
   const tr = useT();
-  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [year, setYear] = useState(String(manilaToday().getFullYear()));
   const [state, setState] = useState(null); // summary object | 'loading' | 'error' | null
   const [prev, setPrev] = useState(null); // previous-year summary (for deltas)
   const [errMsg, setErrMsg] = useState('');

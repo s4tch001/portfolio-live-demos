@@ -1,5 +1,7 @@
 import { withSupabase } from "npm:@supabase/server@1.4.0";
 
+import { manilaLogicalDate } from "../_shared/manila-demo-dates.js";
+
 const ALLOWED_ORIGINS = new Set([
   "https://rcmi-demo.pauuu.dev",
   "https://pauuu-rcmi-demo.netlify.app",
@@ -140,7 +142,7 @@ async function districtLeaders(database: any) {
 async function limitMutation(request: Request, database: any, category: string) {
   const marker = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   const key = await sha256(`${category}|${marker}`);
-  const logicalDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  const logicalDate = manilaLogicalDate();
   const current = await one(database.from("mutation_rate_limits").select("logical_date,request_count").eq("rate_key", key).maybeSingle());
   const count = current?.logical_date === logicalDate ? Number(current.request_count) + 1 : 1;
   if (count > 200) throw new ApiError(429, "daily_mutation_limit");
@@ -223,7 +225,7 @@ async function memberRoutes(request: Request, database: any) {
     const districtLeaderId = role === "leader" ? "pastor-sherwin" : null;
     const row = await one(database.from("members").update({ role, leader_id: leaderId, district_leader_id: districtLeaderId, updated_at: new Date().toISOString() }).eq("id", id).eq("active", true).select("*").single());
     if (!row) throw new ApiError(404, "member_not_found");
-    await database.from("member_role_history").insert({ member_id: id, role, leader_id: leaderId, effective_date: new Date().toISOString().slice(0, 10) });
+    await database.from("member_role_history").insert({ member_id: id, role, leader_id: leaderId, effective_date: manilaLogicalDate() });
     return { member: formatMember(row) };
   }
   if (request.method === "DELETE") {

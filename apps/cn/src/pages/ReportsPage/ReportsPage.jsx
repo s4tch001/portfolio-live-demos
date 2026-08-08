@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { useData } from '../../context/DataContext.jsx';
 import { useToast } from '../../context/ToastProvider.jsx';
-import { parseDate, dateToStr, formatDateNice, uiLocale } from '../../lib/format.js';
+import { parseDate, dateToStr, formatDateNice, manilaToday, uiLocale } from '../../lib/format.js';
 import { buildTeacherScheduleReportsFile, getDateRange, filenameDate } from '../../lib/exporters/xlsx.js';
 import { runExportZip, ensureRangeLoaded } from '../../lib/exporters/run.js';
 import ExportModal from '../../components/ui/ExportModal.jsx';
@@ -26,7 +26,7 @@ export default function ReportsPage() {
   const [view, setView] = useState('cal'); // cal | day | class
   const [exportModal, setExportModal] = useState({ open: false, mode: 'download' });
   const [filterTeacher, setFilterTeacher] = useState('');
-  const now = new Date();
+  const now = manilaToday();
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -98,7 +98,7 @@ export default function ReportsPage() {
   const renderCalendar = () => {
     const startDow = new Date(calYear, calMonth, 1).getDay();
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-    const today = new Date();
+    const today = manilaToday();
     const cells = [];
     for (let i = 0; i < startDow; i++) cells.push(<div className="cal-day empty" key={'e' + i} />);
     for (let day = 1; day <= daysInMonth; day++) {

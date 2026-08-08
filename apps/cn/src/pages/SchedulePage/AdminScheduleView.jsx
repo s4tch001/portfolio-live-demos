@@ -1,5 +1,5 @@
 import { memo, useMemo, useRef, useState, useEffect, useLayoutEffect } from 'react';
-import { dateToStr, parseDate, uiLocale } from '../../lib/format.js';
+import { dateToStr, manilaToday, parseDate, uiLocale } from '../../lib/format.js';
 import { getReadableTextColor } from '../../lib/accountStatus.js';
 import { apiFetch } from '../../lib/apiClient.js';
 import { onRealtime } from '../../lib/realtime.js';
@@ -375,7 +375,7 @@ export default function AdminScheduleView({
     month: 'long',
     year: 'numeric',
   });
-  const today = new Date();
+  const today = manilaToday();
   const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
   const todayDate = today.getDate();
 

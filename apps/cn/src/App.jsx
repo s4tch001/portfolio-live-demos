@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';
@@ -22,6 +22,7 @@ import {
 } from './components/guards/index.jsx';
 
 import LandingPage from './pages/public/LandingPage.jsx';
+import { manilaDateKey } from './lib/format.js';
 
 const AppShell = lazy(() => import('./components/Layout/AppShell.jsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage.jsx'));
@@ -164,6 +165,26 @@ function AppBody() {
 }
 
 export default function App() {
+  useEffect(() => {
+    let activeMonth = manilaDateKey().slice(0, 7);
+    function refreshAfterMonthRollover() {
+      const nextMonth = manilaDateKey().slice(0, 7);
+      if (nextMonth !== activeMonth) {
+        activeMonth = nextMonth;
+        window.location.reload();
+      }
+    }
+    function refreshWhenVisible() {
+      if (!document.hidden) refreshAfterMonthRollover();
+    }
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    window.addEventListener('focus', refreshAfterMonthRollover);
+    return () => {
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+      window.removeEventListener('focus', refreshAfterMonthRollover);
+    };
+  }, []);
+
   return (
     <AuthProvider>
       <LanguageProvider>

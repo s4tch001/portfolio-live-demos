@@ -12,6 +12,7 @@ import {
 import {
   DEMO_DEPLOYMENT_NOTICE,
   GENERATED_SAMPLE_NOTICE,
+  MONTHLY_DEMO_DATE_POLICY,
   PAYROLL_HOURS_BEHAVIOR,
   getPersistentDemoBaseline,
   validatePersistentDemoBaselines
@@ -110,6 +111,23 @@ test("locks the persistent fictional CN baseline and restricted admin access", (
     "security-dashboard.write"
   ]);
   assert.equal(Object.isFrozen(cn), true);
+});
+
+test("publishes one Manila monthly-rollover policy for dated demo data", () => {
+  assert.deepEqual(MONTHLY_DEMO_DATE_POLICY, {
+    timezone: "Asia/Manila",
+    rolloverLocalTime: "00:00",
+    rolloverDay: 1,
+    stableWithinMonth: true,
+    projects: {
+      cn: "schedules-reports-transactions-and-usage",
+      rcmi: "directory-role-history-and-attendance",
+      hours: "session-isolated-hour-entries"
+    }
+  });
+  assert.equal(getPersistentDemoBaseline("cn").dateStrategy, "stable-within-manila-logical-month");
+  assert.equal(getPersistentDemoBaseline("rcmi").dateStrategy, "stable-within-manila-logical-month");
+  assert.equal(Object.isFrozen(MONTHLY_DEMO_DATE_POLICY.projects), true);
 });
 
 test("locks a small persistent fictional RCMI baseline", () => {

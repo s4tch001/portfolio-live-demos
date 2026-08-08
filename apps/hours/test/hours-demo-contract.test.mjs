@@ -4,6 +4,12 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import {
+  createHoursSampleEntries,
+  manilaLogicalDate,
+  monthKeyFromLogicalDate,
+} from '../../../supabase/functions/_shared/manila-demo-dates.js';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
 
@@ -34,6 +40,35 @@ test('isolates visitor entries by server-issued session and bounds stored hours'
   assert.match(edge, /count > 200/);
   assert.match(edge, /ALLOWED_ORIGINS/);
   assert.match(edge, /https:\/\/pauuu-hours-demo\.netlify\.app/);
+  assert.match(edge, /session_hash: tokenHash/);
+  assert.match(edge, /createHoursSampleEntries\(currentLogicalDate\)/);
+  assert.match(edge, /logicalDate: currentLogicalDate/);
+  assert.match(edge, /delete\(\)\.eq\("token_hash", tokenHash\)/);
+});
+
+test('generates a stable, bounded Hours baseline inside the Manila logical month', () => {
+  const julyStart = createHoursSampleEntries('2026-07-01');
+  const julyEnd = createHoursSampleEntries('2026-07-31');
+  const august = createHoursSampleEntries('2026-08-01');
+
+  assert.deepEqual(julyStart, julyEnd);
+  assert.notDeepEqual(julyStart, august);
+  assert.equal(julyStart.length, 12);
+  assert.ok(julyStart.every((entry) => entry.dateKey.startsWith('2026-07-')));
+  assert.ok(august.every((entry) => entry.dateKey.startsWith('2026-08-')));
+  assert.ok(julyStart.every((entry) => (
+    entry.hoursList.length >= 1
+    && entry.hoursList.every((hours) => hours > 0 && hours <= 24)
+    && entry.hoursList.reduce((sum, hours) => sum + hours, 0) <= 24
+  )));
+  assert.equal(monthKeyFromLogicalDate('2028-02-29'), '2028-02');
+  assert.throws(() => monthKeyFromLogicalDate('2027-02-29'), TypeError);
+});
+
+test('changes the logical month exactly at midnight in Asia/Manila', () => {
+  assert.equal(manilaLogicalDate(new Date('2026-07-31T15:59:59.999Z')), '2026-07-31');
+  assert.equal(manilaLogicalDate(new Date('2026-07-31T16:00:00.000Z')), '2026-08-01');
+  assert.equal(manilaLogicalDate(new Date('2026-12-31T16:00:00.000Z')), '2027-01-01');
 });
 
 test('locks the password at the database and API layers', async () => {

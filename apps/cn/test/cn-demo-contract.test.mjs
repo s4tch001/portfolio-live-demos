@@ -4,6 +4,8 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { manilaDateKey, manilaToday } from '../src/lib/format.js';
+
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workspaceRoot = path.resolve(appRoot, '..', '..');
 
@@ -156,6 +158,17 @@ test('database seeds richer current-month CN preview data without exposing extra
   assert.match(migration, /update cn_demo\.class_transactions tx/);
   assert.match(migration, /activity_logs/);
   assert.doesNotMatch(await read('apps/cn/src/pages/LoginPage/LoginPage.jsx'), /amanda\.reyes|liam\.garcia|isabella\.ramos/);
+});
+
+test('keeps CN reset dates stable inside one Manila month', async () => {
+  const migration = await read('supabase/migrations/20260808000100_anchor_demo_dates_to_manila_month.sql');
+  assert.match(migration, /stable_report_cutoff := month_start \+ 13/);
+  assert.match(migration, /reset_demo_data_month_source\(stable_report_cutoff\)/);
+  assert.match(migration, /revoke all on function cn_demo\.reset_demo_data_month_source\(date\)/);
+  assert.match(migration, /revoke all on function cn_demo\.reset_demo_data\(date\)/);
+  assert.equal(manilaDateKey(new Date('2026-07-31T15:59:59.999Z')), '2026-07-31');
+  assert.equal(manilaDateKey(new Date('2026-07-31T16:00:00.000Z')), '2026-08-01');
+  assert.equal(manilaToday(new Date('2026-07-31T16:00:00.000Z')).getMonth(), 7);
 });
 
 test('CN Edge adapter returns frontend-ready receipts and yearly summaries', async () => {

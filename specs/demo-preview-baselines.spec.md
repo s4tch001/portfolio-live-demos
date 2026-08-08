@@ -51,9 +51,9 @@ While the `admin` default account is authenticated, when it directly requests a 
 
 While the `admin` default account is authenticated, the system shall show the generated teachers, students, relative-date schedules, submitted class reports, receipts, class balances, usage, and annual/reporting views that it is allowed to access.
 
-### FR-CN-007: Relative schedule dates
+### FR-CN-007: Manila-month schedule dates
 
-When the daily reset restores CN baseline schedules and reports, the system shall derive their dates from the current logical `Asia/Manila` reset date so that past, current, and upcoming examples remain meaningful.
+When the daily reset restores CN baseline schedules, reports, transactions, and usage, the system shall derive their dates from the current logical `Asia/Manila` month. The generated date set shall remain stable inside that month and shift on the first day of the next month at 00:00 Manila time.
 
 ### FR-RCMI-001: Generated directory baseline
 
@@ -61,7 +61,11 @@ Where the RCMI demo is active, the system shall restore a small fictional direct
 
 ### FR-RCMI-002: Generated attendance baseline
 
-When the daily reset restores RCMI attendance, the system shall derive sample attendance dates from the current logical `Asia/Manila` reset date.
+When the daily reset restores RCMI directory, role-history, and attendance records, the system shall keep all visible sample dates inside the current logical `Asia/Manila` month and use a stable date set within that month.
+
+### FR-HOURS-001: Session-isolated monthly sample entries
+
+When a visitor successfully unlocks Hours Tracker, the system shall create a bounded fictional hours baseline for that session only. Every sample entry shall use the current logical `Asia/Manila` month, and the visitor may edit or delete the isolated entries without affecting another session.
 
 ### FR-RESET-001: Baseline preservation
 
@@ -108,7 +112,7 @@ Where a portfolio project has both a live production link and a demo link, the p
 
 - Baseline restore operations must be deterministic and idempotent.
 - Partial reset retries must converge to one complete baseline without duplicates.
-- Relative dates must use the logical `Asia/Manila` date, not the Edge Function region or browser timezone.
+- Monthly demo dates must use the logical `Asia/Manila` month, not the Edge Function region or browser timezone.
 
 ### Usability and accessibility
 

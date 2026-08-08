@@ -4,7 +4,7 @@ import { apiFetch, getAuthToken } from '../../lib/apiClient.js';
 import { WORKER_URL } from '../../lib/workerUrl.js';
 import { useToast } from '../../context/ToastProvider.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
-import { dateToStr, formatDateNice } from '../../lib/format.js';
+import { dateToStr, formatDateNice, manilaToday } from '../../lib/format.js';
 import { getDateRange, triggerDownload } from '../../lib/exporters/xlsx.js';
 
 // Master-only data backup modal (legacy modal-data-backup + openDataBackupModal/
@@ -20,7 +20,7 @@ export default function DataBackupModal({ open, mode = 'download', onClose }) {
   // Default the range to first-of-month → today each time it opens.
   useEffect(() => {
     if (!open) return;
-    const today = new Date();
+    const today = manilaToday();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     setStart(dateToStr(firstDay));
     setEnd(dateToStr(today));

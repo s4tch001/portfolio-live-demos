@@ -7,6 +7,7 @@ import { useConfirm } from '../../context/ConfirmProvider.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import { useReceiptModal } from './ReceiptModalContext.jsx';
 import ReceiptDownloadModal from './ReceiptDownloadModal.jsx';
+import { manilaToday } from '../../lib/format.js';
 
 const YEARS = [];
 for (let y = 2026; y <= 2099; y++) YEARS.push(y);
@@ -20,7 +21,7 @@ export default function RemainingReceipts() {
   const tr = useT();
   const toast = useToast();
   const confirm = useConfirm();
-  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [year, setYear] = useState(String(manilaToday().getFullYear()));
   const [search, setSearch] = useState('');
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);

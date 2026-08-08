@@ -13,7 +13,25 @@ const DAY_NAMES = [
   'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 ];
 
-const today = new Date();
+function manilaDateKey(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Manila',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function calendarDateFromKey(key) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(key));
+  if (!match) return null;
+  const value = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return Number.isNaN(value.getTime()) ? null : value;
+}
+
+let today = calendarDateFromKey(manilaDateKey());
 let currentYear = today.getFullYear();
 let currentMonth = today.getMonth();
 let selectedDate = null;
@@ -85,6 +103,10 @@ async function loadMonth(year, month) {
   } catch (error) {
     console.error('Hours preview load failed:', error.message);
     setSyncStatus('err', error.status === 401 ? 'session expired' : 'error');
+    if (error.status === 401) {
+      sessionToken = '';
+      element('pwGate').classList.remove('hidden');
+    }
   }
 }
 
@@ -366,6 +388,12 @@ async function unlock() {
     });
     sessionToken = String(payload.token ?? '');
     if (!sessionToken) throw new Error('invalid_session');
+    const serverToday = calendarDateFromKey(payload.logicalDate);
+    if (serverToday) {
+      today = serverToday;
+      currentYear = today.getFullYear();
+      currentMonth = today.getMonth();
+    }
     input.value = '';
     element('pwGate').classList.add('hidden');
     await loadMonth(currentYear, currentMonth);
@@ -405,6 +433,25 @@ element('nextBtn').addEventListener('click', async () => {
   await loadMonth(currentYear, currentMonth);
   render();
 });
+
+async function refreshManilaMonth() {
+  const nextToday = calendarDateFromKey(manilaDateKey());
+  if (!nextToday) return;
+  const monthChanged =
+    nextToday.getFullYear() !== today.getFullYear()
+    || nextToday.getMonth() !== today.getMonth();
+  today = nextToday;
+  if (!monthChanged) return;
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
+  if (sessionToken) await loadMonth(currentYear, currentMonth);
+  render();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshManilaMonth();
+});
+window.addEventListener('focus', refreshManilaMonth);
 
 const themeToggle = element('themeToggle');
 function applyTheme(theme) {

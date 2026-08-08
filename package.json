@@ -41,6 +41,7 @@
     "audit:isolation": "node scripts/verify-isolation.mjs",
     "audit:isolation:ci": "node scripts/verify-isolation.mjs --workspace-only",
     "audit:netlify:live": "node scripts/verify-netlify-live.mjs",
+    "audit:monthly-demo-data:live": "node scripts/verify-monthly-demo-data.mjs",
     "audit:supabase": "node scripts/verify-supabase-config.mjs",
     "audit:toolchain": "node scripts/verify-toolchain.mjs",
     "build": "npm run build:apps",

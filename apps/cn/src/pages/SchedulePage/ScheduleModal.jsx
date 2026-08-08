@@ -7,7 +7,7 @@ import { findStudentForSchedule } from '../../lib/studentLookup.js';
 import { useToast } from '../../context/ToastProvider.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
 import { SCHEDULE_TIMESLOTS } from '../../lib/scheduleHelpers.js';
-import { parseDate, uiLocale, dateToStr } from '../../lib/format.js';
+import { parseDate, uiLocale, dateToStr, manilaToday } from '../../lib/format.js';
 
 // Add / Edit / View schedule modal (legacy modal-schedule + saveSchedule).
 // `locked` = the schedule already has a report → view-only (no save, delete only).
@@ -65,7 +65,7 @@ export default function ScheduleModal({
     } else {
       setTeacherId(defaults?.teacherId ? String(defaults.teacherId) : teacherOptions[0] ? String(teacherOptions[0].id) : '');
       // Default the date to today (local) for convenience when adding fresh.
-      setDate(defaults?.date || dateToStr(new Date()));
+      setDate(defaults?.date || dateToStr(manilaToday()));
       const ts = defaults?.timeslot;
       if (ts && SCHEDULE_TIMESLOTS.includes(ts)) {
         setTimeslot(ts);

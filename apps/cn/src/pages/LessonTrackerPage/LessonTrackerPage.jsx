@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
-import { dateToStr, parseDate, formatDateNice } from '../../lib/format.js';
+import { dateToStr, parseDate, formatDateNice, manilaToday } from '../../lib/format.js';
 import { getReadableTextColor, isActiveAccount } from '../../lib/accountStatus.js';
 import {
   buildLessonTrackerRows,
@@ -105,7 +105,7 @@ export default function LessonTrackerPage() {
   const tr = useT();
   const [exportModal, setExportModal] = useState({ open: false, mode: 'download' });
 
-  const now = new Date();
+  const now = manilaToday();
   const firstOfMonth = dateToStr(new Date(now.getFullYear(), now.getMonth(), 1));
   const todayStr = dateToStr(now);
   const [start, setStart] = useState(firstOfMonth);

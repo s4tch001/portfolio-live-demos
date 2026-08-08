@@ -4,10 +4,22 @@ export const GENERATED_SAMPLE_NOTICE =
 export const DEMO_DEPLOYMENT_NOTICE =
   "Demo hosting: frontend on Netlify; backend and database on Supabase.";
 
+export const MONTHLY_DEMO_DATE_POLICY = Object.freeze({
+  timezone: "Asia/Manila",
+  rolloverLocalTime: "00:00",
+  rolloverDay: 1,
+  stableWithinMonth: true,
+  projects: Object.freeze({
+    cn: "schedules-reports-transactions-and-usage",
+    rcmi: "directory-role-history-and-attendance",
+    hours: "session-isolated-hour-entries"
+  })
+});
+
 const cnBaseline = {
   projectId: "cn",
   timezone: "Asia/Manila",
-  dateStrategy: "relative-to-logical-reset-date",
+  dateStrategy: "stable-within-manila-logical-month",
   resetPolicy: "restore-protected-baseline-after-visitor-data-purge",
   generated: true,
   accounts: {
@@ -272,7 +284,7 @@ const cnBaseline = {
 const rcmiBaseline = {
   projectId: "rcmi",
   timezone: "Asia/Manila",
-  dateStrategy: "relative-to-logical-reset-date",
+  dateStrategy: "stable-within-manila-logical-month",
   resetPolicy: "restore-protected-baseline-after-visitor-data-purge",
   generated: true,
   roleHistoryStrategy: "one-relative-baseline-row-per-member",

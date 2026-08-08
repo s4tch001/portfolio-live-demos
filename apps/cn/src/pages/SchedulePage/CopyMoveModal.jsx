@@ -4,7 +4,7 @@ import { apiFetch } from '../../lib/apiClient.js';
 import { useData } from '../../context/DataContext.jsx';
 import { useToast } from '../../context/ToastProvider.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
-import { dateToStr, parseDate, formatDateNice, uiLocale } from '../../lib/format.js';
+import { dateToStr, parseDate, formatDateNice, manilaToday, uiLocale } from '../../lib/format.js';
 import { isActiveAccount } from '../../lib/accountStatus.js';
 
 // Mini month calendar used for source/dest day picking (legacy renderCopyCal /
@@ -13,7 +13,7 @@ function MiniCalendar({ year, month, onPrev, onNext, selectedDates, scheduledDat
   const first = new Date(year, month, 1);
   const startDow = first.getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date();
+  const today = manilaToday();
   const label = first.toLocaleDateString(uiLocale(), { month: 'long', year: 'numeric' });
   const cells = [];
   for (let i = 0; i < startDow; i++) cells.push(<div className="mini-cal-day empty" key={'e' + i} />);
@@ -59,7 +59,7 @@ export default function CopyMoveModal({ open, isMove, onClose, teachers, schedul
   const data = useData();
   const toast = useToast();
   const t = useT();
-  const now = new Date();
+  const now = manilaToday();
 
   const activeTeachers = useMemo(() => teachers.filter(isActiveAccount), [teachers]);
   const [selectedIds, setSelectedIds] = useState(() => new Set());

@@ -14,6 +14,7 @@ import {
   resolveAttachReceipt,
   resolveStudentId,
 } from '../../lib/receipts.js';
+import { manilaDateKey } from '../../lib/format.js';
 
 // [type value, translation key for the dropdown label]. The value stays as the
 // English type key the server expects.
@@ -43,7 +44,7 @@ const FORM_HEADS = {
   transfer: { color: '#0d9488', icon: 'fa-right-left', titleKey: 'rmod.typeTransfer', subKey: 'rmod.transferSub' },
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => manilaDateKey();
 const EMPTY = {
   student: '', receipt: '', date: '', pkg: '', teacher: '', status: '', amount: '',
   transaction: '', remarks: '', classes: '', note: '', direction: 'add',

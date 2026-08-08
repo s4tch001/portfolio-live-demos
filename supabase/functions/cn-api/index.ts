@@ -1,5 +1,7 @@
 import { withSupabase } from "npm:@supabase/server@1.4.0";
 
+import { manilaLogicalDate } from "../_shared/manila-demo-dates.js";
+
 const APP_ID = "cn";
 const ALLOWED_ORIGINS = new Set([
   "https://cn-demo.pauuu.dev",
@@ -42,6 +44,10 @@ class ApiError extends Error {
     this.status = status;
     this.code = code;
   }
+}
+
+function manilaYear() {
+  return Number(manilaLogicalDate().slice(0, 4));
 }
 
 function corsHeaders(request: Request) {
@@ -737,7 +743,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
       status: optionalString(body.status, 40),
       amount: body.amount === "" || body.amount == null ? null : Number(body.amount),
       transaction_no: optionalString(body.transaction_no, 80),
-      date: DATE.test(String(body.date ?? "")) ? body.date : new Date().toISOString().slice(0, 10),
+      date: DATE.test(String(body.date ?? "")) ? body.date : manilaLogicalDate(),
       notes: optionalString(body.notes, 1000)
     };
     return await queryOne(database.from("class_transactions").insert(values).select("*").single());
@@ -806,7 +812,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     });
   }
   if (path === "/annual-summary" && request.method === "GET") {
-    const year = Number(params.get("year") ?? new Date().getFullYear());
+    const year = Number(params.get("year") ?? manilaYear());
     const compact = params.get("compact") === "1";
     const start = `${year}-01-01`;
     const end = `${year}-12-31`;
@@ -943,7 +949,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     return { taken: Boolean(row) };
   }
   if (path === "/receipts/next" && request.method === "GET") {
-    const currentYear = new Date().getFullYear();
+    const currentYear = manilaYear();
     const requestedYear = Number(params.get("year") ?? currentYear);
     const year = Number.isInteger(requestedYear) && requestedYear >= 1000 && requestedYear <= 9999
       ? requestedYear
@@ -964,7 +970,7 @@ async function transactionRoutes(request: Request, path: string, database: any, 
     return { receipt_no: `${year}-${String(highestSequence + 1).padStart(3, "0")}` };
   }
   if (path === "/receipts" && request.method === "GET") {
-    const year = Number(params.get("year") ?? new Date().getFullYear());
+    const year = Number(params.get("year") ?? manilaYear());
     const search = String(params.get("search") ?? "").trim().toLowerCase();
     const limit = Math.min(100, Math.max(1, Number(params.get("limit") ?? 30)));
     const before = String(params.get("before") ?? "");
@@ -1072,7 +1078,7 @@ async function upload(request: Request, database: any, storage: any, session: Se
   if (!(file instanceof File) || file.size < 1 || file.size > MAX_UPLOAD_BYTES) throw new ApiError(400, "invalid_upload");
   const extension = ALLOWED_UPLOAD_TYPES.get(file.type);
   if (!extension) throw new ApiError(400, "invalid_upload_type");
-  const logicalDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  const logicalDate = manilaLogicalDate();
   const existing = await queryMany(database.from("uploads").select("id,size_bytes").eq("session_token_hash", session.tokenHash).eq("logical_date", logicalDate));
   if (existing.length >= 20) throw new ApiError(429, "upload_daily_limit");
   const allUploads = await queryMany(database.from("uploads").select("size_bytes"));

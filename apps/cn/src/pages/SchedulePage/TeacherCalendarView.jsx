@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Modal from '../../components/ui/Modal.jsx';
 import { useT } from '../../i18n/LanguageProvider.jsx';
-import { dateToStr, parseDate, uiLocale } from '../../lib/format.js';
+import { dateToStr, manilaToday, parseDate, uiLocale } from '../../lib/format.js';
 import { sortSchedulesByTime } from '../../lib/scheduleHelpers.js';
 import { useInfiniteScroll } from '../../lib/useInfiniteScroll.js';
 
@@ -68,7 +68,7 @@ export default function TeacherCalendarView({ year, month, schedules, reports, o
 
   const startDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date();
+  const today = manilaToday();
 
   const chip = (s) => {
     const isTrial = !!s.trial;

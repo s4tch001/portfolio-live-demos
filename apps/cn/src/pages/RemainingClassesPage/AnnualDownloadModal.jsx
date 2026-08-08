@@ -4,6 +4,7 @@ import { useToast } from '../../context/ToastProvider.jsx';
 import { apiFetch, queryPath } from '../../lib/apiClient.js';
 import { buildAnnualReportFile, triggerDownload } from '../../lib/exporters/xlsx.js';
 import { useT } from '../../i18n/LanguageProvider.jsx';
+import { manilaToday } from '../../lib/format.js';
 
 // Year picker for the Annual Report download. Pick one or more years → fetches
 // each year's /annual-summary and builds a single .xlsx with one sheet per year
@@ -16,7 +17,7 @@ export default function AnnualDownloadModal({ open, onClose, currentYear }) {
 
   // Offer 2025 → current year (only those can hold data). Preselect the year
   // currently on screen for convenience.
-  const nowYear = new Date().getFullYear();
+  const nowYear = manilaToday().getFullYear();
   const maxYear = Math.max(nowYear, Number(currentYear) || nowYear);
   const years = [];
   for (let y = 2025; y <= maxYear; y++) years.push(y);

@@ -1,5 +1,11 @@
 import { withSupabase } from "npm:@supabase/server@1.4.0";
 
+import {
+  createHoursSampleEntries,
+  MANILA_TIMEZONE,
+  manilaLogicalDate
+} from "../_shared/manila-demo-dates.js";
+
 const ALLOWED_ORIGINS = new Set([
   "https://hours-demo.pauuu.dev",
   "https://pauuu-hours-demo.netlify.app",
@@ -82,15 +88,6 @@ function clientMarker(request: Request) {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 }
 
-function logicalDate() {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Manila",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-}
-
 async function passwordValid(database: any, password: unknown) {
   if (typeof password !== "string" || password.length < 1 || password.length > 72) return false;
   const { data, error } = await database.rpc("verify_password", { p_password: password });
@@ -121,11 +118,26 @@ async function authenticate(request: Request, database: any) {
   }
   await database.from("login_rate_limits").delete().eq("attempt_key", attemptKey);
   const token = randomToken();
-  await database.from("sessions").insert({
-    token_hash: await sha256(token),
+  const tokenHash = await sha256(token);
+  const currentLogicalDate = manilaLogicalDate();
+  const sessionInsert = await database.from("sessions").insert({
+    token_hash: tokenHash,
     expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString()
   });
-  return { token };
+  if (sessionInsert.error) throw new ApiError(503, "database_unavailable");
+
+  const sampleRows = createHoursSampleEntries(currentLogicalDate).map((entry) => ({
+    session_hash: tokenHash,
+    date_key: entry.dateKey,
+    hours_list: entry.hoursList
+  }));
+  const sampleInsert = await database.from("entries").insert(sampleRows);
+  if (sampleInsert.error) {
+    await database.from("sessions").delete().eq("token_hash", tokenHash);
+    throw new ApiError(503, "database_unavailable");
+  }
+
+  return { token, logicalDate: currentLogicalDate, timezone: MANILA_TIMEZONE };
 }
 
 async function requireSession(request: Request, database: any) {
@@ -145,7 +157,7 @@ async function requireSession(request: Request, database: any) {
 
 async function limitMutation(database: any, sessionHash: string) {
   const rateKey = await sha256(`entries|${sessionHash}`);
-  const date = logicalDate();
+  const date = manilaLogicalDate();
   const current = await one(
     database.from("mutation_rate_limits")
       .select("logical_date,request_count")

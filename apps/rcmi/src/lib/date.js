@@ -18,9 +18,15 @@ export function formatMonth(date) {
   return `${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
 }
 
-export function todayAtStart() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+export function todayAtStart(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Manila',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return new Date(Number(values.year), Number(values.month) - 1, Number(values.day));
 }
 
 export function buildCalendarDays(viewDate) {

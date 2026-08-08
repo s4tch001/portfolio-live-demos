@@ -8,7 +8,7 @@ import StickyToolbar from '../../components/Layout/StickyToolbar.jsx';
 import ClassReportContent from '../ReportsPage/ClassReportContent.jsx';
 import { SkeletonCards } from '../../components/ui/Skeleton.jsx';
 import { useInfiniteScroll } from '../../lib/useInfiniteScroll.js';
-import { dateToStr, parseDate, uiLocale } from '../../lib/format.js';
+import { dateToStr, manilaToday, parseDate, uiLocale } from '../../lib/format.js';
 
 // Student/parent schedule (China build). Mobile-first AGENDA LIST (not a cramped
 // calendar grid): each of the student's own classes is a full-width card that
@@ -18,7 +18,7 @@ import { dateToStr, parseDate, uiLocale } from '../../lib/format.js';
 export default function StudentSchedulePage() {
   const { user } = useAuth();
   const t = useT();
-  const now = new Date();
+  const now = manilaToday();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [schedules, setSchedules] = useState([]);
@@ -124,7 +124,7 @@ export default function StudentSchedulePage() {
       })
     : '';
 
-  const today = dateToStr(new Date());
+  const today = dateToStr(manilaToday());
 
   // Every day of the month gets a row: the day's class(es), or a blank
   // "No class" placeholder — so the student can scan the whole month and spot

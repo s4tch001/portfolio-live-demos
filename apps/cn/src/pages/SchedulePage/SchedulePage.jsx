@@ -20,7 +20,7 @@ import StickyToolbar from '../../components/Layout/StickyToolbar.jsx';
 import { SkeletonCalendar, SkeletonCards, SkeletonFilterCard } from '../../components/ui/Skeleton.jsx';
 import { buildTeacherScheduleReportsFile, getDateRange } from '../../lib/exporters/xlsx.js';
 import { runExport, ensureRangeLoaded } from '../../lib/exporters/run.js';
-import { dateToStr, formatDateNice, uiLocale } from '../../lib/format.js';
+import { dateToStr, formatDateNice, manilaToday, uiLocale } from '../../lib/format.js';
 
 export default function SchedulePage() {
   const { user, isAdmin } = useAuth();
@@ -29,7 +29,7 @@ export default function SchedulePage() {
   const showConfirm = useConfirm();
   const t = useT();
 
-  const now = new Date();
+  const now = manilaToday();
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
   const [modal, setModal] = useState({
