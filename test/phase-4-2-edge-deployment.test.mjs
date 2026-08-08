@@ -25,7 +25,7 @@ test('each persistent app API accepts only its exact named publishable key', asy
   const functions = {
     'cn-api': ['cn_demo', 17],
     'rcmi-api': ['rcmi_demo', 7],
-    'hours-api': ['hours_demo', 7],
+    'hours-api': ['hours_demo', 8],
   };
 
   for (const [functionName, [keyName, version]] of Object.entries(functions)) {
@@ -57,7 +57,7 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
   assert.equal(verification.cn.monthlyFeeScheduleBalanceExempt, true);
   assert.deepEqual(
     [verification.cn.teacherCount, verification.cn.studentCount, verification.cn.scheduleCount, verification.cn.reportCount],
-    [4, 16, 336, 150],
+    [4, 16, 336, 75],
   );
   assert.equal(verification.cn.credentialMutationRejected, true);
   assert.equal(verification.cn.restrictedRoutesRejected, true);
@@ -66,7 +66,7 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
   assert.equal(verification.rcmi.passwordMutationRejected, true);
   assert.equal(verification.hours.passwordLoginVerified, true);
   assert.equal(verification.hours.entriesReadVerified, true);
-  assert.equal(verification.hours.sampleEntryCount, 12);
+  assert.equal(verification.hours.sampleEntryCount, 5);
   assert.equal(verification.hours.sampleMonth, '2026-08');
   assert.equal(verification.hours.passwordMutationRejected, true);
   assert.deepEqual(verification.monthlyDemoData, {
@@ -75,12 +75,12 @@ test('live checks cover key isolation, sample baselines, and immutable credentia
     logicalDate: '2026-08-08',
     monthKey: '2026-08',
     cnSchedules: 336,
-    cnReports: 150,
-    cnAbsentReports: 13,
+    cnReports: 75,
+    cnAbsentReports: 5,
     cnTransactions: 20,
     rcmiMembers: 16,
-    rcmiAttendanceDays: 9,
-    hoursSessionEntries: 12,
+    rcmiAttendanceDays: 2,
+    hoursSessionEntries: 5,
   });
 });
 

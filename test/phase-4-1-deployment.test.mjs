@@ -21,8 +21,8 @@ test('deployment record accounts for applied and explicitly pending migration ve
   ].sort();
   assert.deepEqual(recordedVersions, versions);
   assert.equal(new Set(recordedVersions).size, recordedVersions.length);
-  assert.deepEqual(state.supabase.pendingMigrationVersions, ['20260808000200']);
-  assert.deepEqual(state.supabase.pendingEdgeFunctions, ['hours-api']);
+  assert.deepEqual(state.supabase.pendingMigrationVersions, []);
+  assert.deepEqual(state.supabase.pendingEdgeFunctions, []);
   assert.equal(state.supabase.remoteMigrationHistoryVerified, true);
   assert.equal(state.supabase.remoteLintErrorCount, 0);
 });

@@ -190,15 +190,16 @@ async function main() {
     "20260729000300",
     "20260730000100",
     "20260730000200",
-    "20260808000100"
+    "20260808000100",
+    "20260808000200"
   ];
-  const expectedPendingMigrationVersions = ["20260808000200"];
+  const expectedPendingMigrationVersions = [];
   if (
     !["4.4", "4.5"].includes(deployment.phase) ||
     deployment.supabase?.projectRef !== project.projectRef ||
     JSON.stringify(deployment.supabase?.migrationVersions) !== JSON.stringify(expectedMigrationVersions) ||
     JSON.stringify(deployment.supabase?.pendingMigrationVersions) !== JSON.stringify(expectedPendingMigrationVersions) ||
-    JSON.stringify(deployment.supabase?.pendingEdgeFunctions) !== JSON.stringify(["hours-api"]) ||
+    JSON.stringify(deployment.supabase?.pendingEdgeFunctions) !== JSON.stringify([]) ||
     deployment.supabase?.remoteMigrationHistoryVerified !== true ||
     deployment.supabase?.remoteLintErrorCount !== 0
   ) {
@@ -253,7 +254,7 @@ async function main() {
   ) {
     failures.push("Phase 4.2 Data API exposure is incomplete or broader than the reviewed schemas.");
   }
-  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 17], ["rcmi-api", 7], ["hours-api", 7]]) {
+  for (const [name, version] of [["reset-coordinator", 5], ["cn-api", 17], ["rcmi-api", 7], ["hours-api", 8]]) {
     const edgeFunction = deployment.supabase?.edgeFunctions?.[name];
     if (edgeFunction?.status !== "active" || edgeFunction?.version !== version || edgeFunction?.verifyJwt !== false) {
       failures.push(`Phase 4.2 function deployment evidence is incomplete for ${name}.`);

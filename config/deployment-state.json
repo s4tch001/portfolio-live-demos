@@ -24,11 +24,10 @@
       "20260729000300",
       "20260730000100",
       "20260730000200",
-      "20260808000100"
-    ],
-    "pendingMigrationVersions": [
+      "20260808000100",
       "20260808000200"
     ],
+    "pendingMigrationVersions": [],
     "remoteMigrationHistoryVerified": true,
     "remoteLintErrorCount": 0,
     "dataApi": {
@@ -53,9 +52,9 @@
       "reset-coordinator": { "status": "active", "version": 5, "verifyJwt": false },
       "cn-api": { "status": "active", "version": 17, "verifyJwt": false },
       "rcmi-api": { "status": "active", "version": 7, "verifyJwt": false },
-      "hours-api": { "status": "active", "version": 7, "verifyJwt": false }
+      "hours-api": { "status": "active", "version": 8, "verifyJwt": false }
     },
-    "pendingEdgeFunctions": ["hours-api"],
+    "pendingEdgeFunctions": [],
     "namedKeys": {
       "automations": "configured",
       "cn_demo": "configured",
@@ -73,8 +72,8 @@
         "teacherCount": 4,
         "studentCount": 16,
         "scheduleCount": 336,
-        "reportCount": 150,
-        "absentReportCount": 13,
+        "reportCount": 75,
+        "absentReportCount": 5,
         "absentReasonsVerified": ["Late Notice", "No Notice", "Other"],
         "receiptScheduledTeacherVerified": true,
         "receiptReportRemarksVerified": true,
@@ -101,7 +100,7 @@
       "hours": {
         "passwordLoginVerified": true,
         "entriesReadVerified": true,
-        "sampleEntryCount": 12,
+        "sampleEntryCount": 5,
         "sampleMonth": "2026-08",
         "passwordMutationRejected": true
       },
@@ -113,12 +112,12 @@
         "logicalDate": "2026-08-08",
         "monthKey": "2026-08",
         "cnSchedules": 336,
-        "cnReports": 150,
-        "cnAbsentReports": 13,
+        "cnReports": 75,
+        "cnAbsentReports": 5,
         "cnTransactions": 20,
         "rcmiMembers": 16,
-        "rcmiAttendanceDays": 9,
-        "hoursSessionEntries": 12
+        "rcmiAttendanceDays": 2,
+        "hoursSessionEntries": 5
       }
     },
     "vault": {
