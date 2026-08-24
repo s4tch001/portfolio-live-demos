@@ -70,6 +70,6 @@
   },
   "devDependencies": {
     "@supabase/server": "1.4.0",
-    "supabase": "2.109.1"
+    "supabase": "2.115.0"
   }
 }
