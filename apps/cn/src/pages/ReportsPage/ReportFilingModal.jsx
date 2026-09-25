@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Modal from '../../components/ui/Modal.jsx';
 import Lightbox from '../../components/ui/Lightbox.jsx';
+import AiComposerModal from './AiComposerModal.jsx';
 import { useData } from '../../context/DataContext.jsx';
 import { useToast } from '../../context/ToastProvider.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -40,6 +41,7 @@ export default function ReportFilingModal({ open, onClose, session }) {
   const [uploadStatus, setUploadStatus] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [aiComposerOpen, setAiComposerOpen] = useState(false);
   // Per-field autofill suggestions (localStorage), refreshed on open and after submit.
   const [history, setHistory] = useState({});
   const loadHistory = () => {
@@ -82,6 +84,7 @@ export default function ReportFilingModal({ open, onClose, session }) {
     setLink(src.link || '');
     setImages(Array.isArray(src.images) ? src.images.slice() : []);
     setUploadStatus('');
+    setAiComposerOpen(false);
     setBusy(false);
     setSavingDraft(false);
     setErrors({});
@@ -374,7 +377,13 @@ export default function ReportFilingModal({ open, onClose, session }) {
             <DatalistOptions id="report-hist-classDuration" values={history.classDuration} />
           </div>
           <div className="form-group">
-            <label>{t('report.memo')}</label>
+            <div className="report-memo-heading">
+              <label>{t('report.memo')}</label>
+              <button type="button" className="btn btn-outline btn-sm ai-compose-btn"
+                onClick={() => setAiComposerOpen(true)} title={t('ai.title')}>
+                <i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" /> {t('ai.button')}
+              </button>
+            </div>
             <div
               ref={editorRef}
               className={'report-editor' + (errors.content ? ' required-error' : '')}
@@ -384,6 +393,7 @@ export default function ReportFilingModal({ open, onClose, session }) {
               onInput={() => clearErr('content')}
               data-placeholder={t('reportM.editorPh')}
             ></div>
+            <div className="ai-composer-hint">{t('ai.editorHint')}</div>
           </div>
           <div className="form-group">
             <label>{t('reportM.images')}</label>
@@ -553,6 +563,8 @@ export default function ReportFilingModal({ open, onClose, session }) {
           </button>
         </div>
       </Modal>
+      <AiComposerModal open={open && aiComposerOpen} onClose={() => setAiComposerOpen(false)}
+        session={session} classDuration={classDuration} />
       <Lightbox src={lightbox} onClose={() => setLightbox(null)} />
     </>
   );

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@pauuu-demo/demo-shell": "0.2.0",
+    "openai": "7.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-router": "8.3.0"

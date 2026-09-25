@@ -1,11 +1,14 @@
 import { withSupabase } from "npm:@supabase/server@1.4.0";
 
 import { manilaLogicalDate } from "../_shared/manila-demo-dates.js";
+import { aiClassDuration, aiPromptNotes, aiUsage } from "./ai-composer.ts";
 
 const APP_ID = "cn";
 const ALLOWED_ORIGINS = new Set([
   "https://cn-demo.pauuu.dev",
   "https://pauuu-cn-demo.netlify.app",
+  "https://balisong-cn-demo.netlify.app",
+  "https://6ab691f7c052051f76c4e4df--pauuu-cn-demo.netlify.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ]);
@@ -649,6 +652,53 @@ async function requireReportScheduleAccess(
   return schedule;
 }
 
+async function aiComposerRoute(request: Request, path: string, database: any, session: Session) {
+  if (!["/ai/compose-report/prepare", "/ai/compose-report/usage"].includes(path)) return null;
+  requireStaff(session);
+  const quotaKey = `${session.user.role}:${session.user.id}`;
+  const period = new Date().toISOString().slice(0, 10);
+  const usageRow = await queryOne(database.from("ai_compose_usage")
+    .select("request_count").eq("quota_key", quotaKey).eq("period", period).maybeSingle());
+  const currentUsage = aiUsage(Number(usageRow?.request_count ?? 0));
+  if (path === "/ai/compose-report/usage") {
+    if (request.method !== "GET") throw new ApiError(405, "method_not_allowed");
+    return { usage: currentUsage };
+  }
+  if (request.method !== "POST") throw new ApiError(405, "method_not_allowed");
+  const body = await bodyJson(request);
+  const scheduleId = positiveId(body.schedule_id, "schedule_id");
+  const notes = requiredString(body.notes, "notes", 4000);
+  const schedule = await queryOne(database.from("schedules")
+    .select("id,teacher_id,student,date,timeslot").eq("id", scheduleId).maybeSingle());
+  if (!schedule) throw new ApiError(404, "schedule_not_found");
+  if (session.user.role === "teacher" && Number(schedule.teacher_id) !== session.user.id) {
+    throw new ApiError(403, "forbidden");
+  }
+  const student = requiredString(schedule.student, "student", 300);
+  const teacher = session.user.role === "teacher"
+    ? session.user.fullname
+    : String((await queryOne(database.from("teachers").select("fullname")
+      .eq("id", schedule.teacher_id).maybeSingle()))?.fullname ?? "");
+  const teacherName = requiredString(teacher, "teacher_name", 100);
+  const duration = aiClassDuration(body.class_duration, schedule.timeslot);
+  if (!duration) throw new ApiError(400, "invalid_class_duration");
+
+  const { data: claim, error: claimError } = await database.rpc("claim_ai_compose", {
+    p_role: session.user.role, p_user_id: session.user.id
+  });
+  if (claimError) throw new ApiError(503, "database_unavailable");
+  if (!claim?.allowed) {
+    throw new ApiError(429, claim?.reason === "cooldown" ? "ai_cooldown"
+      : claim?.global_exhausted ? "ai_demo_daily_limit" : "ai_daily_limit");
+  }
+
+  return {
+    notes: aiPromptNotes(notes, student, teacherName),
+    context: { student, teacherName, date: String(schedule.date), timeslot: String(schedule.timeslot), duration },
+    usage: aiUsage(Number(claim.used))
+  };
+}
+
 async function reportRoutes(request: Request, path: string, database: any, session: Session) {
   if (path === "/reports" && request.method === "GET") {
     const params = new URL(request.url).searchParams;
@@ -1187,6 +1237,8 @@ async function handle(request: Request, context: any) {
   if (accountResult !== null) return json(request, accountResult);
   const scheduleResult = await scheduleRoutes(request, path, database, session);
   if (scheduleResult !== null) return json(request, scheduleResult);
+  const aiResult = await aiComposerRoute(request, path, database, session);
+  if (aiResult !== null) return json(request, aiResult);
   const reportResult = await reportRoutes(request, path, database, session);
   if (reportResult !== null) return json(request, reportResult);
   const draftResult = await draftRoutes(request, path, database, session);

@@ -38,7 +38,10 @@ export async function apiFetch(path, method = 'GET', body = null, opts = {}) {
   if (authToken) fetchOpts.headers.Authorization = `Bearer ${authToken}`;
   if (body) fetchOpts.body = JSON.stringify(body);
 
-  const res = await fetch(WORKER_URL + path, fetchOpts);
+  const target = path.startsWith('/ai/compose-report')
+    ? '/api' + path
+    : WORKER_URL + path;
+  const res = await fetch(target, fetchOpts);
   const text = await res.text();
   let data = null;
   try {
