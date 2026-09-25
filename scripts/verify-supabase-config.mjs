@@ -191,7 +191,8 @@ async function main() {
     "20260730000100",
     "20260730000200",
     "20260808000100",
-    "20260808000200"
+    "20260808000200",
+    "20260925000100"
   ];
   const expectedPendingMigrationVersions = [];
   if (
