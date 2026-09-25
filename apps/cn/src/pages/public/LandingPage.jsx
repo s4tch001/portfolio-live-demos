@@ -55,7 +55,7 @@ export default function LandingPage() {
         {/* Hero */}
         <section className='landing-hero'>
           <div className='landing-hero-bg' aria-hidden='true'>
-            <DeferredBackgroundVideo />
+            <DeferredBackgroundVideo revealAfterPlaying />
           </div>
           <div className='landing-hero-inner'>
             <img

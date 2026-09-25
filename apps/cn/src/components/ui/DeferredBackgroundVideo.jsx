@@ -1,19 +1,20 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const VIDEO_SRC = '/assets/video/login-background.webm';
 const VIDEO_POSTER = '/assets/video/login-background-poster.webp';
 
 /**
- * Shows the video's real first frame immediately, then starts the decorative
- * animation after the visitor interacts. This keeps the same visual treatment
- * while preventing a background video from delaying the page's initial paint.
+ * Defers decorative playback until interaction. Landing pages can keep a
+ * static fallback visible until the first video frame is actually playing.
  */
-export default function DeferredBackgroundVideo({ id }) {
+export default function DeferredBackgroundVideo({ id, revealAfterPlaying = false }) {
   const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     let started = false;
     let fallbackTimer;
@@ -52,11 +53,13 @@ export default function DeferredBackgroundVideo({ id }) {
     <video
       id={id}
       ref={videoRef}
+      className={revealAfterPlaying && isPlaying ? 'deferred-background-video-playing' : undefined}
       muted
       loop
       playsInline
       preload="none"
-      poster={VIDEO_POSTER}
+      poster={revealAfterPlaying ? undefined : VIDEO_POSTER}
+      onPlaying={revealAfterPlaying ? () => setIsPlaying(true) : undefined}
     />
   );
 }

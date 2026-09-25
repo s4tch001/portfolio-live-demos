@@ -6,7 +6,7 @@ Resettable public demos for the projects featured on [pauuu.dev](https://pauuu.d
 
 | Demo | Public URL | Runtime/data model |
 | --- | --- | --- |
-| CN Class Management / Sunset-Speaks | [cn-demo.pauuu.dev](https://cn-demo.pauuu.dev) | React/Vite, Supabase Edge API, private CN schema and bounded Storage uploads |
+| CN Class Management / Sunset-Speaks | [cn-demo.pauuu.dev](https://cn-demo.pauuu.dev) | React/Vite, Supabase Edge API, private CN schema, bounded Storage uploads, and an AI report composer via Netlify AI Gateway |
 | RCMI Attendance Checker | [rcmi-demo.pauuu.dev](https://rcmi-demo.pauuu.dev) | React/Vite, Supabase Edge API, private directory and attendance schema |
 | Hours Tracker | [hours-demo.pauuu.dev](https://hours-demo.pauuu.dev) | Vanilla JavaScript/Vite, Supabase Edge API, session-isolated hour entries |
 | Payroll Splitter | [payroll-demo.pauuu.dev](https://payroll-demo.pauuu.dev) | Vanilla JavaScript/Vite, browser-only calculations |
@@ -20,6 +20,7 @@ The RCMI administrator preview is available at `/administrator`. Each demo displ
 - Shared `@pauuu-demo/demo-shell` notices with hide/show controls
 - Netlify-ready frontend builds for five custom demo subdomains
 - Supabase schemas, Edge Functions, and reset-coordinator tooling
+- A teacher-facing AI class-report composer for CN, served through a server-side Netlify Function and Netlify AI Gateway
 - Fictional seed data for CN Class Management and RCMI Attendance Checker
 - Daily reset behavior based on the Asia/Manila logical date
 - Security headers, robots policies, `llms.txt` files, and immutable caching for hashed assets
@@ -28,7 +29,9 @@ The demo metadata is intentionally kept per application: every app owns its titl
 
 ## Deployment status
 
-Deployment evidence is tracked in `config/deployment-state.json`. The recorded Phase 4.5 state confirms:
+Deployment evidence is tracked in `config/deployment-state.json`. Its Phase 4.5 entries document the original five-site rollout. Since then, CN moved to the separate `balisong-cn-demo` Netlify project and team; RCMI, Hours, Payroll, and Travels remain on the original Netlify team. Use the CN AI Composer guide for current CN hosting and integration details.
+
+The recorded Phase 4.5 baseline confirms:
 
 - Five Netlify sites and their `pauuu.dev` custom domains are configured.
 - HTTPS, custom domains, security headers, immutable assets, SPA routes, and app APIs have live-verification evidence.
@@ -42,6 +45,7 @@ Deployment evidence is tracked in `config/deployment-state.json`. The recorded P
 - React 19 for CN, RCMI, and Travels
 - Vanilla JavaScript for Hours and Payroll
 - Netlify for frontend hosting
+- Netlify AI Gateway for the CN report composer, called only from a Netlify Function
 - Supabase for database, Edge Functions, Storage, and scheduled reset jobs
 - Cloudflare DNS for the demo subdomains under `pauuu.dev`
 
@@ -111,4 +115,5 @@ npm.cmd run audit:netlify:live
 - Daily reset contract: `docs/architecture/reset-contract.md`
 - Source isolation rules: `config/source-import-policy.json`
 - Supabase setup and deployment history: `docs/supabase-setup.md` and `docs/supabase-deployment.md`
+- CN AI Composer behavior, privacy, limits, hosting, and local development: `docs/cn-ai-composer.md`
 - Preview baseline requirements: `specs/demo-preview-baselines.spec.md`
